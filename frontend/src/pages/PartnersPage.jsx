@@ -1,130 +1,218 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAvailablePartners, assignPartner } from '../services/api';
+import { getAvailablePartners, requestPartner } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Star } from 'lucide-react';
-
-function getInitials(name = '') {
-    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-}
+import { ArrowLeft, Star, Zap, Award, Clock, Send } from 'lucide-react';
 
 export default function PartnersPage() {
     const { orderId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const socket = useSocket();
+
     const [partners, setPartners] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [assigning, setAssigning] = useState(null);
+    const [requesting, setRequesting] = useState(false);
+    const [requestedPartnerId, setRequestedPartnerId] = useState(null);
+    const [requestedPartnerName, setRequestedPartnerName] = useState('');
+    const [waitingResponse, setWaitingResponse] = useState(false);
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const res = await getAvailablePartners(orderId);
-                setPartners(res.data.partners);
-            } catch {
-                toast.error('Failed to load delivery partners');
-            } finally {
-                setLoading(false);
-            }
-        };
-        load();
+    const fetchPartners = useCallback(async () => {
+        try {
+            const { data } = await getAvailablePartners(orderId);
+            setPartners(data.partners);
+        } catch {
+            toast.error('Failed to load partners');
+        } finally {
+            setLoading(false);
+        }
     }, [orderId]);
 
-    const handleSelect = async (partnerId) => {
-        setAssigning(partnerId);
+    useEffect(() => {
+        fetchPartners();
+    }, [fetchPartners]);
+
+    // Listen for partner's accept/decline response
+    useEffect(() => {
+        if (!socket || !user) return;
+
+        socket.emit('join_user_room', { userId: user._id });
+
+        socket.on('order_request_response', ({ order_id, response, partner, partnerName }) => {
+            if (order_id !== orderId) return;
+
+            if (response === 'accepted') {
+                toast.success(`${partner.name} accepted your request! Chat is open 🎉`);
+                navigate(`/chat/${orderId}`);
+            } else {
+                toast.error(`${partnerName} declined. Pick someone else.`);
+                setWaitingResponse(false);
+                setRequestedPartnerId(null);
+                setRequestedPartnerName('');
+                // Refresh partner list
+                fetchPartners();
+            }
+        });
+
+        return () => {
+            socket.off('order_request_response');
+        };
+    }, [socket, user, orderId, navigate, fetchPartners]);
+
+    const handleRequest = async (partner) => {
+        if (requesting) return;
+        setRequesting(true);
         try {
-            await assignPartner({ order_id: orderId, partner_id: partnerId });
-            toast.success('Delivery partner assigned! Chat started 💬');
-            navigate(`/order/${orderId}/chat`);
+            await requestPartner({ order_id: orderId, partner_id: partner._id });
+            setRequestedPartnerId(partner._id);
+            setRequestedPartnerName(partner.name);
+            setWaitingResponse(true);
+            toast.success(`Request sent to ${partner.name}! Waiting for response...`);
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to assign partner');
+            toast.error(err.response?.data?.message || 'Failed to send request');
         } finally {
-            setAssigning(null);
+            setRequesting(false);
         }
     };
 
+    const handleCancelRequest = () => {
+        setWaitingResponse(false);
+        setRequestedPartnerId(null);
+        setRequestedPartnerName('');
+        // Navigate back to let them create a new order or refresh
+        toast('Request cancelled. You can pick a different partner.');
+        fetchPartners();
+    };
+
+    const getMatchColor = (score) => {
+        if (score >= 85) return '#22c55e';
+        if (score >= 70) return '#f59e0b';
+        return '#6366f1';
+    };
+
     return (
-        <div className="page">
+        <div className="app-container">
             <div className="page-header">
-                <button className="btn btn-icon btn-ghost" onClick={() => navigate('/')}><ArrowLeft size={20} /></button>
+                <button className="btn-icon" onClick={() => navigate(-1)}>
+                    <ArrowLeft size={20} />
+                </button>
                 <div>
-                    <h1 className="page-title">Choose Delivery Partner</h1>
-                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                        {partners.length} available · AI-ranked for you
-                    </p>
+                    <h1>Pick Your Partner</h1>
+                    <p className="subtitle">Choose who delivers your order</p>
                 </div>
             </div>
 
             <div className="page-content">
+                {/* Waiting overlay */}
+                {waitingResponse && (
+                    <div className="card" style={{
+                        background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                        color: '#fff',
+                        textAlign: 'center',
+                        marginBottom: '1.5rem',
+                        padding: '2rem',
+                    }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>⏳</div>
+                        <h2 style={{ marginBottom: '0.5rem' }}>Waiting for {requestedPartnerName}...</h2>
+                        <p style={{ opacity: 0.85, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                            They'll accept or decline your request shortly
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+                            <div className="typing-dot" style={{ background: '#fff' }}></div>
+                            <div className="typing-dot" style={{ background: '#fff', animationDelay: '0.2s' }}></div>
+                            <div className="typing-dot" style={{ background: '#fff', animationDelay: '0.4s' }}></div>
+                        </div>
+                        <button
+                            className="btn btn-secondary"
+                            onClick={handleCancelRequest}
+                            style={{ marginTop: '1.5rem', background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff' }}
+                        >
+                            Cancel & Pick Someone Else
+                        </button>
+                    </div>
+                )}
+
                 {loading ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 120, borderRadius: 16 }} />)}
+                    <div className="loading-spinner">
+                        <div className="spinner"></div>
+                        <p>Finding partners near you...</p>
                     </div>
                 ) : partners.length === 0 ? (
                     <div className="empty-state">
-                        <div className="empty-state-icon">😔</div>
-                        <p className="empty-state-title">No partners available</p>
-                        <p className="empty-state-sub">No one is online right now. Try again in a few minutes!</p>
-                        <button className="btn btn-outline" style={{ marginTop: 20 }} onClick={() => window.location.reload()}>
-                            🔄 Refresh
-                        </button>
+                        <div style={{ fontSize: '3rem' }}>😴</div>
+                        <h3>No partners online</h3>
+                        <p>No delivery partners are available right now. Try again in a few minutes!</p>
+                        <button className="btn btn-primary" onClick={fetchPartners}>Refresh</button>
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        {partners.map((p, i) => (
-                            <div key={p._id} className={`partner-card fade-in ${p.best_match ? 'best' : ''}`}
-                                style={{ animationDelay: `${i * 0.08}s` }}>
-                                <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                                    <div className="avatar avatar-lg">{getInitials(p.name)}</div>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                                            <div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                    <h3 style={{ fontSize: 16 }}>{p.name}</h3>
-                                                    {p.best_match && <span className="badge badge-primary">⚡ Best Match</span>}
-                                                </div>
-                                                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                                                    {p.enrollment_no} · {p.hostel} Room {p.room_no}
-                                                </p>
+                    <>
+                        <p className="section-label">{partners.length} partner{partners.length > 1 ? 's' : ''} available</p>
+                        <div className="partners-list">
+                            {partners.map((partner, idx) => (
+                                <div key={partner._id} className={`card partner-card ${idx === 0 ? 'best-match' : ''}`}>
+                                    {idx === 0 && (
+                                        <div className="best-match-badge">
+                                            <Award size={12} /> Best Match
+                                        </div>
+                                    )}
+
+                                    <div className="partner-header">
+                                        <div className="partner-avatar">
+                                            {partner.name?.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="partner-info">
+                                            <h3>{partner.name}</h3>
+                                            <p>{partner.hostel} · Room {partner.room_no}</p>
+                                            <div className="partner-badges">
+                                                <span className="badge badge-primary">
+                                                    <Star size={10} fill="currentColor" /> {partner.rating?.toFixed(1)}
+                                                </span>
+                                                <span className="badge badge-secondary">
+                                                    <Zap size={10} /> {partner.total_deliveries} deliveries
+                                                </span>
                                             </div>
                                         </div>
-
-                                        <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                <Star size={14} style={{ color: '#F59E0B', fill: '#F59E0B' }} />
-                                                <span style={{ fontWeight: 700, fontSize: 14 }}>{p.rating?.toFixed(1)}</span>
-                                            </div>
-                                            <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                                                📦 {p.total_deliveries} deliveries
-                                            </span>
-                                            <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                                                ⚡ ~{Math.round(p.avg_response_time || 5)} min
-                                            </span>
+                                        <div className="match-score" style={{ color: getMatchColor(partner.matchScore) }}>
+                                            <div className="match-percent">{partner.matchScore}%</div>
+                                            <div style={{ fontSize: '0.65rem', opacity: 0.8 }}>match</div>
                                         </div>
-
-                                        {/* AI Score bar */}
-                                        <div style={{ marginBottom: 14 }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                                <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>AI Match Score</span>
-                                                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)' }}>{Math.round((p.ai_score || 0) * 100)}%</span>
-                                            </div>
-                                            <div style={{ height: 6, background: 'var(--bg)', borderRadius: 3, overflow: 'hidden' }}>
-                                                <div style={{ height: '100%', width: `${(p.ai_score || 0) * 100}%`, background: 'linear-gradient(90deg, var(--primary), var(--secondary))', borderRadius: 3 }} />
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            className="btn btn-primary btn-sm btn-w-full"
-                                            onClick={() => handleSelect(p._id)}
-                                            disabled={assigning === p._id}>
-                                            {assigning === p._id ? '⏳ Assigning...' : '✅ Select Partner'}
-                                        </button>
                                     </div>
+
+                                    <div className="match-bar-container">
+                                        <div className="match-bar-label">
+                                            <Clock size={11} /> ~{partner.avg_response_time?.toFixed(0)} min avg response
+                                        </div>
+                                        <div className="match-bar-track">
+                                            <div
+                                                className="match-bar-fill"
+                                                style={{
+                                                    width: `${partner.matchScore}%`,
+                                                    background: getMatchColor(partner.matchScore),
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        className="btn btn-primary"
+                                        style={{ width: '100%', marginTop: '1rem' }}
+                                        onClick={() => handleRequest(partner)}
+                                        disabled={requesting || waitingResponse}
+                                    >
+                                        {requestedPartnerId === partner._id ? (
+                                            '⏳ Waiting for response...'
+                                        ) : waitingResponse ? (
+                                            'Waiting for another partner...'
+                                        ) : (
+                                            <><Send size={14} style={{ marginRight: 6 }} /> Send Request</>
+                                        )}
+                                    </button>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
         </div>

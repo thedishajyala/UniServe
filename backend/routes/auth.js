@@ -5,7 +5,7 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-const UNIVERSITY_DOMAIN = process.env.UNIVERSITY_EMAIL_DOMAIN || 'bmu.edu.in';
+const UNIVERSITY_DOMAIN = process.env.UNIVERSITY_EMAIL_DOMAIN || 'bennett.edu.in';
 
 function generateToken(id) {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });

@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { toggleAvailability, getMyOrders, getDemandAnalytics } from '../services/api';
+import { useSocket } from '../context/SocketContext';
+import { toggleAvailability, getMyOrders, getDemandAnalytics, getIncomingRequests, respondToOrder, getMyDeliveries } from '../services/api';
 import toast from 'react-hot-toast';
-import { Home, Package, TrendingUp, User } from 'lucide-react';
+import { Home, Package, TrendingUp, User, CheckCircle, XCircle, Bell } from 'lucide-react';
+import { useNotifications } from '../hooks/useNotifications';
 
 function BottomNav() {
     const { logoutUser } = useAuth();
@@ -19,26 +21,90 @@ function BottomNav() {
 }
 
 function statusBadge(status) {
-    const map = { pending: '⏳ Pending', accepted: '✅ Accepted', picked: '📦 Picked', on_the_way: '🚗 On Way', delivered: '🎉 Delivered', cancelled: '❌ Cancelled' };
+    const map = {
+        pending: '⏳ Pending',
+        requested: '📨 Requested',
+        accepted: '✅ Accepted',
+        picked: '📦 Picked',
+        on_the_way: '🚗 On Way',
+        delivered: '🎉 Delivered',
+        cancelled: '❌ Cancelled',
+    };
     return <span className={`badge status-${status} badge-sm`} style={{ fontSize: 11, padding: '3px 10px' }}>{map[status] || status}</span>;
 }
 
 export default function HomePage() {
     const { user, updateUser } = useAuth();
+    const socket = useSocket();
+    const { requestPermission, notify } = useNotifications();
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [demand, setDemand] = useState(null);
     const [togglingAvail, setTogglingAvail] = useState(false);
+    const [incomingRequests, setIncomingRequests] = useState([]);
+    const [respondingTo, setRespondingTo] = useState(null);
+    const [activeDeliveries, setActiveDeliveries] = useState([]);
 
     const loadData = useCallback(async () => {
         try {
-            const [ordersRes, demandRes] = await Promise.all([getMyOrders(), getDemandAnalytics()]);
+            const [ordersRes, demandRes, deliveriesRes] = await Promise.all([
+                getMyOrders(), getDemandAnalytics(), getMyDeliveries()
+            ]);
             setOrders(ordersRes.data.slice(0, 5));
             setDemand(demandRes.data);
+            // Show only active (accepted/picked/on_the_way) deliveries
+            setActiveDeliveries(deliveriesRes.data.filter(d =>
+                ['accepted', 'picked', 'on_the_way'].includes(d.status)
+            ));
         } catch { }
     }, []);
 
+    // Fetch incoming requests (for delivery partners)
+    const loadIncomingRequests = useCallback(async () => {
+        if (!user?.is_available) return;
+        try {
+            const { data } = await getIncomingRequests();
+            setIncomingRequests(data);
+        } catch { }
+    }, [user?.is_available]);
+
     useEffect(() => { loadData(); }, [loadData]);
+    useEffect(() => { loadIncomingRequests(); }, [loadIncomingRequests]);
+
+    // Request notification permission on first load
+    useEffect(() => { requestPermission(); }, [requestPermission]);
+
+    // Socket: join personal room and listen for incoming requests
+    useEffect(() => {
+        if (!socket || !user) return;
+
+        socket.emit('join_user_room', { userId: user._id });
+
+        socket.on('incoming_order_request', (data) => {
+            setIncomingRequests((prev) => {
+                if (prev.find((r) => r._id === data.order?._id)) return prev;
+                return [data, ...prev];
+            });
+            toast('📨 New delivery request!', { icon: '🛵', duration: 5000 });
+            notify('🛵 New Delivery Request!', `Earn ₹${data.order?.delivery_earning} — from ${data.requester?.name}`, '/');
+        });
+
+        socket.on('order_request_response', ({ order_id, response, partner, partnerName }) => {
+            if (response === 'accepted') {
+                notify('✅ Partner Accepted!', `${partner?.name} is on the way`, `/chat/${order_id}`);
+            } else {
+                notify('❌ Partner Declined', `${partnerName} declined your request. Pick someone else!`, '/');
+            }
+        });
+
+        socket.on('order_cancelled', ({ cancelled_by, reason }) => {
+            notify('🚫 Order Cancelled', `${cancelled_by}: ${reason}`, '/');
+        });
+
+        return () => {
+            socket.off('incoming_order_request');
+        };
+    }, [socket, user]);
 
     const handleToggleAvail = async () => {
         setTogglingAvail(true);
@@ -46,10 +112,33 @@ export default function HomePage() {
             const res = await toggleAvailability();
             updateUser({ is_available: res.data.is_available });
             toast.success(res.data.message);
+            if (res.data.is_available) loadIncomingRequests();
+            else setIncomingRequests([]);
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to toggle');
         } finally {
             setTogglingAvail(false);
+        }
+    };
+
+    const handleRespond = async (orderId, response, partnerName) => {
+        setRespondingTo(orderId + response);
+        try {
+            await respondToOrder({ order_id: orderId, response });
+            if (response === 'accepted') {
+                toast.success('Order accepted! Chat is now open 🎉');
+                navigate(`/chat/${orderId}`);
+            } else {
+                toast('Request declined.');
+                setIncomingRequests((prev) => prev.filter((r) => {
+                    const id = r._id || r.order?._id;
+                    return id !== orderId;
+                }));
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to respond');
+        } finally {
+            setRespondingTo(null);
         }
     };
 
@@ -68,6 +157,142 @@ export default function HomePage() {
             </div>
 
             <div className="page-content" style={{ marginTop: -32 }}>
+
+                {/* ── INCOMING REQUESTS PANEL (partner only, when online) ── */}
+                {user?.is_available && incomingRequests.length > 0 && (
+                    <div style={{ marginBottom: 20 }}>
+                        <div className="section-header">
+                            <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Bell size={16} color="var(--primary)" /> Incoming Requests
+                                <span style={{
+                                    background: 'var(--primary)', color: '#fff',
+                                    borderRadius: '50%', fontSize: 11, fontWeight: 700,
+                                    width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    {incomingRequests.length}
+                                </span>
+                            </h3>
+                        </div>
+
+                        {incomingRequests.map((req) => {
+                            // req can be a raw Order doc (from REST poll) OR socket payload { order, requester }
+                            const order = req.order || req;
+                            const requester = req.requester || req.user_id;
+                            const orderId = order._id;
+
+                            return (
+                                <div key={orderId} className="card" style={{
+                                    marginBottom: 12,
+                                    border: '2px solid var(--primary)',
+                                    background: 'linear-gradient(135deg, rgba(79,70,229,0.05), rgba(124,58,237,0.05))',
+                                }}>
+                                    {/* Requester info */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                                        <div style={{
+                                            width: 40, height: 40, borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            color: '#fff', fontWeight: 700, fontSize: 16,
+                                        }}>
+                                            {(requester?.name || 'U').charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p style={{ fontWeight: 700, fontSize: 14 }}>{requester?.name || 'Student'}</p>
+                                            <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                                                {requester?.hostel} · Room {requester?.room_no}
+                                            </p>
+                                        </div>
+                                        <span style={{
+                                            marginLeft: 'auto', background: 'var(--primary)',
+                                            color: '#fff', borderRadius: 8, padding: '4px 10px',
+                                            fontSize: 13, fontWeight: 700,
+                                        }}>
+                                            +₹{order.delivery_earning}
+                                        </span>
+                                    </div>
+
+                                    {/* Order details */}
+                                    <div style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Pickup</span>
+                                            <span style={{ fontSize: 13, fontWeight: 600 }}>{order.pickup_location}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Deliver to</span>
+                                            <span style={{ fontSize: 13, fontWeight: 600 }}>{order.delivery_hostel} · Room {order.delivery_room}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Items</span>
+                                            <span style={{ fontSize: 13, fontWeight: 600 }}>{order.item_details?.slice(0, 30)}{order.item_details?.length > 30 ? '...' : ''}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Accept / Decline */}
+                                    <div style={{ display: 'flex', gap: 10 }}>
+                                        <button
+                                            className="btn btn-primary"
+                                            style={{ flex: 1, background: '#22c55e', borderColor: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                                            onClick={() => handleRespond(orderId, 'accepted')}
+                                            disabled={respondingTo !== null}
+                                        >
+                                            <CheckCircle size={16} />
+                                            {respondingTo === orderId + 'accepted' ? 'Accepting...' : 'Accept'}
+                                        </button>
+                                        <button
+                                            className="btn btn-secondary"
+                                            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#ef4444', borderColor: '#ef4444' }}
+                                            onClick={() => handleRespond(orderId, 'declined')}
+                                            disabled={respondingTo !== null}
+                                        >
+                                            <XCircle size={16} />
+                                            {respondingTo === orderId + 'declined' ? 'Declining...' : 'Decline'}
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                {/* ── ACTIVE DELIVERIES PANEL (partner's ongoing deliveries) ── */}
+                {activeDeliveries.length > 0 && (
+                    <div style={{ marginBottom: 20 }}>
+                        <div className="section-header">
+                            <h3 className="section-title">🚴 Active Deliveries</h3>
+                        </div>
+                        {activeDeliveries.map((delivery) => (
+                            <div key={delivery._id} className="card" style={{
+                                marginBottom: 12,
+                                border: '2px solid #22c55e',
+                                background: 'linear-gradient(135deg, rgba(34,197,94,0.05), rgba(16,185,129,0.05))',
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                    <div>
+                                        <p style={{ fontWeight: 700, fontSize: 14 }}>{delivery.pickup_location} → {delivery.delivery_hostel}</p>
+                                        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Room {delivery.delivery_room}</p>
+                                    </div>
+                                    <span style={{
+                                        background: '#22c55e22', color: '#16a34a',
+                                        borderRadius: 8, padding: '4px 10px', fontSize: 12, fontWeight: 700,
+                                    }}>
+                                        {delivery.status === 'accepted' ? '✅ Accepted' : delivery.status === 'picked' ? '📦 Picked' : '🚗 On the Way'}
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                    <button className="btn btn-primary" style={{ flex: 1, fontSize: 13 }}
+                                        onClick={() => navigate(`/chat/${delivery._id}`)}>
+                                        💬 Open Chat
+                                    </button>
+                                    <button className="btn btn-secondary" style={{ flex: 1, fontSize: 13 }}
+                                        onClick={() => navigate(`/order/${delivery._id}/track`)}>
+                                        📍 Track
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 {/* Demand Banner */}
                 {demand?.isCurrentlyPeak && (
                     <div className="demand-banner fade-in" style={{ marginBottom: 20 }}>
@@ -144,7 +369,11 @@ export default function HomePage() {
                     ) : (
                         orders.map((order) => (
                             <div key={order._id} className="order-card" style={{ cursor: 'pointer' }}
-                                onClick={() => navigate(order.status === 'delivered' ? `/order/${order._id}/review` : `/order/${order._id}/track`)}>
+                                onClick={() => navigate(
+                                    order.status === 'delivered' ? `/order/${order._id}/review` :
+                                        order.status === 'accepted' ? `/chat/${order._id}` :
+                                            `/order/${order._id}/track`
+                                )}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                                     <div>
                                         <p style={{ fontWeight: 600, fontSize: 14 }}>{order.pickup_location}</p>

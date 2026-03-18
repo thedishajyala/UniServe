@@ -12,10 +12,20 @@ const messageSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
+        // type: 'text' | 'image' | 'location'
+        type: {
+            type: String,
+            enum: ['text', 'image', 'location'],
+            default: 'text',
+        },
         content: {
             type: String,
-            required: true,
-            maxlength: 1000,
+            default: '',
+            maxlength: 2000,
+        },
+        image_url: {
+            type: String,
+            default: null,
         },
         read: {
             type: Boolean,

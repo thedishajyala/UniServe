@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getOrderById, updateOrderStatus } from '../services/api';
+import { getOrderById, updateOrderStatus, cancelOrder } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { ORDER_STATUSES } from '../config/campus';
@@ -19,6 +19,7 @@ export default function TrackingPage() {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
 
     const loadOrder = useCallback(async () => {
         try {
@@ -35,11 +36,19 @@ export default function TrackingPage() {
 
     useEffect(() => {
         if (!socket || !user) return;
+        socket.emit('join_user_room', { userId: user._id });
         socket.emit('join_order_room', { orderId, userId: user._id });
         socket.on('order_status_changed', ({ status }) => {
             setOrder((o) => o ? { ...o, status } : o);
         });
-        return () => socket.off('order_status_changed');
+        socket.on('order_cancelled', ({ cancelled_by, reason }) => {
+            toast.error(`Order cancelled by ${cancelled_by}: ${reason}`);
+            setOrder((o) => o ? { ...o, status: 'cancelled' } : o);
+        });
+        return () => {
+            socket.off('order_status_changed');
+            socket.off('order_cancelled');
+        };
     }, [socket, orderId, user]);
 
     const handleUpdateStatus = async (newStatus) => {
@@ -56,6 +65,21 @@ export default function TrackingPage() {
             toast.error(err.response?.data?.message || 'Failed to update');
         } finally {
             setUpdating(false);
+        }
+    };
+
+    const handleCancel = async () => {
+        const reason = window.prompt('Reason for cancellation? (optional)');
+        if (reason === null) return; // user hit Cancel on prompt
+        setCancelling(true);
+        try {
+            await cancelOrder({ order_id: orderId, reason: reason || 'No reason given' });
+            toast.success('Order cancelled');
+            setOrder((o) => o ? { ...o, status: 'cancelled' } : o);
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to cancel');
+        } finally {
+            setCancelling(false);
         }
     };
 
@@ -84,7 +108,7 @@ export default function TrackingPage() {
             <div className="page-header">
                 <button className="btn btn-icon btn-ghost" onClick={() => navigate('/')}><ArrowLeft size={20} /></button>
                 <h1 className="page-title">Order Tracking</h1>
-                <button className="btn btn-icon btn-ghost" onClick={() => navigate(`/order/${orderId}/chat`)}>
+                <button className="btn btn-icon btn-ghost" onClick={() => navigate(`/chat/${orderId}`)}>
                     <MessageCircle size={20} />
                 </button>
             </div>
@@ -124,7 +148,7 @@ export default function TrackingPage() {
                                 </p>
                             </div>
                             <button className="btn btn-outline btn-sm" style={{ marginLeft: 'auto' }}
-                                onClick={() => navigate(`/order/${orderId}/chat`)}>
+                                onClick={() => navigate(`/chat/${orderId}`)}>
                                 💬 Chat
                             </button>
                         </div>
@@ -150,7 +174,7 @@ export default function TrackingPage() {
                     </div>
                 </div>
 
-                {/* Partner Action Buttons */}
+                {/* Partner Action: update status */}
                 {isPartner && nextStatusMap[order.status] && (
                     <button className="btn btn-success btn-w-full btn-lg"
                         onClick={() => handleUpdateStatus(nextStatusMap[order.status])}
@@ -159,11 +183,23 @@ export default function TrackingPage() {
                     </button>
                 )}
 
-                {/* Owner: go to review after delivered */}
+                {/* Owner: leave review after delivery */}
                 {isOwner && order.status === 'delivered' && (
                     <button className="btn btn-primary btn-w-full btn-lg"
                         onClick={() => navigate(`/order/${orderId}/review`)}>
                         ⭐ Leave a Review
+                    </button>
+                )}
+
+                {/* Cancel button — requester or partner, only for cancellable statuses */}
+                {(isOwner || isPartner) && ['pending', 'requested', 'accepted'].includes(order.status) && (
+                    <button
+                        className="btn btn-w-full"
+                        onClick={handleCancel}
+                        disabled={cancelling}
+                        style={{ marginTop: 10, background: 'transparent', border: '1.5px solid #ef4444', color: '#ef4444', fontWeight: 600 }}
+                    >
+                        {cancelling ? '⏳ Cancelling...' : '❌ Cancel Order'}
                     </button>
                 )}
             </div>

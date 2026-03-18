@@ -24,7 +24,10 @@ export const getEarnings = () => API.get('/users/earnings');
 // Orders
 export const createOrder = (data) => API.post('/orders/create', data);
 export const getAvailablePartners = (orderId) => API.get(`/orders/partners/${orderId}`);
-export const assignPartner = (data) => API.post('/orders/assign', data);
+export const requestPartner = (data) => API.post('/orders/request', data);       // Requester → request a partner
+export const respondToOrder = (data) => API.post('/orders/respond', data);        // Partner → accept or decline
+export const getIncomingRequests = () => API.get('/orders/incoming');              // Partner → see requests sent to them
+export const cancelOrder = (data) => API.post('/orders/cancel', data);        // Cancel an order
 export const updateOrderStatus = (data) => API.post('/orders/status', data);
 export const getMyOrders = () => API.get('/orders/my-orders');
 export const getMyDeliveries = () => API.get('/orders/my-deliveries');
@@ -39,5 +42,8 @@ export const getDemandAnalytics = () => API.get('/analytics/demand');
 
 // Messages
 export const getMessages = (orderId) => API.get(`/messages/order/${orderId}`);
+export const uploadImage = (formData) => API.post('/messages/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+});
 
 export default API;

@@ -27,12 +27,12 @@ const userSchema = new mongoose.Schema(
     },
     hostel: {
       type: String,
-      required: [true, 'Hostel is required'],
-      // Boys: C1-C15, Girls: D1-D6
+      default: '',
+      // Boys: C1-C15, Girls: D1-D6 — set during profile setup
     },
     room_no: {
       type: String,
-      required: [true, 'Room number is required'],
+      default: '',
     },
     profile_complete: {
       type: Boolean,

@@ -42,7 +42,7 @@ export function getPricing(pickupType, pickupLocation) {
     return PRICING.gate3; // manual = ₹29
 }
 
-export const UNIVERSITY_DOMAIN = 'bmu.edu.in';
+export const UNIVERSITY_DOMAIN = 'bennett.edu.in';
 
 export const ORDER_STATUSES = [
     { key: 'accepted', label: 'Accepted', icon: '✅' },

@@ -12,6 +12,11 @@ const orderSchema = new mongoose.Schema(
             ref: 'User',
             default: null,
         },
+        requested_partner_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
 
         // Pickup
         pickup_type: {
@@ -62,7 +67,7 @@ const orderSchema = new mongoose.Schema(
         // Status
         status: {
             type: String,
-            enum: ['pending', 'accepted', 'picked', 'on_the_way', 'delivered', 'cancelled'],
+            enum: ['pending', 'requested', 'accepted', 'picked', 'on_the_way', 'delivered', 'cancelled'],
             default: 'pending',
         },
         payment_status: {
