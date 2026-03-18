@@ -25,7 +25,8 @@ export const BOYS_HOSTELS = [
 
 export const GIRLS_HOSTELS = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6'];
 
-export const ALL_HOSTELS = [...BOYS_HOSTELS, ...GIRLS_HOSTELS];
+export const HOSTELS = [...BOYS_HOSTELS, ...GIRLS_HOSTELS];
+export const ALL_HOSTELS = HOSTELS;
 
 // Pricing
 export const PRICING = {

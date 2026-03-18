@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
 });
 
 // Attach JWT token to every request
@@ -20,6 +20,7 @@ export const getProfile = () => API.get('/users/profile');
 export const updateProfile = (data) => API.put('/users/profile', data);
 export const toggleAvailability = () => API.post('/users/toggle-availability');
 export const getEarnings = () => API.get('/users/earnings');
+export const getOnlinePartners = () => API.get('/users/online');
 
 // Orders
 export const createOrder = (data) => API.post('/orders/create', data);

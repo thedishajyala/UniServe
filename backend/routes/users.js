@@ -100,4 +100,16 @@ router.get('/earnings', protect, async (req, res) => {
     }
 });
 
+// GET /api/users/online
+router.get('/online', protect, async (req, res) => {
+    try {
+        const users = await User.find({ is_available: true, _id: { $ne: req.user._id } })
+            .limit(3)
+            .select('name rating hostel');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;

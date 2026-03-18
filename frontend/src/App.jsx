@@ -13,6 +13,7 @@ import ChatPage from './pages/ChatPage';
 import TrackingPage from './pages/TrackingPage';
 import ReviewPage from './pages/ReviewPage';
 import EarningsPage from './pages/EarningsPage';
+import ProfilePage from './pages/ProfilePage';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -42,9 +43,10 @@ function AppRoutes() {
       <Route path="/login" element={<AuthRoute><LoginPage /></AuthRoute>} />
       <Route path="/setup" element={<ProfileSetupPage />} />
       <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/order/create" element={<ProtectedRoute><CreateOrderPage /></ProtectedRoute>} />
       <Route path="/order/:orderId/partners" element={<ProtectedRoute><PartnersPage /></ProtectedRoute>} />
-      <Route path="/order/:orderId/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+      <Route path="/chat/:orderId" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
       <Route path="/order/:orderId/track" element={<ProtectedRoute><TrackingPage /></ProtectedRoute>} />
       <Route path="/order/:orderId/review" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
       <Route path="/earnings" element={<ProtectedRoute><EarningsPage /></ProtectedRoute>} />

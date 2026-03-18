@@ -2,20 +2,30 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { toggleAvailability, getMyOrders, getDemandAnalytics, getIncomingRequests, respondToOrder, getMyDeliveries } from '../services/api';
+import { toggleAvailability, getMyOrders, getDemandAnalytics, getIncomingRequests, respondToOrder, getMyDeliveries, getOnlinePartners } from '../services/api';
 import toast from 'react-hot-toast';
-import { Home, Package, TrendingUp, User, CheckCircle, XCircle, Bell } from 'lucide-react';
+import { Home, Package, TrendingUp, User, CheckCircle, XCircle, Bell, ArrowRight, Star } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 
 function BottomNav() {
-    const { logoutUser } = useAuth();
-    const navigate = useNavigate();
     return (
         <nav className="bottom-nav">
-            <Link to="/" className="nav-item active"><Home /><span className="nav-label">Home</span></Link>
-            <Link to="/order/create" className="nav-item"><Package /><span className="nav-label">Order</span></Link>
-            <Link to="/earnings" className="nav-item"><TrendingUp /><span className="nav-label">Earnings</span></Link>
-            <button className="nav-item" onClick={() => { logoutUser(); navigate('/login'); }}><User /><span className="nav-label">Logout</span></button>
+            <Link to="/" className="nav-item active">
+                <div className="nav-icon-wrapper active-pill"><Home size={20} /></div>
+                <span className="nav-label">Home</span>
+            </Link>
+            <Link to="/order/create" className="nav-item">
+                <div className="nav-icon-wrapper"><Package size={20} /></div>
+                <span className="nav-label">Order</span>
+            </Link>
+            <Link to="/earnings" className="nav-item">
+                <div className="nav-icon-wrapper"><TrendingUp size={20} /></div>
+                <span className="nav-label">Earnings</span>
+            </Link>
+            <Link to="/profile" className="nav-item">
+                <div className="nav-icon-wrapper"><User size={20} /></div>
+                <span className="nav-label">Profile</span>
+            </Link>
         </nav>
     );
 }
@@ -45,17 +55,17 @@ export default function HomePage() {
     const [respondingTo, setRespondingTo] = useState(null);
     const [activeDeliveries, setActiveDeliveries] = useState([]);
 
+    const [onlinePartners, setOnlinePartners] = useState([]);
+
     const loadData = useCallback(async () => {
         try {
-            const [ordersRes, demandRes, deliveriesRes] = await Promise.all([
-                getMyOrders(), getDemandAnalytics(), getMyDeliveries()
+            const [ordersRes, demandRes, deliveriesRes, partnersRes] = await Promise.all([
+                getMyOrders(), getDemandAnalytics(), getMyDeliveries(), getOnlinePartners().catch(() => ({ data: [] }))
             ]);
             setOrders(ordersRes.data.slice(0, 5));
             setDemand(demandRes.data);
-            // Show only active (accepted/picked/on_the_way) deliveries
-            setActiveDeliveries(deliveriesRes.data.filter(d =>
-                ['accepted', 'picked', 'on_the_way'].includes(d.status)
-            ));
+            setActiveDeliveries(deliveriesRes.data.filter(d => ['accepted', 'picked', 'on_the_way'].includes(d.status)));
+            setOnlinePartners(partnersRes.data || []);
         } catch { }
     }, []);
 
@@ -145,14 +155,23 @@ export default function HomePage() {
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Hero Header */}
-            <div className="gradient-hero" style={{ padding: '40px 24px 60px', textAlign: 'left', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
-                <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, marginBottom: 4 }}>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'} 👋</p>
-                <h1 style={{ color: 'white', fontSize: 28, marginBottom: 4 }}>{user?.name?.split(' ')[0]}</h1>
-                <div className="glass" style={{ display: 'inline-flex', gap: 12, padding: '8px 16px', marginTop: 12 }}>
-                    <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13 }}>🏠 {user?.hostel} · Room {user?.room_no}</span>
-                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>|</span>
-                    <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13 }}>⭐ {user?.rating?.toFixed(1) || '5.0'}</span>
+            <div className="gradient-hero" style={{ padding: '32px 24px 50px', textAlign: 'left', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: -30, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, marginBottom: 2, fontWeight: 500 }}>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'} 👋</p>
+                    <h1 style={{ color: 'white', fontSize: 26, marginBottom: 6, letterSpacing: '-0.5px' }}>{user?.name?.split(' ')[0]}</h1>
+                    <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14, fontWeight: 500, marginBottom: 12 }}>Ready to order or earn today?</p>
+                    
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <div className="glass" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 12 }}>
+                            <span style={{ fontSize: 13 }}>🏠</span>
+                            <span style={{ color: 'rgba(255,255,255,0.95)', fontSize: 13, fontWeight: 600 }}>{user?.hostel} · Room {user?.room_no}</span>
+                        </div>
+                        <div className="glass trust-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 12, cursor: 'pointer', transition: 'transform 0.2s', ':active': { transform: 'scale(0.95)' } }} onClick={() => navigate('/profile')}>
+                            <Star size={14} color="#FBBF24" fill="#FBBF24" />
+                            <span style={{ color: 'rgba(255,255,255,0.95)', fontSize: 13, fontWeight: 700 }}>{user?.rating?.toFixed(1) || '5.0'} Rating</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -293,50 +312,64 @@ export default function HomePage() {
                     </div>
                 )}
 
-                {/* Demand Banner */}
+                {/* Demand Banner Moved to Top */}
                 {demand?.isCurrentlyPeak && (
-                    <div className="demand-banner fade-in" style={{ marginBottom: 20 }}>
-                        <span style={{ fontSize: 24 }}>🔥</span>
-                        <div>
-                            <p style={{ fontWeight: 700, fontSize: 14 }}>High Demand Right Now!</p>
-                            <p style={{ fontWeight: 500, fontSize: 12, opacity: 0.9 }}>Go online to earn more 💸</p>
-                        </div>
+                    <div className="demand-pill fade-in" style={{ 
+                        margin: '-20px auto 20px', width: '90%', background: 'linear-gradient(135deg, #F59E0B, #D97706)', 
+                        color: 'white', padding: '10px 16px', borderRadius: 999, display: 'flex', alignItems: 'center', 
+                        justifyContent: 'center', gap: 8, fontWeight: 600, fontSize: 13, position: 'relative', zIndex: 2,
+                        boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)'
+                    }}>
+                        <span>🔥</span> High Demand — Earn more right now
                     </div>
                 )}
 
                 {/* Main Actions */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-                    <button className="card" style={{ border: 'none', cursor: 'pointer', padding: 20, textAlign: 'left', background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', color: 'white' }}
-                        onClick={() => navigate('/order/create')}>
-                        <div style={{ fontSize: 32, marginBottom: 10 }}>📦</div>
-                        <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 15 }}>Create Order</div>
-                        <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>Request a delivery</div>
-                    </button>
-
-                    <div className="toggle-wrapper" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 12, padding: 20 }}>
-                        <div style={{ fontSize: 32 }}>{user?.is_available ? '🟢' : '🔴'}</div>
-                        <div>
-                            <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 14 }}>
-                                {user?.is_available ? 'Online' : 'Offline'}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12, marginBottom: 24, padding: '0 4px' }}>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                        <button className="card action-card premium-card" style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 22, background: 'linear-gradient(145deg, #4F46E5, #6366f1)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden' }}
+                            onClick={() => navigate('/order/create')}>
+                            <div style={{ position: 'absolute', right: -20, bottom: -20, opacity: 0.1, transform: 'scale(1.5)' }}>
+                                <Package size={100} />
                             </div>
-                            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Delivery mode</div>
+                            <div style={{ background: 'rgba(255,255,255,0.2)', padding: 10, borderRadius: 12, marginBottom: 16 }}>
+                                <Package size={24} color="white" />
+                            </div>
+                            <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 18, marginBottom: 4 }}>Create Order</div>
+                            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                Fast delivery <ArrowRight size={14} />
+                            </div>
+                        </button>
+
+                        <div className="card action-card toggle-card" style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #f0fdf4, #dcfce7)' : 'white', border: user?.is_available ? '1px solid #bbf7d0' : '1px solid var(--border)' }}>
+                            <div style={{ fontSize: 24, marginBottom: 4 }}>{user?.is_available ? '🚴' : '😴'}</div>
+                            <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 14, color: user?.is_available ? '#166534' : 'var(--text-primary)' }}>
+                                {user?.is_available ? 'Live' : 'Offline'}
+                            </div>
+                            <div style={{ fontSize: 11, color: user?.is_available ? '#15803d' : 'var(--text-muted)', marginBottom: 12, lineHeight: 1.2 }}>
+                                {user?.is_available ? "You're ready for orders 🚀" : "Go online to earn"}
+                            </div>
+                            <label className="toggle">
+                                <input type="checkbox" checked={!!user?.is_available} onChange={handleToggleAvail} disabled={togglingAvail} />
+                                <span className="toggle-slider" />
+                            </label>
                         </div>
-                        <label className="toggle" style={{ marginTop: 4 }}>
-                            <input type="checkbox" checked={!!user?.is_available} onChange={handleToggleAvail} disabled={togglingAvail} />
-                            <span className="toggle-slider" />
-                        </label>
                     </div>
                 </div>
 
                 {/* Quick Stats */}
-                <div className="stat-grid" style={{ marginBottom: 20 }}>
+                <div className="stat-grid" style={{ marginBottom: 24 }}>
                     <div className="stat-card">
                         <div className="stat-value">₹{user?.total_earnings || 0}</div>
-                        <div className="stat-label">Total Earned</div>
+                        <div className="stat-label">
+                            {user?.total_earnings > 0 ? "Total Earned 🎉" : "You haven't earned yet 👀"}
+                        </div>
                     </div>
                     <div className="stat-card">
                         <div className="stat-value">{user?.total_deliveries || 0}</div>
-                        <div className="stat-label">Deliveries</div>
+                        <div className="stat-label">
+                            {user?.total_deliveries > 0 ? "Deliveries Done 📦" : "Start your first delivery 🚀"}
+                        </div>
                     </div>
                 </div>
 
@@ -348,6 +381,30 @@ export default function HomePage() {
                             {demand.popularOutlets.slice(0, 4).map((o) => (
                                 <div key={o.name} className="chip" style={{ cursor: 'default' }}>
                                     {o.name} <span style={{ opacity: 0.6 }}>({o.count})</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Available Nearby Snippet */}
+                {!user?.is_available && onlinePartners.length > 0 && (
+                    <div style={{ marginBottom: 24 }}>
+                        <div className="section-header">
+                            <h3 className="section-title">👥 Available Nearby</h3>
+                        </div>
+                        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px' }}>
+                            {onlinePartners.map((p) => (
+                                <div key={p._id} className="card partner-pill" style={{ minWidth: 160, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 12 }}>
+                                        {p.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: 13, fontWeight: 700 }}>{p.name.split(' ')[0]}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                            <Star size={10} color="#FBBF24" fill="#FBBF24" /> {p.rating.toFixed(1)} · {p.hostel}
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -368,22 +425,27 @@ export default function HomePage() {
                         </div>
                     ) : (
                         orders.map((order) => (
-                            <div key={order._id} className="order-card" style={{ cursor: 'pointer' }}
+                            <div key={order._id} className="order-card recent-order-card" style={{ cursor: 'pointer', padding: 16 }}
                                 onClick={() => navigate(
                                     order.status === 'delivered' ? `/order/${order._id}/review` :
                                         order.status === 'accepted' ? `/chat/${order._id}` :
                                             `/order/${order._id}/track`
                                 )}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                                    <div>
-                                        <p style={{ fontWeight: 600, fontSize: 14 }}>{order.pickup_location}</p>
-                                        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>→ {order.delivery_hostel}, Room {order.delivery_room}</p>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                                        <div style={{ background: 'var(--bg)', padding: 8, borderRadius: 10 }}>
+                                            {order.pickup_location.includes('Gate') ? <Package size={18} color="var(--primary)" /> : <span style={{ fontSize: 18 }}>🍔</span>}
+                                        </div>
+                                        <div>
+                                            <p style={{ fontWeight: 700, fontSize: 15 }}>{order.pickup_location}</p>
+                                            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>→ {order.delivery_hostel}, Room {order.delivery_room}</p>
+                                        </div>
                                     </div>
                                     {statusBadge(order.status)}
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{order.item_details.slice(0, 40)}{order.item_details.length > 40 ? '...' : ''}</p>
-                                    <span style={{ fontFamily: 'Poppins', fontWeight: 700, color: 'var(--primary)', fontSize: 15 }}>₹{order.price}</span>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                                    <p style={{ fontSize: 12, color: 'var(--text-muted)', flex: 1 }}>{order.item_details.slice(0, 35)}{order.item_details.length > 35 ? '...' : ''}</p>
+                                    <span style={{ fontFamily: 'Poppins', fontWeight: 800, color: 'var(--primary-dark)', fontSize: 16 }}>₹{order.price}</span>
                                 </div>
                             </div>
                         ))
