@@ -21,7 +21,7 @@ function ProtectedRoute({ children }) {
     <div className="full-center">
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>🚀</div>
-        <p style={{ color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif' }}>Loading UniServe...</p>
+        <p style={{ color: 'var(--text-muted)', fontFamily: 'Outfit, sans-serif' }}>Loading UniServe...</p>
       </div>
     </div>
   );
@@ -67,7 +67,7 @@ export default function App() {
               duration: 3000,
               style: {
                 borderRadius: '12px',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'Outfit, sans-serif',
                 fontWeight: 600,
                 fontSize: 14,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.12)',

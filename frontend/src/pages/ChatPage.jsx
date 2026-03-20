@@ -169,14 +169,14 @@ export default function ChatPage() {
                 </button>
                 <div className="avatar avatar-sm">{getInitials(partner?.name || '?')}</div>
                 <div style={{ flex: 1 }}>
-                    <h1 style={{ fontSize: 15, fontFamily: 'Poppins, sans-serif', fontWeight: 700 }}>{partner?.name || 'Loading...'}</h1>
+                    <h1 style={{ fontSize: 15, fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>{partner?.name || 'Loading...'}</h1>
                     <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{partner?.hostel} · {partner?.enrollment_no}</p>
                 </div>
                 {order && (
                     <span style={{
                         background: statusColors[order.status] ? `${statusColors[order.status]}22` : 'var(--bg)',
                         color: statusColors[order.status] || 'var(--text-secondary)',
-                        padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, fontFamily: 'Poppins',
+                        padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, fontFamily: 'Outfit',
                     }}>
                         {order.status?.replace('_', ' ')}
                     </span>

@@ -67,7 +67,7 @@ export default function CreateOrderPage() {
                     {STEPS.map((s, i) => (
                         <div key={s} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                             <div style={{ height: 4, borderRadius: 2, background: i <= step ? 'var(--primary)' : 'var(--border)', transition: 'background 0.3s' }} />
-                            <span style={{ fontSize: 11, color: i <= step ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>{s}</span>
+                            <span style={{ fontSize: 11, color: i <= step ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}>{s}</span>
                         </div>
                     ))}
                 </div>
@@ -90,7 +90,7 @@ export default function CreateOrderPage() {
                                             flex: 1, padding: '12px 8px', borderRadius: 12, border: `2px solid ${form.pickup_type === opt.key ? 'var(--primary)' : 'var(--border)'}`,
                                             background: form.pickup_type === opt.key ? 'rgba(79,70,229,0.08)' : 'white',
                                             color: form.pickup_type === opt.key ? 'var(--primary)' : 'var(--text-secondary)',
-                                            fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 12, cursor: 'pointer',
+                                            fontFamily: 'Outfit, sans-serif', fontWeight: 600, fontSize: 12, cursor: 'pointer',
                                             transition: 'all 0.2s ease'
                                         }}
                                         onClick={() => setPickupType(opt.key)}>
@@ -122,7 +122,7 @@ export default function CreateOrderPage() {
                                                 textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s'
                                             }}
                                             onClick={() => setForm((f) => ({ ...f, pickup_location: g.value }))}>
-                                            <span style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, color: form.pickup_location === g.value ? 'var(--primary)' : 'var(--text-primary)' }}>
+                                            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 600, color: form.pickup_location === g.value ? 'var(--primary)' : 'var(--text-primary)' }}>
                                                 🚪 {g.label}
                                             </span>
                                             {g.parcelOnly && <span className="badge badge-warning">Parcels Only</span>}
@@ -152,7 +152,7 @@ export default function CreateOrderPage() {
                             <div className="card" style={{ padding: 16, background: 'rgba(79,70,229,0.04)', border: '1px solid rgba(79,70,229,0.2)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div>
-                                        <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 16 }}>Delivery Fee</p>
+                                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 16 }}>Delivery Fee</p>
                                         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>Partner earns ₹{pricing.partnerEarns}</p>
                                     </div>
                                     <span className="price-tag">₹{pricing.price}</span>
@@ -229,7 +229,7 @@ export default function CreateOrderPage() {
                                 </div>
                                 <hr style={{ border: 'none', borderTop: '1px solid var(--border)' }} />
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700 }}>Delivery Fee</span>
+                                    <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Delivery Fee</span>
                                     <span className="price-tag">₹{pricing?.price}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-muted)' }}>

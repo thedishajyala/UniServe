@@ -79,13 +79,13 @@ export default function EarningsPage() {
                 <div className="card" style={{ padding: 20, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
                     <div style={{ fontSize: 40 }}>⭐</div>
                     <div>
-                        <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 32, color: '#F59E0B', lineHeight: 1 }}>
+                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 32, color: '#F59E0B', lineHeight: 1 }}>
                             {(earnings?.rating || user?.rating || 5).toFixed(1)}
                         </p>
                         <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Your rating</p>
                     </div>
                     <div style={{ marginLeft: 'auto' }}>
-                        <p style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 15 }}>
+                        <p style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: 15 }}>
                             {earnings?.successful_deliveries || 0}/{earnings?.total_deliveries || 0}
                         </p>
                         <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Success rate</p>
@@ -99,7 +99,7 @@ export default function EarningsPage() {
                         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
                             {demand.peakHours.map((ph) => (
                                 <div key={ph.hour} style={{ background: 'white', borderRadius: 12, padding: '12px 14px', textAlign: 'center', minWidth: 60, boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' }}>
-                                    <p style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: 16, color: 'var(--primary)' }}>{ph.count}</p>
+                                    <p style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: 16, color: 'var(--primary)' }}>{ph.count}</p>
                                     <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{formatTime(ph.hour)}</p>
                                 </div>
                             ))}
@@ -127,7 +127,7 @@ export default function EarningsPage() {
                                         </p>
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <p style={{ fontFamily: 'Poppins', fontWeight: 800, color: 'var(--success)', fontSize: 17 }}>+₹{d.delivery_earning}</p>
+                                        <p style={{ fontFamily: 'Outfit', fontWeight: 800, color: 'var(--success)', fontSize: 17 }}>+₹{d.delivery_earning}</p>
                                         <span className={`badge status-${d.status}`} style={{ fontSize: 10, padding: '2px 8px' }}>{d.status}</span>
                                     </div>
                                 </div>

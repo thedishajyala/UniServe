@@ -335,7 +335,7 @@ export default function HomePage() {
                             <div style={{ background: 'rgba(255,255,255,0.2)', padding: 10, borderRadius: 12, marginBottom: 16 }}>
                                 <Package size={24} color="white" />
                             </div>
-                            <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 18, marginBottom: 4 }}>Create Order</div>
+                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 18, marginBottom: 4 }}>Create Order</div>
                             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 4 }}>
                                 Fast delivery <ArrowRight size={14} />
                             </div>
@@ -343,7 +343,7 @@ export default function HomePage() {
 
                         <div className="card action-card toggle-card" style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #f0fdf4, #dcfce7)' : 'white', border: user?.is_available ? '1px solid #bbf7d0' : '1px solid var(--border)' }}>
                             <div style={{ fontSize: 24, marginBottom: 4 }}>{user?.is_available ? '🚴' : '😴'}</div>
-                            <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 14, color: user?.is_available ? '#166534' : 'var(--text-primary)' }}>
+                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 14, color: user?.is_available ? '#166534' : 'var(--text-primary)' }}>
                                 {user?.is_available ? 'Live' : 'Offline'}
                             </div>
                             <div style={{ fontSize: 11, color: user?.is_available ? '#15803d' : 'var(--text-muted)', marginBottom: 12, lineHeight: 1.2 }}>
@@ -445,7 +445,7 @@ export default function HomePage() {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 10 }}>
                                     <p style={{ fontSize: 12, color: 'var(--text-muted)', flex: 1 }}>{order.item_details.slice(0, 35)}{order.item_details.length > 35 ? '...' : ''}</p>
-                                    <span style={{ fontFamily: 'Poppins', fontWeight: 800, color: 'var(--primary-dark)', fontSize: 16 }}>₹{order.price}</span>
+                                    <span style={{ fontFamily: 'Outfit', fontWeight: 800, color: 'var(--primary-dark)', fontSize: 16 }}>₹{order.price}</span>
                                 </div>
                             </div>
                         ))

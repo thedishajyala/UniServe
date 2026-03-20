@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 /* ===== CSS VARIABLES ===== */
 :root {
-  --primary: #4F46E5;
+  --primary: #4f46e5;
   --primary-dark: #3730A3;
   --primary-light: #818CF8;
   --secondary: #7C3AED;
   --secondary-light: #A78BFA;
 
-  --bg: #F0F0F7;
+  --bg: #F8F9FB; /* Ultra-sleek off-white */
   --bg-dark: #0F0F1A;
   --card: #FFFFFF;
   --card-dark: #1A1A2E;
@@ -24,20 +24,20 @@
   --warning: #F59E0B;
   --warning-light: #FEF3C7;
 
-  --border: #E5E7EB;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.15);
-  --shadow-accent: 0 4px 24px rgba(79,70,229,0.25);
+  --border: #eaecf0;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+  --shadow-md: 0 8px 30px rgba(0,0,0,0.04);
+  --shadow-lg: 0 20px 40px rgba(0,0,0,0.08);
+  --shadow-accent: 0 8px 24px rgba(79,70,229,0.3);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --radius-full: 9999px;
 
-  --transition: 0.2s ease;
-  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* ===== RESET ===== */
@@ -50,17 +50,19 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   background: var(--bg);
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.03em;
 }
 
 /* ===== UTILITY ===== */
@@ -92,7 +94,8 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius-lg);
   padding: 24px;
   box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-top: 1px solid #ffffff;
 }
 
 /* ===== BUTTON ===== */
@@ -101,7 +104,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-weight: 600;
   font-size: 15px;
   border: none;
@@ -111,6 +114,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 14px 28px;
   white-space: nowrap;
   text-decoration: none;
+  letter-spacing: -0.01em;
 }
 .btn:disabled {
   opacity: 0.55;
@@ -118,16 +122,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, #4F46E5 0%, #6366f1 100%);
   color: white;
   box-shadow: var(--shadow-accent);
+  border-top: 1px solid rgba(255,255,255,0.2);
 }
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 32px rgba(79,70,229,0.38);
+  box-shadow: 0 10px 30px rgba(79,70,229,0.4);
 }
 .btn-primary:active:not(:disabled) {
-  transform: translateY(0);
+  transform: translateY(1px);
 }
 
 .btn-outline {
@@ -139,6 +144,17 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--primary);
   color: white;
   transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #f8f9fb;
+  border-color: #d1d5db;
 }
 
 .btn-ghost {
@@ -187,31 +203,33 @@ h1, h2, h3, h4, h5, h6 {
   gap: 6px;
 }
 .input-label {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
   font-size: 13px;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 .input {
   width: 100%;
-  padding: 13px 16px;
+  padding: 14px 18px;
   font-size: 15px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 500;
   color: var(--text-primary);
-  background: var(--bg);
-  border: 2px solid var(--border);
+  background: #fdfdfd;
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition: all var(--transition);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
 .input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+  box-shadow: 0 0 0 4px rgba(79,70,229,0.1), inset 0 2px 4px rgba(0,0,0,0.01);
   background: white;
 }
-.input::placeholder { color: var(--text-muted); }
+.input::placeholder { color: var(--text-muted); font-weight: 400; }
 .input.error { border-color: var(--error); }
 .input-error {
   color: var(--error);
@@ -231,12 +249,13 @@ select.input {
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
+  gap: 6px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
   font-size: 12px;
-  font-weight: 600;
-  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.02em;
 }
 .badge-primary { background: rgba(79,70,229,0.12); color: var(--primary); }
 .badge-success { background: var(--success-light); color: #065F46; }
@@ -250,11 +269,12 @@ select.input {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
   text-transform: uppercase;
   color: white;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
+  box-shadow: 0 4px 12px rgba(79,70,229,0.25);
   flex-shrink: 0;
 }
 .avatar-sm { width: 36px; height: 36px; font-size: 14px; }
@@ -317,9 +337,10 @@ select.input {
 }
 .stepper-content { padding: 9px 0 24px; }
 .stepper-label {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 15px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
 }
 .stepper-time { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
@@ -397,9 +418,10 @@ select.input {
   width: 100%;
 }
 .page-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 /* ===== BOTTOM NAV ===== */
@@ -449,7 +471,7 @@ select.input {
 
 /* ===== GRADIENT BG ===== */
 .gradient-hero {
-  background: linear-gradient(160deg, #4F46E5 0%, #7C3AED 60%, #9F1ABE 100%);
+  background: linear-gradient(160deg, #3730A3 0%, #4F46E5 50%, #7C3AED 100%);
   color: white;
   padding: 48px 24px 80px;
   text-align: center;
@@ -481,12 +503,13 @@ select.input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 .section-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 /* ===== LOADING SKELETON ===== */
@@ -577,12 +600,12 @@ select.input {
 }
 
 /* ===== STATUS COLORS ===== */
-.status-pending { color: var(--warning); background: var(--warning-light); }
-.status-accepted { color: var(--primary); background: rgba(79,70,229,0.1); }
-.status-picked { color: var(--secondary); background: rgba(124,58,237,0.1); }
-.status-on_the_way { color: #2563EB; background: #DBEAFE; }
-.status-delivered { color: var(--success); background: var(--success-light); }
-.status-cancelled { color: var(--error); background: var(--error-light); }
+.status-pending { color: #B45309; background: #FEF3C7; }
+.status-accepted { color: var(--primary); background: rgba(79,70,229,0.12); }
+.status-picked { color: var(--secondary); background: rgba(124,58,237,0.12); }
+.status-on_the_way { color: #1D4ED8; background: #DBEAFE; }
+.status-delivered { color: #047857; background: #D1FAE5; }
+.status-cancelled { color: #B91C1C; background: #FEE2E2; }
 
 /* ===== GLASS MORPHISM ===== */
 .glass {

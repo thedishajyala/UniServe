@@ -73,7 +73,7 @@ export default function ReviewPage() {
                     </div>
 
                     {(hover || rating) > 0 && (
-                        <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 18, color: rating > 0 ? '#F59E0B' : 'var(--text-muted)', marginBottom: 24 }}>
+                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 18, color: rating > 0 ? '#F59E0B' : 'var(--text-muted)', marginBottom: 24 }}>
                             {REVIEW_LABELS[hover || rating]}
                         </p>
                     )}

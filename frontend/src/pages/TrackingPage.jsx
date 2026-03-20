@@ -87,7 +87,7 @@ export default function TrackingPage() {
         <div className="full-center">
             <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
-                <p style={{ color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif' }}>Loading order...</p>
+                <p style={{ color: 'var(--text-muted)', fontFamily: 'Outfit, sans-serif' }}>Loading order...</p>
             </div>
         </div>
     );
@@ -157,7 +157,7 @@ export default function TrackingPage() {
 
                 {/* Status Stepper */}
                 <div className="card" style={{ marginBottom: 20, padding: 20 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 20, fontFamily: 'Poppins, sans-serif' }}>Order Status</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 20, fontFamily: 'Outfit, sans-serif' }}>Order Status</p>
                     <div className="stepper">
                         {ORDER_STATUSES.map((s, i) => {
                             const done = currentStatusIndex > i || order.status === s.key;

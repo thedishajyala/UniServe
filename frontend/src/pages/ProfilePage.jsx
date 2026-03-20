@@ -75,12 +75,12 @@ export default function ProfilePage() {
                         width: 80, height: 80, borderRadius: '50%',
                         background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 800, fontSize: 32, fontFamily: 'Poppins, sans-serif',
+                        color: '#fff', fontWeight: 800, fontSize: 32, fontFamily: 'Outfit, sans-serif',
                         margin: '0 auto 12px', boxShadow: '0 4px 20px rgba(79,70,229,0.3)',
                     }}>
                         {(user?.name || 'U').charAt(0).toUpperCase()}
                     </div>
-                    <h2 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 20, fontWeight: 700 }}>{user?.name}</h2>
+                    <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 20, fontWeight: 700 }}>{user?.name}</h2>
                     <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>{user?.email}</p>
 
                     {/* Availability toggle */}
