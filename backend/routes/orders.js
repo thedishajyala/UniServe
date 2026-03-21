@@ -137,6 +137,16 @@ router.post('/respond', protect, async (req, res) => {
         }
 
         if (response === 'accepted') {
+            // Check if partner has enough delivery passes
+            const partner = await User.findById(req.user._id);
+            if (partner.delivery_passes <= 0) {
+                return res.status(403).json({ message: 'No delivery passes left. Please recharge.' });
+            }
+
+            // Deduct pass
+            partner.delivery_passes -= 1;
+            await partner.save();
+
             order.delivery_partner_id = req.user._id;
             order.status = 'accepted';
             order.accepted_at = new Date();

@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: 6,
     },
+    phone: {
+      type: String,
+      sparse: true,
+      unique: true,
+    },
     enrollment_no: {
       type: String,
       required: [true, 'Enrollment number is required'],
@@ -35,6 +40,10 @@ const userSchema = new mongoose.Schema(
       default: '',
     },
     profile_complete: {
+      type: Boolean,
+      default: false,
+    },
+    name_changed_once: {
       type: Boolean,
       default: false,
     },
@@ -65,6 +74,10 @@ const userSchema = new mongoose.Schema(
     today_earnings: {
       type: Number,
       default: 0,
+    },
+    delivery_passes: {
+      type: Number,
+      default: 3,
     },
 
     // Availability

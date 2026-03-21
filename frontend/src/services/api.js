@@ -22,6 +22,11 @@ export const toggleAvailability = () => API.post('/users/toggle-availability');
 export const getEarnings = () => API.get('/users/earnings');
 export const getOnlinePartners = () => API.get('/users/online');
 
+// Payments
+export const getRazorpayKey = () => API.get('/payments/key');
+export const createPaymentOrder = (data) => API.post('/payments/create-order', data);
+export const verifyPayment = (data) => API.post('/payments/verify', data);
+
 // Orders
 export const createOrder = (data) => API.post('/orders/create', data);
 export const getAvailablePartners = (orderId) => API.get(`/orders/partners/${orderId}`);

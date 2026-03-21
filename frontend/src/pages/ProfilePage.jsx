@@ -123,11 +123,14 @@ export default function ProfilePage() {
 
                     <div className="form-group" style={{ marginBottom: 16 }}>
                         <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                            <UserIcon size={14} /> Full Name
+                            <UserIcon size={14} /> Full Name {user?.name_changed_once && <span style={{ fontSize: 10, color: 'var(--primary)', fontWeight: 'bold' }}>(LOCKED 🔒)</span>}
                         </label>
                         <input className="input" value={form.name}
                             onChange={(e) => handleChange('name', e.target.value)}
+                            disabled={user?.name_changed_once}
+                            style={{ opacity: user?.name_changed_once ? 0.6 : 1, cursor: user?.name_changed_once ? 'not-allowed' : 'text' }}
                             placeholder="Your name" />
+                        {!user?.name_changed_once && <p style={{ fontSize: 11, color: 'var(--primary)', marginTop: 4 }}>⚠️ You can only rename this once.</p>}
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 16 }}>

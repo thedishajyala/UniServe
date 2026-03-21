@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createOrder } from '../services/api';
+import { createOrder, createPaymentOrder, verifyPayment, getRazorpayKey } from '../services/api';
 import { OUTLETS, GATES, ALL_HOSTELS, getPricing } from '../config/campus';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowLeft } from 'lucide-react';
 
 const STEPS = ['Pickup', 'Delivery', 'Confirm'];
 
 export default function CreateOrderPage() {
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [step, setStep] = useState(0);
     const [loading, setLoading] = useState(false);

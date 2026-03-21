@@ -15,6 +15,7 @@ export default function LoginPage() {
         email: '',
         password: '',
         enrollment_no: '',
+        phone: '',
         hostel: '',
         room_no: '',
     });
@@ -35,6 +36,9 @@ export default function LoginPage() {
         if (mode === 'signup') {
             if (!form.name) errs.name = 'Name is required';
             if (!form.enrollment_no) errs.enrollment_no = 'Enrollment number is required';
+            if (!form.phone || form.phone.length !== 10 || !/^\d+$/.test(form.phone)) {
+                errs.phone = 'Valid 10-digit phone number strictly required';
+            }
         }
         return errs;
     };
@@ -122,11 +126,18 @@ export default function LoginPage() {
                         </div>
 
                         {mode === 'signup' && (
-                            <div className="input-group">
-                                <label className="input-label">Enrollment Number</label>
-                                <input className={`input${errors.enrollment_no ? ' error' : ''}`} name="enrollment_no" placeholder="e.g. 22BCE001" value={form.enrollment_no} onChange={handleChange} />
-                                {errors.enrollment_no && <p className="input-error">{errors.enrollment_no}</p>}
-                            </div>
+                            <>
+                                <div className="input-group">
+                                    <label className="input-label">Phone Number <span style={{ color: 'var(--primary)' }}>(MUST BE REAL)</span></label>
+                                    <input className={`input${errors.phone ? ' error' : ''}`} type="tel" name="phone" placeholder="10-digit mobile number" value={form.phone} onChange={handleChange} maxLength={10} />
+                                    {errors.phone && <p className="input-error">{errors.phone}</p>}
+                                </div>
+                                <div className="input-group">
+                                    <label className="input-label">Enrollment Number</label>
+                                    <input className={`input${errors.enrollment_no ? ' error' : ''}`} name="enrollment_no" placeholder="e.g. 22BCE001" value={form.enrollment_no} onChange={handleChange} />
+                                    {errors.enrollment_no && <p className="input-error">{errors.enrollment_no}</p>}
+                                </div>
+                            </>
                         )}
 
                         <button type="submit" className="btn btn-primary btn-w-full btn-lg" style={{ marginTop: 8 }} disabled={loading}>

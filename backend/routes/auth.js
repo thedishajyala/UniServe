@@ -14,7 +14,7 @@ function generateToken(id) {
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
     try {
-        const { name, email, password, enrollment_no, hostel, room_no } = req.body;
+        const { name, email, password, enrollment_no, hostel, room_no, phone } = req.body;
 
         // Validate university email
         if (!email.toLowerCase().endsWith(`@${UNIVERSITY_DOMAIN}`)) {
@@ -24,10 +24,13 @@ router.post('/signup', async (req, res) => {
         }
 
         // Check if user already exists
-        const existingUser = await User.findOne({ $or: [{ email }, { enrollment_no }] });
+        const existingUser = await User.findOne({ $or: [{ email }, { enrollment_no }, { phone }] });
         if (existingUser) {
             if (existingUser.email === email.toLowerCase()) {
                 return res.status(400).json({ message: 'An account with this email already exists' });
+            }
+            if (existingUser.phone === phone) {
+                return res.status(400).json({ message: 'This phone number is already registered' });
             }
             return res.status(400).json({ message: 'Enrollment number already registered' });
         }
@@ -42,9 +45,10 @@ router.post('/signup', async (req, res) => {
             email: email.toLowerCase(),
             password: hashedPassword,
             enrollment_no,
+            phone,
             hostel,
             room_no,
-            profile_complete: !!(name && enrollment_no && hostel && room_no),
+            profile_complete: !!(name && enrollment_no && phone && hostel && room_no),
         });
 
         res.status(201).json({
@@ -52,9 +56,11 @@ router.post('/signup', async (req, res) => {
             name: user.name,
             email: user.email,
             enrollment_no: user.enrollment_no,
+            phone: user.phone,
             hostel: user.hostel,
             room_no: user.room_no,
             profile_complete: user.profile_complete,
+            name_changed_once: user.name_changed_once,
             token: generateToken(user._id),
         });
     } catch (error) {
@@ -93,6 +99,7 @@ router.post('/login', async (req, res) => {
             total_deliveries: user.total_deliveries,
             is_available: user.is_available,
             profile_complete: user.profile_complete,
+            name_changed_once: user.name_changed_once,
             token: generateToken(user._id),
         });
     } catch (error) {

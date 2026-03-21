@@ -21,7 +21,13 @@ router.put('/profile', protect, async (req, res) => {
         const { name, hostel, room_no, enrollment_no } = req.body;
         const user = await User.findById(req.user._id);
 
-        if (name) user.name = name;
+        if (name && name !== user.name) {
+            if (user.name_changed_once) {
+                return res.status(400).json({ message: 'You can only change your name once' });
+            }
+            user.name = name;
+            user.name_changed_once = true;
+        }
         if (hostel) user.hostel = hostel;
         if (room_no) user.room_no = room_no;
         if (enrollment_no) user.enrollment_no = enrollment_no;
@@ -64,7 +70,7 @@ router.post('/toggle-availability', protect, async (req, res) => {
 // GET /api/users/earnings
 router.get('/earnings', protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('total_earnings total_deliveries successful_deliveries rating');
+        const user = await User.findById(req.user._id).select('total_earnings total_deliveries successful_deliveries rating delivery_passes');
 
         // Get today's earnings from completed deliveries
         const today = new Date();
@@ -94,6 +100,7 @@ router.get('/earnings', protect, async (req, res) => {
             total_deliveries: user.total_deliveries,
             successful_deliveries: user.successful_deliveries,
             rating: user.rating,
+            delivery_passes: user.delivery_passes || 0,
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

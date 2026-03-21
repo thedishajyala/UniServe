@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getEarnings, getMyDeliveries, getDemandAnalytics } from '../services/api';
+import { getEarnings, getMyDeliveries, getDemandAnalytics, createPaymentOrder, verifyPayment, getRazorpayKey } from '../services/api';
 import toast from 'react-hot-toast';
-import { Home, Package, TrendingUp, User, ArrowLeft } from 'lucide-react';
+import { Home, Package, TrendingUp, User, ArrowLeft, RefreshCw, Key } from 'lucide-react';
 
 export default function EarningsPage() {
     const { user, logoutUser } = useAuth();
@@ -30,6 +30,55 @@ export default function EarningsPage() {
         };
         load();
     }, []);
+
+    const handleRechargePasses = async () => {
+        setLoading(true);
+        try {
+            const { data: { key, bypass } } = await getRazorpayKey();
+
+            if (bypass) {
+                toast.success('Passes Recharged! (Payment Bypassed)');
+                window.location.reload();
+                return;
+            }
+
+            const paymentOrderRes = await createPaymentOrder({ amount: 50 }); // ₹50 for 5 passes
+            const rzpOrderId = paymentOrderRes.data.id;
+
+            const options = {
+                key,
+                amount: 5000,
+                currency: 'INR',
+                name: 'UniServe',
+                description: '5 Delivery Passes',
+                order_id: rzpOrderId,
+                handler: async function (response) {
+                    try {
+                        toast.loading('Verifying payment...', { id: 'payment' });
+                        await verifyPayment({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                        });
+                        toast.success('Successfully recharged 5 Passes! 🎉', { id: 'payment' });
+                        window.location.reload();
+                    } catch (verifyErr) {
+                        toast.error(verifyErr.response?.data?.message || 'Verification Failed', { id: 'payment' });
+                    }
+                },
+                prefill: { name: user?.name, email: user?.email },
+                theme: { color: '#4F46E5' },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', (response) => toast.error(`Payment Failed: ${response.error.description}`));
+            rzp.open();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to initialize Razorpay');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const formatTime = (h) => {
         const period = h >= 12 ? 'PM' : 'AM';
@@ -75,20 +124,26 @@ export default function EarningsPage() {
                     </div>
                 </div>
 
-                {/* Rating */}
-                <div className="card" style={{ padding: 20, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ fontSize: 40 }}>⭐</div>
-                    <div>
-                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 32, color: '#F59E0B', lineHeight: 1 }}>
+                {/* Rating & Action Panel */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                    <div className="card" style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ fontSize: 32, marginBottom: 4 }}>⭐</div>
+                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 24, color: '#F59E0B', lineHeight: 1 }}>
                             {(earnings?.rating || user?.rating || 5).toFixed(1)}
                         </p>
-                        <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Your rating</p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>Your rating</p>
                     </div>
-                    <div style={{ marginLeft: 'auto' }}>
-                        <p style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: 15 }}>
-                            {earnings?.successful_deliveries || 0}/{earnings?.total_deliveries || 0}
-                        </p>
-                        <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Success rate</p>
+
+                    <div className="card" style={{ padding: 20, background: 'linear-gradient(135deg, #1A1A2E, #2D2D44)', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                            <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>Passes Left</span>
+                            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 28, color: earnings?.delivery_passes > 0 ? '#10B981' : '#EF4444' }}>
+                                {earnings?.delivery_passes || 0}
+                            </span>
+                        </div>
+                        <button className="btn btn-primary" style={{ padding: '10px', fontSize: 13, width: '100%', background: 'white', color: 'var(--primary)', boxShadow: 'none' }} onClick={handleRechargePasses} disabled={loading}>
+                            {loading ? 'Wait...' : 'Recharge ₹50'}
+                        </button>
                     </div>
                 </div>
 
