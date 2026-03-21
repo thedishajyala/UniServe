@@ -5,7 +5,20 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { ORDER_STATUSES } from '../config/campus';
 import toast from 'react-hot-toast';
-import { ArrowLeft, MessageCircle } from 'lucide-react';
+import { ArrowLeft, MessageCircle, MapPin } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: markerIcon2x,
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
+});
 
 function getInitials(name = '') {
     return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -20,6 +33,10 @@ export default function TrackingPage() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [cancelling, setCancelling] = useState(false);
+    
+    // Live Tracking State
+    const [partnerLocation, setPartnerLocation] = useState(null); // { lat, lng }
+    const [watchId, setWatchId] = useState(null);
 
     const loadOrder = useCallback(async () => {
         try {
@@ -45,11 +62,52 @@ export default function TrackingPage() {
             toast.error(`Order cancelled by ${cancelled_by}: ${reason}`);
             setOrder((o) => o ? { ...o, status: 'cancelled' } : o);
         });
+
+        // Listen for live location updates from the partner
+        socket.on('partner_location', (loc) => {
+            setPartnerLocation(loc);
+        });
+
         return () => {
             socket.off('order_status_changed');
             socket.off('order_cancelled');
+            socket.off('partner_location');
         };
     }, [socket, orderId, user]);
+
+    // Partner: Start broadcasting location when 'on_the_way'
+    useEffect(() => {
+        const isPartner = order?.delivery_partner_id?._id === user?._id || order?.delivery_partner_id === user?._id;
+        
+        if (isPartner && order?.status === 'on_the_way') {
+            if ('geolocation' in navigator) {
+                const id = navigator.geolocation.watchPosition(
+                    (pos) => {
+                        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        setPartnerLocation(loc); // Show it locally too
+                        if (socket) {
+                            socket.emit('location_update', { orderId, lat: loc.lat, lng: loc.lng });
+                        }
+                    },
+                    (err) => console.error("Geolocation error:", err),
+                    { enableHighAccuracy: true, maximumAge: 0 }
+                );
+                setWatchId(id);
+            } else {
+                toast.error("Geolocation is not supported by your browser");
+            }
+        }
+
+        // Cleanup watcher if status changes or unmount
+        if (order?.status === 'delivered' && watchId) {
+            navigator.geolocation.clearWatch(watchId);
+            setWatchId(null);
+        }
+
+        return () => {
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+        };
+    }, [order?.status]);
 
     const handleUpdateStatus = async (newStatus) => {
         setUpdating(true);
@@ -128,8 +186,19 @@ export default function TrackingPage() {
                             <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Room {order.delivery_room}</p>
                         </div>
                     </div>
-                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                         <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>🛍️ {order.item_details}</p>
+                        
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                            {order.is_prepaid ? (
+                                <span className="badge" style={{ background: 'var(--success-light)', color: '#065F46' }}>✅ Items Pre-Paid</span>
+                            ) : (
+                                <span className="badge" style={{ background: 'var(--warning-light)', color: '#92400E' }}>💵 Pay Item Cost + Delivery</span>
+                            )}
+                            {order.special_instructions && (
+                                <span className="badge" style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--text-muted)' }}>📝 Has Instructions</span>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -173,6 +242,29 @@ export default function TrackingPage() {
                         })}
                     </div>
                 </div>
+
+                {/* Live Map (Only visible if On The Way & Coordinates Exist) */}
+                {order.status === 'on_the_way' && partnerLocation && (
+                    <div className="card slide-up" style={{ marginBottom: 20, padding: 16, overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                            <MapPin size={18} color="var(--primary)" />
+                            <p style={{ fontWeight: 700, fontSize: 14 }}>Live Tracking 📍</p>
+                        </div>
+                        <div style={{ height: 250, borderRadius: 12, overflow: 'hidden', zIndex: 0 }}>
+                            <MapContainer center={[partnerLocation.lat, partnerLocation.lng]} zoom={17} style={{ height: '100%', width: '100%' }}>
+                                <TileLayer
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
+                                />
+                                <Marker position={[partnerLocation.lat, partnerLocation.lng]}>
+                                    <Popup>
+                                        <b>{(isOwner ? partner : requester)?.name || 'Partner'}</b> is here!
+                                    </Popup>
+                                </Marker>
+                            </MapContainer>
+                        </div>
+                    </div>
+                )}
 
                 {/* Partner Action: update status */}
                 {isPartner && nextStatusMap[order.status] && (

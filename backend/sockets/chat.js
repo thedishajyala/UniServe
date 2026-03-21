@@ -54,6 +54,11 @@ function setupChatSockets(io) {
             io.to(`order_${orderId}`).emit('order_status_changed', { status, updatedBy: userId });
         });
 
+        // Location update broadcast from delivery partner
+        socket.on('location_update', ({ orderId, lat, lng }) => {
+            socket.to(`order_${orderId}`).emit('partner_location', { lat, lng });
+        });
+
         socket.on('disconnect', () => {
             console.log('Socket disconnected:', socket.id);
         });

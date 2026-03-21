@@ -19,6 +19,7 @@ export default function CreateOrderPage() {
         delivery_hostel: '',
         delivery_room: '',
         item_details: '',
+        is_prepaid: false,
         special_instructions: '',
     });
 
@@ -43,6 +44,7 @@ export default function CreateOrderPage() {
                 delivery_hostel: form.delivery_hostel,
                 delivery_room: form.delivery_room,
                 item_details: form.item_details,
+                is_prepaid: form.is_prepaid,
                 special_instructions: form.special_instructions,
             });
             toast.success('Order placed! Finding delivery partners 🔍');
@@ -202,6 +204,18 @@ export default function CreateOrderPage() {
                             <input className="input" name="special_instructions" placeholder="e.g. No spice please" value={form.special_instructions} onChange={handleChange} />
                         </div>
 
+                        {/* Prepaid options */}
+                        <div className="input-group">
+                            <label className="input-label">Payment Status of Items</label>
+                            <div style={{ display: 'flex', gap: 10 }}>
+                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: form.is_prepaid ? 'rgba(79,70,229,0.08)' : 'white' }} onClick={() => setForm(f => ({ ...f, is_prepaid: true }))}>✅ Already Paid (Online)</button>
+                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${!form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: !form.is_prepaid ? 'rgba(79,70,229,0.08)' : 'white' }} onClick={() => setForm(f => ({ ...f, is_prepaid: false }))}>💵 I will pay Partner</button>
+                            </div>
+                            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
+                                If "Already Paid", partner only collects ₹{pricing?.price} delivery fee. Otherwise, partner buys the item with their own cash, and you pay them (Item Cost + ₹{pricing?.price}).
+                            </p>
+                        </div>
+
                         <button className="btn btn-primary btn-w-full btn-lg"
                             onClick={() => setStep(2)}
                             disabled={!form.delivery_hostel || !form.delivery_room || !form.item_details}>
@@ -243,10 +257,12 @@ export default function CreateOrderPage() {
                             </div>
                         </div>
 
-                        <div style={{ background: 'var(--success-light)', borderRadius: 12, padding: 14, display: 'flex', gap: 10, alignItems: 'center' }}>
-                            <span style={{ fontSize: 20 }}>💳</span>
-                            <p style={{ fontSize: 13, color: '#065F46', fontWeight: 500 }}>
-                                Payment is prepaid. No cash needed — safer for everyone!
+                        <div style={{ background: form.is_prepaid ? 'var(--success-light)' : 'var(--warning-light)', borderRadius: 12, padding: 14, display: 'flex', gap: 10, alignItems: 'center' }}>
+                            <span style={{ fontSize: 20 }}>{form.is_prepaid ? '💳' : '💵'}</span>
+                            <p style={{ fontSize: 13, color: form.is_prepaid ? '#065F46' : '#92400E', fontWeight: 500 }}>
+                                {form.is_prepaid 
+                                    ? "Items are pre-paid! You only owe the partner ₹" + pricing?.price + " for delivery upon arrival." 
+                                    : "Items are NOT paid. The partner will buy them entirely with their own money, and you will pay them exactly (Item Cost + ₹" + pricing?.price + " delivery fee) upon arrival."}
                             </p>
                         </div>
 

@@ -14,7 +14,7 @@ router.setIo = (io) => { _io = io; };
 // POST /api/orders/create
 router.post('/create', protect, async (req, res) => {
     try {
-        const { pickup_type, pickup_location, delivery_hostel, delivery_room, item_details, special_instructions } = req.body;
+        const { pickup_type, pickup_location, delivery_hostel, delivery_room, item_details, special_instructions, is_prepaid } = req.body;
 
         if (!pickup_type || !pickup_location || !delivery_hostel || !delivery_room || !item_details) {
             return res.status(400).json({ message: 'All fields are required' });
@@ -30,6 +30,7 @@ router.post('/create', protect, async (req, res) => {
             delivery_hostel,
             delivery_room,
             item_details,
+            is_prepaid: is_prepaid || false,
             special_instructions: special_instructions || '',
             price,
             commission,

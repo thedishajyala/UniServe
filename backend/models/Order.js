@@ -41,6 +41,10 @@ const orderSchema = new mongoose.Schema(
         },
 
         // Order Details
+        is_prepaid: {
+            type: Boolean,
+            default: false,
+        },
         item_details: {
             type: String,
             required: true,

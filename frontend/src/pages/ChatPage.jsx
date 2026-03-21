@@ -186,15 +186,25 @@ export default function ChatPage() {
 
             {/* ── ORDER INFO BANNER ── */}
             {order && (
-                <div style={{ background: 'rgba(79,70,229,0.06)', borderBottom: '1px solid var(--border)', padding: '10px 16px', display: 'flex', gap: 12, alignItems: 'center', flexShrink: 0 }}>
-                    <MapPin size={14} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-                    <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-                        <strong>{order.pickup_location}</strong> → {order.delivery_hostel} Room {order.delivery_room}
-                    </p>
-                    <button className="btn btn-sm btn-outline" style={{ marginLeft: 'auto', padding: '4px 12px', fontSize: 11 }}
-                        onClick={() => navigate(`/order/${orderId}/track`)}>
-                        Track
-                    </button>
+                <div style={{ background: 'rgba(79,70,229,0.06)', borderBottom: '1px solid var(--border)', padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <MapPin size={14} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                        <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                            <strong style={{ color: 'var(--text-primary)' }}>{order.pickup_location}</strong> → {order.delivery_hostel} Room {order.delivery_room}
+                        </p>
+                        <button className="btn btn-sm btn-outline" style={{ marginLeft: 'auto', padding: '4px 12px', fontSize: 11 }}
+                            onClick={() => navigate(`/order/${orderId}/track`)}>
+                            Track Map
+                        </button>
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 26 }}>
+                        {order.is_prepaid ? (
+                            <span className="badge" style={{ background: 'var(--success-light)', color: '#065F46', padding: '2px 8px', fontSize: 10 }}>✅ Items Pre-Paid</span>
+                        ) : (
+                            <span className="badge" style={{ background: 'var(--warning-light)', color: '#92400E', padding: '2px 8px', fontSize: 10 }}>💵 Cash Required for Items</span>
+                        )}
+                        <span style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 600 }}>+ ₹{order.price} Delivery Fee</span>
+                    </div>
                 </div>
             )}
 
