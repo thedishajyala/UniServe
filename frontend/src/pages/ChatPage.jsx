@@ -73,11 +73,15 @@ export default function ChatPage() {
             setOrder((o) => o ? { ...o, status } : o);
             toast(`Order status: ${status} 📦`, { icon: '✅' });
         });
+        socket.on('message_error', ({ error }) => {
+            toast.error('SERVER ERROR: ' + error);
+        });
 
         return () => {
             socket.off('receive_message');
             socket.off('partner_typing');
             socket.off('order_status_changed');
+            socket.off('message_error');
         };
     }, [socket, orderId, user]);
 
