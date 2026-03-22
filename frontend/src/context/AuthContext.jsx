@@ -9,17 +9,33 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         const token = localStorage.getItem('uniserve_token');
+        
+        // Safety: If for some reason the app stays loading too long, unlock it
+        const safety = setTimeout(() => {
+            if (loading) {
+                console.warn('Auth loading timed out, unlocking app safety gate');
+                setLoading(false);
+            }
+        }, 8000); 
+
         if (token) {
             getProfile()
-                .then((res) => setUser(res.data))
+                .then((res) => {
+                    setUser(res.data);
+                })
                 .catch(() => {
                     localStorage.removeItem('uniserve_token');
                     setUser(null);
                 })
-                .finally(() => setLoading(false));
+                .finally(() => {
+                    clearTimeout(safety);
+                    setLoading(false);
+                });
         } else {
+            clearTimeout(safety);
             setLoading(false);
         }
+        return () => clearTimeout(safety);
     }, []);
 
     const loginUser = (userData, token) => {
