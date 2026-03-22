@@ -136,14 +136,13 @@ export default function HomePage() {
         try {
             await respondToOrder({ order_id: orderId, response });
             if (response === 'accepted') {
-                toast.success('Order accepted! Chat is now open 🎉');
-                navigate(`/chat/${orderId}`);
+                toast.success('Order accepted! You can chat with them below 🎉');
+                // Removed forced navigation so they can accept multiple orders
+                loadData(); // Refresh active deliveries instantly
+                setIncomingRequests((prev) => prev.filter((r) => (r._id || r.order?._id) !== orderId));
             } else {
                 toast('Request declined.');
-                setIncomingRequests((prev) => prev.filter((r) => {
-                    const id = r._id || r.order?._id;
-                    return id !== orderId;
-                }));
+                setIncomingRequests((prev) => prev.filter((r) => (r._id || r.order?._id) !== orderId));
             }
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to respond');
