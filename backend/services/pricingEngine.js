@@ -4,7 +4,7 @@
  * based on pickup location type/name.
  */
 
-const LOW_PRICE_OUTLETS = ['Tuck Shop BU', 'Maggie Hotspot'];
+const LOW_PRICE_OUTLETS = ['Tuck Shop BU', 'Maggie Hotspot', 'Quench'];
 const ALL_OUTLETS = [
     'Kathi House',
     'Dominos',
@@ -14,6 +14,7 @@ const ALL_OUTLETS = [
     'SnapEats',
     'House of Chow',
     'Tuck Shop BU',
+    'Quench',
 ];
 
 const GATES = ['Gate 1', 'Gate 2', 'Gate 3'];

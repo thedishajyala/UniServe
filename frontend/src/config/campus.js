@@ -9,9 +9,10 @@ export const OUTLETS = [
     'SnapEats',
     'House of Chow',
     'Tuck Shop BU',
+    'Quench',
 ];
 
-export const LOW_PRICE_OUTLETS = ['Tuck Shop BU', 'Maggie Hotspot'];
+export const LOW_PRICE_OUTLETS = ['Tuck Shop BU', 'Maggie Hotspot', 'Quench'];
 
 export const GATES = [
     { label: 'Gate 1', value: 'Gate 1', parcelOnly: false },
