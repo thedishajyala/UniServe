@@ -154,7 +154,7 @@ export default function HomePage() {
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Hero Header */}
-            <div className="gradient-hero" style={{ padding: '32px 24px 50px', textAlign: 'left', position: 'relative', overflow: 'hidden' }}>
+            <div className="gradient-hero" style={{ padding: '40px 24px 80px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
                 <div style={{ position: 'absolute', top: -30, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
                 <div style={{ position: 'relative', zIndex: 1 }}>
                     <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, marginBottom: 2, fontWeight: 500 }}>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'} 👋</p>
@@ -174,7 +174,7 @@ export default function HomePage() {
                 </div>
             </div>
 
-            <div className="page-content" style={{ marginTop: -32 }}>
+            <div className="page-content" style={{ marginTop: -48 }}>
 
                 {/* ── INCOMING REQUESTS PANEL (partner only, when online) ── */}
                 {user?.is_available && incomingRequests.length > 0 && (
@@ -201,8 +201,9 @@ export default function HomePage() {
                             return (
                                 <div key={orderId} className="card" style={{
                                     marginBottom: 12,
-                                    border: '2px solid var(--primary)',
-                                    background: 'linear-gradient(135deg, rgba(79,70,229,0.05), rgba(124,58,237,0.05))',
+                                    border: '1px solid var(--primary-light)',
+                                    background: 'linear-gradient(135deg, rgba(79,70,229,0.03), rgba(124,58,237,0.03))',
+                                    boxShadow: '0 10px 25px rgba(79,70,229,0.1)',
                                 }}>
                                     {/* Requester info */}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -326,7 +327,7 @@ export default function HomePage() {
                 {/* Main Actions */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12, marginBottom: 24, padding: '0 4px' }}>
                     <div style={{ display: 'flex', gap: 12 }}>
-                        <button className="card action-card premium-card" style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 22, background: 'linear-gradient(145deg, #4F46E5, #6366f1)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden' }}
+                        <button className="card action-card premium-card" style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 22, background: 'linear-gradient(145deg, #4F46E5, #6366f1)', color: 'white', border: '2px solid rgba(255,255,255,0.2)', position: 'relative', overflow: 'hidden', boxShadow: '0 12px 30px rgba(0,0,0,0.15)' }}
                             onClick={() => navigate('/order/create')}>
                             <div style={{ position: 'absolute', right: -20, bottom: -20, opacity: 0.1, transform: 'scale(1.5)' }}>
                                 <Package size={100} />
@@ -340,13 +341,13 @@ export default function HomePage() {
                             </div>
                         </button>
 
-                        <div className="card action-card toggle-card" style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #f0fdf4, #dcfce7)' : 'white', border: user?.is_available ? '1px solid #bbf7d0' : '1px solid var(--border)' }}>
-                            <div style={{ fontSize: 24, marginBottom: 4 }}>{user?.is_available ? '🚴' : '😴'}</div>
-                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 14, color: user?.is_available ? '#166534' : 'var(--text-primary)' }}>
-                                {user?.is_available ? 'Live' : 'Offline'}
+                        <div className="card action-card toggle-card" style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #f0fdf4, #dcfce7)' : 'white', border: user?.is_available ? '1px solid #bbf7d0' : '1px solid var(--border)', boxShadow: '0 8px 25px rgba(0,0,0,0.06)' }}>
+                            <div style={{ fontSize: 28, marginBottom: 4 }}>{user?.is_available ? '🚴' : '😴'}</div>
+                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 15, color: user?.is_available ? '#166534' : 'var(--text-primary)' }}>
+                                {user?.is_available ? 'Live Now' : 'Offline'}
                             </div>
-                            <div style={{ fontSize: 11, color: user?.is_available ? '#15803d' : 'var(--text-muted)', marginBottom: 12, lineHeight: 1.2 }}>
-                                {user?.is_available ? "You're ready for orders 🚀" : "Go online to earn"}
+                            <div style={{ fontSize: 11, color: user?.is_available ? '#15803d' : 'var(--text-muted)', marginBottom: 12, lineHeight: 1.2, fontWeight: 500 }}>
+                                {user?.is_available ? "Waiting for orders..." : "Go online to earn"}
                             </div>
                             <label className="toggle">
                                 <input type="checkbox" checked={!!user?.is_available} onChange={handleToggleAvail} disabled={togglingAvail} />

@@ -93,18 +93,23 @@ export default function PartnersPage() {
     };
 
     return (
-        <div className="app-container">
-            <div className="page-header">
-                <button className="btn-icon" onClick={() => navigate(-1)}>
-                    <ArrowLeft size={20} />
-                </button>
-                <div>
-                    <h1>Pick Your Partner</h1>
-                    <p className="subtitle">Choose who delivers your order</p>
+        <div className="page" style={{ paddingBottom: 40, background: 'var(--bg)' }}>
+            {/* Hero Header */}
+            <div className="gradient-hero" style={{ padding: '40px 24px 80px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
+                <div style={{ position: 'absolute', top: -30, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+                
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <button className="btn btn-icon" onClick={() => navigate(-1)} style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: 'none', color: 'white' }}>
+                        <ArrowLeft size={20} />
+                    </button>
+                    <div>
+                        <h1 style={{ color: 'white', fontSize: 22, fontWeight: 800, fontFamily: 'Outfit' }}>Pick Your Partner</h1>
+                        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13 }}>Choose who delivers your order</p>
+                    </div>
                 </div>
             </div>
 
-            <div className="page-content">
+            <div className="page-content" style={{ marginTop: -48 }}>
                 {/* Waiting overlay */}
                 {waitingResponse && (
                     <div className="card" style={{

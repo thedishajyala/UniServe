@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { updateProfile, toggleAvailability } from '../services/api';
 import toast from 'react-hot-toast';
@@ -57,60 +57,57 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className="page">
-            <div className="page-header">
-                <button className="btn btn-icon btn-ghost" onClick={() => navigate(-1)}>
-                    <ArrowLeft size={20} />
-                </button>
-                <h1 className="page-title">Profile</h1>
-                <div style={{ width: 40 }} />
-            </div>
-
-            <div className="page-content">
-                {/* Avatar & Name Header */}
-                <div style={{
-                    textAlign: 'center', marginBottom: 24, padding: '24px 0 16px',
-                }}>
+        <div className="page" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+            {/* Hero Header */}
+            <div className="gradient-hero" style={{ padding: '48px 24px 80px', textAlign: 'center', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
+                <div style={{ position: 'absolute', top: -30, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+                
+                <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{
-                        width: 80, height: 80, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                        width: 88, height: 88, borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.15)',
+                        backdropFilter: 'blur(10px)',
+                        border: '2px solid rgba(255,255,255,0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#fff', fontWeight: 800, fontSize: 32, fontFamily: 'Outfit, sans-serif',
-                        margin: '0 auto 12px', boxShadow: '0 4px 20px rgba(79,70,229,0.3)',
+                        margin: '0 auto 16px', boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
                     }}>
                         {(user?.name || 'U').charAt(0).toUpperCase()}
                     </div>
-                    <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 20, fontWeight: 700 }}>{user?.name}</h2>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>{user?.email}</p>
+                    <h1 style={{ color: 'white', fontSize: 24, marginBottom: 4, fontFamily: 'Outfit' }}>{user?.name}</h1>
+                    <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, marginBottom: 16 }}>{user?.email}</p>
 
-                    {/* Availability toggle */}
                     <div style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 12,
-                        background: user?.is_available ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-                        padding: '6px 16px', borderRadius: 999, cursor: 'pointer',
+                        display: 'inline-flex', alignItems: 'center', gap: 10,
+                        background: user?.is_available ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.15)',
+                        padding: '8px 20px', borderRadius: 999, cursor: 'pointer',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        backdropFilter: 'blur(8px)'
                     }} onClick={handleToggle}>
                         <span style={{ fontSize: 14 }}>{user?.is_available ? '🟢' : '🔴'}</span>
-                        <span style={{ fontWeight: 600, fontSize: 13, color: user?.is_available ? '#16a34a' : '#ef4444' }}>
-                            {user?.is_available ? 'Online — Accepting Deliveries' : 'Offline'}
+                        <span style={{ fontWeight: 700, fontSize: 13, color: 'white' }}>
+                            {user?.is_available ? 'Online' : 'Offline'}
                         </span>
                     </div>
                 </div>
+            </div>
 
+            <div className="page-content" style={{ marginTop: -48, paddingBottom: 100 }}>
                 {/* Stats Row */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
-                    <div className="stat-card" style={{ textAlign: 'center', padding: 14 }}>
-                        <Star size={16} style={{ color: '#f59e0b', marginBottom: 4 }} />
-                        <div className="stat-value" style={{ fontSize: 18 }}>{user?.rating?.toFixed(1) || '5.0'}</div>
+                <div className="stat-grid" style={{ marginBottom: 24 }}>
+                    <div className="stat-card">
+                        <Star size={18} style={{ color: '#f59e0b', marginBottom: 6 }} />
+                        <div className="stat-value">{(user?.rating || 5).toFixed(1)}</div>
                         <div className="stat-label">Rating</div>
                     </div>
-                    <div className="stat-card" style={{ textAlign: 'center', padding: 14 }}>
-                        <Package size={16} style={{ color: 'var(--primary)', marginBottom: 4 }} />
-                        <div className="stat-value" style={{ fontSize: 18 }}>{user?.total_deliveries || 0}</div>
+                    <div className="stat-card">
+                        <Package size={18} style={{ color: 'var(--primary)', marginBottom: 6 }} />
+                        <div className="stat-value">{user?.total_deliveries || 0}</div>
                         <div className="stat-label">Deliveries</div>
                     </div>
-                    <div className="stat-card" style={{ textAlign: 'center', padding: 14 }}>
-                        <DollarSign size={16} style={{ color: '#22c55e', marginBottom: 4 }} />
-                        <div className="stat-value" style={{ fontSize: 18 }}>₹{user?.total_earnings || 0}</div>
+                    <div className="stat-card">
+                        <DollarSign size={18} style={{ color: '#22c55e', marginBottom: 6 }} />
+                        <div className="stat-value">₹{user?.total_earnings || 0}</div>
                         <div className="stat-label">Earned</div>
                     </div>
                 </div>
@@ -182,6 +179,26 @@ export default function ProfilePage() {
                     {saving ? '⏳ Saving...' : <><Save size={16} style={{ marginRight: 6 }} /> Save Changes</>}
                 </button>
             </div>
+
+            {/* Bottom Nav */}
+            <nav className="bottom-nav">
+                <Link to="/" className="nav-item">
+                    <div className="nav-icon-wrapper"><Home size={20} /></div>
+                    <span className="nav-label">Home</span>
+                </Link>
+                <Link to="/order/create" className="nav-item">
+                    <div className="nav-icon-wrapper"><Package size={20} /></div>
+                    <span className="nav-label">Order</span>
+                </Link>
+                <Link to="/earnings" className="nav-item">
+                    <div className="nav-icon-wrapper"><TrendingUp size={20} /></div>
+                    <span className="nav-label">Earnings</span>
+                </Link>
+                <Link to="/profile" className="nav-item active">
+                    <div className="nav-icon-wrapper active-pill"><UserIcon size={20} /></div>
+                    <span className="nav-label">Profile</span>
+                </Link>
+            </nav>
         </div>
     );
 }

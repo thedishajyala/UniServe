@@ -75,11 +75,6 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    delivery_passes: {
-      type: Number,
-      default: 3,
-    },
-
     // Availability
     is_available: {
       type: Boolean,

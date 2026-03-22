@@ -70,7 +70,7 @@ router.post('/toggle-availability', protect, async (req, res) => {
 // GET /api/users/earnings
 router.get('/earnings', protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('total_earnings total_deliveries successful_deliveries rating delivery_passes');
+        const user = await User.findById(req.user._id).select('total_earnings total_deliveries successful_deliveries rating');
 
         // Get today's earnings from completed deliveries
         const today = new Date();
@@ -100,7 +100,6 @@ router.get('/earnings', protect, async (req, res) => {
             total_deliveries: user.total_deliveries,
             successful_deliveries: user.successful_deliveries,
             rating: user.rating,
-            delivery_passes: user.delivery_passes || 0,
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

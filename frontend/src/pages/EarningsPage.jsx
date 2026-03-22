@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getEarnings, getMyDeliveries, getDemandAnalytics, createPaymentOrder, verifyPayment, getRazorpayKey } from '../services/api';
+import { getEarnings, getMyDeliveries, getDemandAnalytics } from '../services/api';
 import toast from 'react-hot-toast';
-import { Home, Package, TrendingUp, User, ArrowLeft, RefreshCw, Key } from 'lucide-react';
+import { Home, Package, TrendingUp, User, Globe, Activity } from 'lucide-react';
 
 export default function EarningsPage() {
     const { user, logoutUser } = useAuth();
@@ -31,54 +31,7 @@ export default function EarningsPage() {
         load();
     }, []);
 
-    const handleRechargePasses = async () => {
-        setLoading(true);
-        try {
-            const { data: { key, bypass } } = await getRazorpayKey();
 
-            if (bypass) {
-                toast.success('Passes Recharged! (Payment Bypassed)');
-                window.location.reload();
-                return;
-            }
-
-            const paymentOrderRes = await createPaymentOrder({ amount: 50 }); // ₹50 for 5 passes
-            const rzpOrderId = paymentOrderRes.data.id;
-
-            const options = {
-                key,
-                amount: 5000,
-                currency: 'INR',
-                name: 'UniServe',
-                description: '5 Delivery Passes',
-                order_id: rzpOrderId,
-                handler: async function (response) {
-                    try {
-                        toast.loading('Verifying payment...', { id: 'payment' });
-                        await verifyPayment({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
-                        });
-                        toast.success('Successfully recharged 5 Passes! 🎉', { id: 'payment' });
-                        window.location.reload();
-                    } catch (verifyErr) {
-                        toast.error(verifyErr.response?.data?.message || 'Verification Failed', { id: 'payment' });
-                    }
-                },
-                prefill: { name: user?.name, email: user?.email },
-                theme: { color: '#4F46E5' },
-            };
-
-            const rzp = new window.Razorpay(options);
-            rzp.on('payment.failed', (response) => toast.error(`Payment Failed: ${response.error.description}`));
-            rzp.open();
-        } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to initialize Razorpay');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const formatTime = (h) => {
         const period = h >= 12 ? 'PM' : 'AM';
@@ -89,13 +42,13 @@ export default function EarningsPage() {
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Header */}
-            <div className="gradient-hero" style={{ padding: '40px 24px 60px', textAlign: 'left', overflow: 'hidden', position: 'relative' }}>
+            <div className="gradient-hero" style={{ padding: '40px 24px 80px', textAlign: 'left', overflow: 'hidden', position: 'relative', borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
                 <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
                 <h1 style={{ color: 'white', fontSize: 26, marginBottom: 4 }}>Your Earnings 💸</h1>
                 <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>Track your delivery income</p>
             </div>
 
-            <div className="page-content" style={{ marginTop: -32 }}>
+            <div className="page-content" style={{ marginTop: -48 }}>
                 {/* Demand Alert */}
                 {demand?.isCurrentlyPeak && (
                     <div className="demand-banner fade-in" style={{ marginBottom: 16 }}>
@@ -124,26 +77,22 @@ export default function EarningsPage() {
                     </div>
                 </div>
 
-                {/* Rating & Action Panel */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                    <div className="card" style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ fontSize: 32, marginBottom: 4 }}>⭐</div>
-                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 24, color: '#F59E0B', lineHeight: 1 }}>
-                            {(earnings?.rating || user?.rating || 5).toFixed(1)}
+                {/* Experience & Activity */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 12, marginBottom: 16 }}>
+                    <div className="card" style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+                            {[1,2,3,4,5].map(s => <Star key={s} size={16} fill={s <= Math.round(earnings?.rating || 5) ? "#F59E0B" : "none"} color="#F59E0B" />)}
+                        </div>
+                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 32, color: '#F59E0B', lineHeight: 1 }}>
+                            {(earnings?.rating || user?.rating || 5.0).toFixed(1)}
                         </p>
-                        <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>Your rating</p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4, fontWeight: 600 }}>Partner Rating</p>
                     </div>
 
-                    <div className="card" style={{ padding: 20, background: 'linear-gradient(135deg, #1A1A2E, #2D2D44)', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                            <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>Passes Left</span>
-                            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 28, color: earnings?.delivery_passes > 0 ? '#10B981' : '#EF4444' }}>
-                                {earnings?.delivery_passes || 0}
-                            </span>
-                        </div>
-                        <button className="btn btn-primary" style={{ padding: '10px', fontSize: 13, width: '100%', background: 'white', color: 'var(--primary)', boxShadow: 'none' }} onClick={handleRechargePasses} disabled={loading}>
-                            {loading ? 'Wait...' : 'Recharge ₹50'}
-                        </button>
+                    <div className="card" style={{ padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+                        <Activity size={24} color="var(--primary)" style={{ marginBottom: 8 }} />
+                        <p style={{ fontWeight: 700, fontSize: 14 }}>Accept Rate</p>
+                        <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--primary)' }}>98%</p>
                     </div>
                 </div>
 
@@ -194,10 +143,22 @@ export default function EarningsPage() {
 
             {/* Bottom Nav */}
             <nav className="bottom-nav">
-                <Link to="/" className="nav-item"><Home /><span className="nav-label">Home</span></Link>
-                <Link to="/order/create" className="nav-item"><Package /><span className="nav-label">Order</span></Link>
-                <Link to="/earnings" className="nav-item active"><TrendingUp /><span className="nav-label">Earnings</span></Link>
-                <button className="nav-item" onClick={() => { logoutUser(); navigate('/login'); }}><User /><span className="nav-label">Logout</span></button>
+                <Link to="/" className="nav-item">
+                    <div className="nav-icon-wrapper"><Home size={20} /></div>
+                    <span className="nav-label">Home</span>
+                </Link>
+                <Link to="/order/create" className="nav-item">
+                    <div className="nav-icon-wrapper"><Package size={20} /></div>
+                    <span className="nav-label">Order</span>
+                </Link>
+                <Link to="/earnings" className="nav-item active">
+                    <div className="nav-icon-wrapper active-pill"><TrendingUp size={20} /></div>
+                    <span className="nav-label">Earnings</span>
+                </Link>
+                <Link to="/profile" className="nav-item">
+                    <div className="nav-icon-wrapper"><User size={20} /></div>
+                    <span className="nav-label">Profile</span>
+                </Link>
             </nav>
         </div>
     );
