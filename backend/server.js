@@ -21,7 +21,7 @@ const server = http.createServer(app);
 // Socket.io setup
 const io = new Server(server, {
     cors: {
-        origin: process.env.CLIENT_URL || 'http://localhost:5173',
+        origin: "*", // allow all domains so Vercel doesn't get blocked
         methods: ['GET', 'POST'],
     },
 });
