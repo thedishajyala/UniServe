@@ -60,7 +60,11 @@ export default function ChatPage() {
         socket.emit('join_order_room', { orderId, userId: user._id });
 
         socket.on('receive_message', (msg) => {
-            setMessages((prev) => [...prev, msg]);
+            setMessages((prev) => {
+                // Prevent duplicate optimistic messages
+                if (prev.find((m) => m._id === msg._id || (m.content === msg.content && m.createdAt >= Date.now() - 5000))) return prev;
+                return [...prev, msg];
+            });
         });
         socket.on('partner_typing', ({ isTyping }) => {
             setTypingPartner(isTyping);
@@ -79,7 +83,20 @@ export default function ChatPage() {
 
     const handleSend = () => {
         if (!text.trim() || !socket) return;
-        socket.emit('send_message', { orderId, senderId: user._id, content: text.trim(), type: 'text' });
+        
+        const content = text.trim();
+        // Optimistically add message to UI
+        const optimisticMsg = {
+            _id: Date.now().toString(),
+            sender_id: user._id,
+            type: 'text',
+            content: content,
+            createdAt: new Date(),
+        };
+        setMessages((prev) => [...prev, optimisticMsg]);
+        
+        // Fire to server silently
+        socket.emit('send_message', { orderId, senderId: user._id, content: content, type: 'text' });
         setText('');
         socket.emit('typing', { orderId, userId: user._id, isTyping: false });
     };
