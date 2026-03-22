@@ -4,7 +4,7 @@
  * based on pickup location type/name.
  */
 
-const LOW_PRICE_OUTLETS = ['Tuck Shop BU', 'Maggie Hotspot', 'Quench'];
+const LOW_PRICE_OUTLETS = ['Tuck Shop BU', 'Maggie Hotspot'];
 const ALL_OUTLETS = [
     'Kathi House',
     'Dominos',
@@ -36,9 +36,9 @@ function calculatePricing(pickup_type, pickup_location) {
         return { price: 29, commission: 4, delivery_earning: 25 };
     }
 
-    // Gates 1 & 2 = ₹29 (package pickups)
+    // Gates 1 & 2 = ₹49 (food parcels usually)
     if (pickup_type === 'gate') {
-        return { price: 29, commission: 4, delivery_earning: 25 };
+        return { price: 49, commission: 9, delivery_earning: 40 };
     }
 
     // Other food outlets = ₹49

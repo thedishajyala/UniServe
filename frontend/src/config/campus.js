@@ -12,7 +12,7 @@ export const OUTLETS = [
     'Quench',
 ];
 
-export const LOW_PRICE_OUTLETS = ['Tuck Shop BU', 'Maggie Hotspot', 'Quench'];
+export const LOW_PRICE_OUTLETS = ['Tuck Shop BU', 'Maggie Hotspot'];
 
 export const GATES = [
     { label: 'Gate 1', value: 'Gate 1', parcelOnly: false },
@@ -38,9 +38,9 @@ export const PRICING = {
 
 export function getPricing(pickupType, pickupLocation) {
     if (pickupType === 'gate' && pickupLocation === 'Gate 3') return PRICING.gate3;
+    if (pickupType === 'gate') return PRICING.standard; // Gates 1 and 2 are 49
     if (pickupType === 'outlet' && LOW_PRICE_OUTLETS.includes(pickupLocation)) return PRICING.lowOutlet;
-    if (pickupType === 'gate') return PRICING.gate3;
-    if (pickupType === 'outlet') return PRICING.standard;
+    if (pickupType === 'outlet') return PRICING.standard; // Standard outlets are 49
     return PRICING.gate3; // manual = ₹29
 }
 
