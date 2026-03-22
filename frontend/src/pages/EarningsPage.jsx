@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getEarnings, getMyDeliveries, getDemandAnalytics } from '../services/api';
 import toast from 'react-hot-toast';
-import { Home, Package, TrendingUp, User, Globe, Activity } from 'lucide-react';
+import { Home, Package, TrendingUp, User, Globe, Activity, Star } from 'lucide-react';
 
 export default function EarningsPage() {
     const { user, logoutUser } = useAuth();

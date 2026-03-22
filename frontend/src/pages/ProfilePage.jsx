@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { updateProfile, toggleAvailability } from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Save, MapPin, Hash, User as UserIcon, Mail, Shield, Star, Package, DollarSign } from 'lucide-react';
+import { ArrowLeft, Save, MapPin, Hash, User as UserIcon, Mail, Shield, Star, Package, DollarSign, Home, TrendingUp } from 'lucide-react';
 import { HOSTELS } from '../config/campus';
 
 export default function ProfilePage() {
