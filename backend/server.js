@@ -21,8 +21,9 @@ const server = http.createServer(app);
 // Socket.io setup
 const io = new Server(server, {
     cors: {
-        origin: "*", // allow all domains so Vercel doesn't get blocked
+        origin: (origin, callback) => callback(null, true), // Safely allow all origins with credentials
         methods: ['GET', 'POST'],
+        credentials: true,
     },
 });
 setupChatSockets(io);

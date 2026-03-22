@@ -8,7 +8,11 @@ export function SocketProvider({ children }) {
 
     useEffect(() => {
         const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
-        const newSocket = io(SOCKET_URL, { autoConnect: true });
+        const newSocket = io(SOCKET_URL, { 
+            autoConnect: true,
+            withCredentials: true,
+            transports: ['websocket', 'polling']
+        });
         setSocket(newSocket);
 
         return () => {
