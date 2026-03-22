@@ -174,7 +174,7 @@ export default function HomePage() {
                 </div>
             </div>
 
-            <div className="page-content" style={{ marginTop: -48 }}>
+            <div className="page-content" style={{ marginTop: -48, position: 'relative', zIndex: 2 }}>
 
                 {/* ── INCOMING REQUESTS PANEL (partner only, when online) ── */}
                 {user?.is_available && incomingRequests.length > 0 && (
@@ -341,7 +341,7 @@ export default function HomePage() {
                             </div>
                         </button>
 
-                        <div className="card action-card toggle-card" style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #f0fdf4, #dcfce7)' : 'white', border: user?.is_available ? '1px solid #bbf7d0' : '1px solid var(--border)', boxShadow: '0 8px 25px rgba(0,0,0,0.06)' }}>
+                        <div className="card action-card toggle-card" style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #f0fdf4, #dcfce7)' : 'white', border: user?.is_available ? '1px solid #bbf7d0' : '1px solid var(--border)', boxShadow: '0 8px 25px rgba(0,0,0,0.06)', position: 'relative' }}>
                             <div style={{ fontSize: 28, marginBottom: 4 }}>{user?.is_available ? '🚴' : '😴'}</div>
                             <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 15, color: user?.is_available ? '#166534' : 'var(--text-primary)' }}>
                                 {user?.is_available ? 'Live Now' : 'Offline'}

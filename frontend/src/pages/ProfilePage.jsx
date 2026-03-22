@@ -92,7 +92,7 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            <div className="page-content" style={{ marginTop: -48, paddingBottom: 100 }}>
+            <div className="page-content" style={{ marginTop: -48, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
                 {/* Stats Row */}
                 <div className="stat-grid" style={{ marginBottom: 24 }}>
                     <div className="stat-card">

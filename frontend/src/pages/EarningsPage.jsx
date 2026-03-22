@@ -48,7 +48,7 @@ export default function EarningsPage() {
                 <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>Track your delivery income</p>
             </div>
 
-            <div className="page-content" style={{ marginTop: -48 }}>
+            <div className="page-content" style={{ marginTop: -48, position: 'relative', zIndex: 2 }}>
                 {/* Demand Alert */}
                 {demand?.isCurrentlyPeak && (
                     <div className="demand-banner fade-in" style={{ marginBottom: 16 }}>
