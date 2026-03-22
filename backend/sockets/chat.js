@@ -1,4 +1,5 @@
 const Message = require('../models/Message');
+const Order = require('../models/Order');
 
 function setupChatSockets(io) {
     io.on('connection', (socket) => {
@@ -38,6 +39,22 @@ function setupChatSockets(io) {
                 }
 
                 io.to(`order_${orderId}`).emit('receive_message', savedMessage);
+
+                // Global Notification to recipient
+                const order = await Order.findById(orderId).populate('user_id', 'name');
+                if (order) {
+                    const recipientId = order.user_id._id.toString() === senderId.toString() 
+                        ? order.delivery_partner_id 
+                        : order.user_id._id;
+
+                    if (recipientId) {
+                        io.to(`user_${recipientId}`).emit('new_chat_message', {
+                            orderId,
+                            senderName: order.user_id._id.toString() === senderId.toString() ? (order.user_id.name.split(' ')[0]) : 'Partner',
+                            content: type === 'image' ? '📷 Sent an image' : content,
+                        });
+                    }
+                }
             } catch (err) {
                 console.error('Message send error:', err);
                 socket.emit('message_error', { error: 'Failed to send message' });

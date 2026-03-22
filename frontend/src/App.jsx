@@ -1,8 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { SocketProvider } from './context/SocketContext';
+import { SocketProvider, useSocket } from './context/SocketContext';
+import { useNotifications } from './hooks/useNotifications';
+import toast from 'react-hot-toast';
 
 import LoginPage from './pages/LoginPage';
 import ProfileSetupPage from './pages/ProfileSetupPage';
@@ -37,6 +39,46 @@ function AuthRoute({ children }) {
   return children;
 }
 
+function GlobalSocketListeners() {
+  const socket = useSocket();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { notify } = useNotifications();
+
+  React.useEffect(() => {
+    if (!socket || !user) return;
+
+    // Globally connect to their personal room
+    socket.emit('join_user_room', { userId: user._id });
+
+    // Listen for global chat notifications
+    const handleNewMessage = ({ orderId, senderName, content }) => {
+      // Don't toast if we are currently looking at that exact chat window!
+      if (window.location.pathname === `/chat/${orderId}`) return;
+
+      toast((t) => (
+        <div style={{ cursor: 'pointer', flex: 1, padding: '4px 0' }} onClick={() => {
+          toast.dismiss(t.id);
+          navigate(`/chat/${orderId}`);
+        }}>
+          <p style={{ fontWeight: 700, marginBottom: 2 }}>💬 New message from {senderName}</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{content?.slice(0, 40)}{content?.length > 40 ? '...' : ''}</p>
+        </div>
+      ), { duration: 4000, position: 'top-center' });
+
+      notify(`New message from ${senderName}`, content, `/chat/${orderId}`);
+    };
+
+    socket.on('new_chat_message', handleNewMessage);
+
+    return () => {
+      socket.off('new_chat_message', handleNewMessage);
+    };
+  }, [socket, user, navigate, notify]);
+
+  return null;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -60,6 +102,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <SocketProvider>
+          <GlobalSocketListeners />
           <AppRoutes />
           <Toaster
             position="top-center"
