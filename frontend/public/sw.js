@@ -1,5 +1,5 @@
 // UniServe Service Worker — caches shell, handles background push
-const CACHE_NAME = 'uniserve-v1';
+const CACHE_NAME = 'uniserve-v2';
 const SHELL = ['/', '/index.html'];
 
 self.addEventListener('install', (e) => {
@@ -29,8 +29,8 @@ self.addEventListener('push', (e) => {
     e.waitUntil(
         self.registration.showNotification(data.title, {
             body: data.body,
-            icon: '/icon-192.png',
-            badge: '/icon-192.png',
+            icon: '/icons.svg',
+            badge: '/icons.svg',
             data: { url: data.url || '/' },
             vibrate: [200, 100, 200],
         })
