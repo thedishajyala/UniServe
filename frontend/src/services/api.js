@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+const getBaseURL = () => {
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    // Auto-detect production backend on Vercel
+    if (window.location.hostname.includes('vercel.app')) {
+        return `https://${window.location.hostname}/api`;
+    }
+    return 'http://localhost:5001/api';
+};
+
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
+    baseURL: getBaseURL(),
 });
 
 // Attach JWT token to every request

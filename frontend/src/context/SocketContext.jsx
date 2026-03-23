@@ -7,7 +7,14 @@ export function SocketProvider({ children }) {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
+        const getSocketURL = () => {
+            if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
+            if (window.location.hostname.includes('vercel.app')) {
+                return `https://${window.location.hostname}`;
+            }
+            return 'http://localhost:5001';
+        };
+        const SOCKET_URL = getSocketURL();
         const newSocket = io(SOCKET_URL, { 
             autoConnect: true,
             withCredentials: true,
