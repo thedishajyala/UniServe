@@ -6,7 +6,7 @@ import { useSocket } from '../context/SocketContext';
 import { ORDER_STATUSES } from '../config/campus';
 import toast from 'react-hot-toast';
 import { ArrowLeft, MessageCircle, MapPin } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -22,6 +22,15 @@ L.Icon.Default.mergeOptions({
 
 function getInitials(name = '') {
     return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+// Leaflet Helper to re-center map when location updates
+function ChangeView({ center }) {
+    const map = useMap();
+    useEffect(() => {
+        if (center) map.setView(center, map.getZoom());
+    }, [center, map]);
+    return null;
 }
 
 export default function TrackingPage() {
@@ -75,11 +84,14 @@ export default function TrackingPage() {
         };
     }, [socket, orderId, user]);
 
-    // Partner: Start broadcasting location when 'on_the_way'
+    // Partner: Start broadcasting location when 'picked' or 'on_the_way'
     useEffect(() => {
         const isPartner = order?.delivery_partner_id?._id === user?._id || order?.delivery_partner_id === user?._id;
         
-        if (isPartner && order?.status === 'on_the_way') {
+        // Track once order is picked up
+        const trackingActive = ['picked', 'on_the_way'].includes(order?.status);
+        
+        if (isPartner && trackingActive) {
             if ('geolocation' in navigator) {
                 const id = navigator.geolocation.watchPosition(
                     (pos) => {
@@ -243,18 +255,19 @@ export default function TrackingPage() {
                     </div>
                 </div>
 
-                {/* Live Map (Only visible if On The Way & Coordinates Exist) */}
-                {order.status === 'on_the_way' && partnerLocation && (
+                {/* Live Map (Only visible if Picked/On The Way & Coordinates Exist) */}
+                {['picked', 'on_the_way'].includes(order.status) && partnerLocation && (
                     <div className="card slide-up" style={{ marginBottom: 20, padding: 16, overflow: 'hidden' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                             <MapPin size={18} color="var(--primary)" />
                             <p style={{ fontWeight: 700, fontSize: 14 }}>Live Tracking 📍</p>
                         </div>
-                        <div style={{ height: 250, borderRadius: 12, overflow: 'hidden', zIndex: 0 }}>
+                        <div style={{ height: 300, borderRadius: 12, overflow: 'hidden', zIndex: 0 }}>
                             <MapContainer center={[partnerLocation.lat, partnerLocation.lng]} zoom={17} style={{ height: '100%', width: '100%' }}>
+                                <ChangeView center={[partnerLocation.lat, partnerLocation.lng]} />
                                 <TileLayer
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
+                                    url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                                    attribution='&copy; <a href="https://osm.org/copyright">OSM</a>'
                                 />
                                 <Marker position={[partnerLocation.lat, partnerLocation.lng]}>
                                     <Popup>
