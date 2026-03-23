@@ -26,28 +26,8 @@ const GATES = ['Gate 1', 'Gate 2', 'Gate 3'];
  * @returns {{ price: number, commission: number, delivery_earning: number }}
  */
 function calculatePricing(pickup_type, pickup_location) {
-    // Gate 3 = parcels only, ₹29
-    if (pickup_type === 'gate' && pickup_location === 'Gate 3') {
-        return { price: 29, commission: 4, delivery_earning: 25 };
-    }
-
-    // Tuck Shop BU or Maggie Hotspot = ₹29
-    if (pickup_type === 'outlet' && LOW_PRICE_OUTLETS.includes(pickup_location)) {
-        return { price: 29, commission: 4, delivery_earning: 25 };
-    }
-
-    // Gates 1 & 2 = ₹49 (food parcels usually)
-    if (pickup_type === 'gate') {
-        return { price: 49, commission: 9, delivery_earning: 40 };
-    }
-
-    // Other food outlets = ₹49
-    if (pickup_type === 'outlet') {
-        return { price: 49, commission: 9, delivery_earning: 40 };
-    }
-
-    // Manual location = ₹29
-    return { price: 29, commission: 4, delivery_earning: 25 };
+    // Flat pricing: ₹49 for everyone, everywhere
+    return { price: 49, commission: 0, delivery_earning: 49 };
 }
 
 function validateGate3IsParcel(pickup_location, item_details) {

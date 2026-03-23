@@ -31,17 +31,11 @@ export const ALL_HOSTELS = HOSTELS;
 
 // Pricing
 export const PRICING = {
-    gate3: { price: 29, commission: 4, partnerEarns: 25 },
-    lowOutlet: { price: 29, commission: 4, partnerEarns: 25 },
-    standard: { price: 49, commission: 9, partnerEarns: 40 },
+    fixed: { price: 49, commission: 0, partnerEarns: 49 },
 };
 
 export function getPricing(pickupType, pickupLocation) {
-    if (pickupType === 'gate' && pickupLocation === 'Gate 3') return PRICING.gate3;
-    if (pickupType === 'gate') return PRICING.standard; // Gates 1 and 2 are 49
-    if (pickupType === 'outlet' && LOW_PRICE_OUTLETS.includes(pickupLocation)) return PRICING.lowOutlet;
-    if (pickupType === 'outlet') return PRICING.standard; // Standard outlets are 49
-    return PRICING.gate3; // manual = ₹29
+    return PRICING.fixed;
 }
 
 export const UNIVERSITY_DOMAIN = 'bennett.edu.in';

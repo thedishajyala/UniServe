@@ -88,7 +88,8 @@ export default function LoginPage() {
                     {/* Mode toggle */}
                     <div style={{ display: 'flex', background: 'var(--bg)', borderRadius: 12, padding: 4, marginBottom: 28 }}>
                         {['login', 'signup'].map((m) => (
-                            <button key={m}
+                             <button key={m}
+                                type="button"
                                 className="btn"
                                 style={{
                                     flex: 1, borderRadius: 9, padding: '10px 0', fontSize: 14,

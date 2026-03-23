@@ -8,10 +8,10 @@ export function SocketProvider({ children }) {
 
     useEffect(() => {
         const getSocketURL = () => {
-            if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
             if (window.location.hostname.includes('vercel.app')) {
                 return `https://${window.location.hostname}`;
             }
+            if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
             return 'http://localhost:5001';
         };
         const SOCKET_URL = getSocketURL();

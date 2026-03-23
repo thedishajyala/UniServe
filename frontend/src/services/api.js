@@ -1,11 +1,12 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
-    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-    // Auto-detect production backend on Vercel
+    // If we're on a Vercel deployment, prioritize the local API functions!
+    // This stops Render or other old backends from interfering with the new code.
     if (window.location.hostname.includes('vercel.app')) {
         return `https://${window.location.hostname}/api`;
     }
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
     return 'http://localhost:5001/api';
 };
 
