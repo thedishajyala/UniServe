@@ -68,35 +68,39 @@ export default function LoginPage() {
     };
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+            {/* Background Decorations */}
+            <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(60px)' }} />
+            <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '50%', height: '50%', background: 'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(80px)' }} />
+
             {/* Hero */}
-            <div className="gradient-hero" style={{ padding: '60px 24px 100px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
-                <div style={{ position: 'absolute', bottom: -40, left: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ fontSize: 52, marginBottom: 16 }}>🚀</div>
-                    <h1 style={{ color: 'white', fontSize: 36, marginBottom: 8 }}>UniServe</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 15, lineHeight: 1.6 }}>
+            <div className="gradient-hero" style={{ padding: '80px 24px 120px', position: 'relative', overflow: 'hidden', textAlign: 'center' }}>
+                <div style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto' }}>
+                    <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+                        <span style={{ fontSize: 40 }}>🚀</span>
+                    </div>
+                    <h1 style={{ color: 'white', fontSize: 48, marginBottom: 12, letterSpacing: '-2px', fontWeight: 900 }}>UniServe</h1>
+                    <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 17, lineHeight: 1.6, fontWeight: 500, maxWidth: 400, margin: '0 auto' }}>
                         Campus delivery, powered by students.<br />Your hostel essentials, on demand.
                     </p>
                 </div>
             </div>
 
             {/* Card */}
-            <div style={{ maxWidth: 440, width: '100%', margin: '-48px auto 0', padding: '0 16px 32px', flex: 1 }}>
-                <div className="card slide-up" style={{ borderRadius: 24, padding: 32 }}>
+            <div style={{ maxWidth: 480, width: '100%', margin: '-60px auto 0', padding: '0 16px 48px', position: 'relative', zIndex: 10 }}>
+                <div className="card slide-up" style={{ borderRadius: 32, padding: 32, boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.8)' }}>
                     {/* Mode toggle */}
-                    <div style={{ display: 'flex', background: 'var(--bg)', borderRadius: 12, padding: 4, marginBottom: 28 }}>
+                    <div style={{ display: 'flex', background: 'var(--bg)', borderRadius: 16, padding: 6, marginBottom: 32, border: '1px solid var(--border-strong)' }}>
                         {['login', 'signup'].map((m) => (
                              <button key={m}
                                 type="button"
                                 className="btn"
                                 style={{
-                                    flex: 1, borderRadius: 9, padding: '10px 0', fontSize: 14,
+                                    flex: 1, borderRadius: 12, padding: '12px 0', fontSize: 14, fontWeight: 700,
                                     background: mode === m ? 'white' : 'transparent',
                                     color: mode === m ? 'var(--primary)' : 'var(--text-muted)',
-                                    boxShadow: mode === m ? 'var(--shadow-sm)' : 'none',
-                                    transition: 'all 0.2s ease'
+                                    boxShadow: mode === m ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                                 }}
                                 onClick={() => { setMode(m); setErrors({}); }}
                             >
@@ -105,11 +109,11 @@ export default function LoginPage() {
                         ))}
                     </div>
 
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                         {mode === 'signup' && (
                             <div className="input-group">
                                 <label className="input-label">Full Name</label>
-                                <input className={`input${errors.name ? ' error' : ''}`} name="name" placeholder="Your full name" value={form.name} onChange={handleChange} />
+                                <input className={`input${errors.name ? ' error' : ''}`} name="name" placeholder="John Doe" value={form.name} onChange={handleChange} />
                                 {errors.name && <p className="input-error">{errors.name}</p>}
                             </div>
                         )}
@@ -122,15 +126,15 @@ export default function LoginPage() {
 
                         <div className="input-group">
                             <label className="input-label">Password</label>
-                            <input className={`input${errors.password ? ' error' : ''}`} type="password" name="password" placeholder="Min. 6 characters" value={form.password} onChange={handleChange} />
+                            <input className={`input${errors.password ? ' error' : ''}`} type="password" name="password" placeholder="••••••••" value={form.password} onChange={handleChange} />
                             {errors.password && <p className="input-error">{errors.password}</p>}
                         </div>
 
                         {mode === 'signup' && (
                             <>
                                 <div className="input-group">
-                                    <label className="input-label">Phone Number <span style={{ color: 'var(--primary)' }}>(MUST BE REAL)</span></label>
-                                    <input className={`input${errors.phone ? ' error' : ''}`} type="tel" name="phone" placeholder="10-digit mobile number" value={form.phone} onChange={handleChange} maxLength={10} />
+                                    <label className="input-label">Phone Number</label>
+                                    <input className={`input${errors.phone ? ' error' : ''}`} type="tel" name="phone" placeholder="10-digit mobile" value={form.phone} onChange={handleChange} maxLength={10} />
                                     {errors.phone && <p className="input-error">{errors.phone}</p>}
                                 </div>
                                 <div className="input-group">
@@ -141,15 +145,17 @@ export default function LoginPage() {
                             </>
                         )}
 
-                        <button type="submit" className="btn btn-primary btn-w-full btn-lg" style={{ marginTop: 8 }} disabled={loading}>
-                            {loading ? '⏳ Please wait...' : (mode === 'login' ? '🔑 Sign In' : '🚀 Create Account')}
+                        <button type="submit" className="btn btn-primary btn-w-full btn-lg" style={{ marginTop: 12, height: 60, fontSize: 17, fontWeight: 800, borderRadius: 18 }} disabled={loading}>
+                            {loading ? '⏳ Connecting...' : (mode === 'login' ? 'Sign In' : 'Create My Account')}
                         </button>
                     </form>
 
-                    <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-muted)', marginTop: 24, lineHeight: 1.5 }}>
-                        🔒 Only <strong>@{UNIVERSITY_DOMAIN}</strong> emails accepted.<br />
-                        Student identity is verified for everyone's safety.
-                    </p>
+                    <div style={{ textAlign: 'center', marginTop: 32 }}>
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, fontWeight: 500 }}>
+                            By continuing, you agree to student verification.<br />
+                            Only <strong>@{UNIVERSITY_DOMAIN}</strong> accounts allowed.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

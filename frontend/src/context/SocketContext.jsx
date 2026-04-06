@@ -8,9 +8,6 @@ export function SocketProvider({ children }) {
 
     useEffect(() => {
         const getSocketURL = () => {
-            if (window.location.hostname.includes('vercel.app')) {
-                return `https://${window.location.hostname}`;
-            }
             if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
             return 'http://localhost:5001';
         };
@@ -18,7 +15,6 @@ export function SocketProvider({ children }) {
         const newSocket = io(SOCKET_URL, { 
             autoConnect: true,
             withCredentials: true,
-            transports: ['websocket', 'polling']
         });
         setSocket(newSocket);
 

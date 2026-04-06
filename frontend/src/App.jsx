@@ -20,11 +20,18 @@ import ProfilePage from './pages/ProfilePage';
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return (
-    <div className="full-center">
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 40, marginBottom: 16 }}>🚀</div>
-        <p style={{ color: 'var(--text-muted)', fontFamily: 'Outfit, sans-serif' }}>Loading UniServe...</p>
+    <div className="full-center" style={{ background: 'var(--bg)' }}>
+      <div style={{ textAlign: 'center', animation: 'fadeIn 1s ease' }}>
+        <div style={{ position: 'relative', width: 80, height: 80, margin: '0 auto 24px' }}>
+          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '4px solid var(--border)', borderTopColor: 'var(--primary)', animation: 'spin 1s linear infinite' }} />
+          <div style={{ position: 'absolute', inset: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>🚀</div>
+        </div>
+        <p style={{ color: 'var(--primary)', fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em' }}>UniServe</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4, fontWeight: 500 }}>Connecting campus micro-gigs...</p>
       </div>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
   if (!user) return <Navigate to="/login" replace />;

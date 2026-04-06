@@ -8,22 +8,25 @@ import { Home, Package, TrendingUp, User, CheckCircle, XCircle, Bell, ArrowRight
 import { useNotifications } from '../hooks/useNotifications';
 
 function BottomNav() {
+    const navigate = useNavigate();
+    const path = window.location.pathname;
+
     return (
         <nav className="bottom-nav">
-            <Link to="/" className="nav-item active">
-                <div className="nav-icon-wrapper active-pill"><Home size={20} /></div>
+            <Link to="/" className={`nav-item ${path === '/' ? 'active' : ''}`}>
+                <div className={`nav-icon-wrapper ${path === '/' ? 'active-pill' : ''}`}><Home size={20} /></div>
                 <span className="nav-label">Home</span>
             </Link>
-            <Link to="/order/create" className="nav-item">
-                <div className="nav-icon-wrapper"><Package size={20} /></div>
+            <Link to="/order/create" className={`nav-item ${path === '/order/create' ? 'active' : ''}`}>
+                <div className={`nav-icon-wrapper ${path === '/order/create' ? 'active-pill' : ''}`}><Package size={20} /></div>
                 <span className="nav-label">Order</span>
             </Link>
-            <Link to="/earnings" className="nav-item">
-                <div className="nav-icon-wrapper"><TrendingUp size={20} /></div>
+            <Link to="/earnings" className={`nav-item ${path === '/earnings' ? 'active' : ''}`}>
+                <div className={`nav-icon-wrapper ${path === '/earnings' ? 'active-pill' : ''}`}><TrendingUp size={20} /></div>
                 <span className="nav-label">Earnings</span>
             </Link>
-            <Link to="/profile" className="nav-item">
-                <div className="nav-icon-wrapper"><User size={20} /></div>
+            <Link to="/profile" className={`nav-item ${path === '/profile' ? 'active' : ''}`}>
+                <div className={`nav-icon-wrapper ${path === '/profile' ? 'active-pill' : ''}`}><User size={20} /></div>
                 <span className="nav-label">Profile</span>
             </Link>
         </nav>
@@ -154,21 +157,31 @@ export default function HomePage() {
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Hero Header */}
-            <div className="gradient-hero" style={{ padding: '40px 24px 80px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
-                <div style={{ position: 'absolute', top: -30, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+            <div className="gradient-hero" style={{ padding: '60px 24px 100px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 40, borderBottomRightRadius: 40 }}>
+                {/* Decorative mesh circles */}
+                <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)', filter: 'blur(40px)' }} />
+                <div style={{ position: 'absolute', bottom: -60, left: -20, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)', filter: 'blur(30px)' }} />
+                
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, marginBottom: 2, fontWeight: 500 }}>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'} 👋</p>
-                    <h1 style={{ color: 'white', fontSize: 26, marginBottom: 6, letterSpacing: '-0.5px' }}>{user?.name?.split(' ')[0]}</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14, fontWeight: 500, marginBottom: 12 }}>Ready to order or earn today?</p>
-                    
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        <div className="glass" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 12 }}>
-                            <span style={{ fontSize: 13 }}>🏠</span>
-                            <span style={{ color: 'rgba(255,255,255,0.95)', fontSize: 13, fontWeight: 600 }}>{user?.hostel} · Room {user?.room_no}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
+                            <span style={{ fontSize: 20 }}>🚀</span>
                         </div>
-                        <div className="glass trust-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 12, cursor: 'pointer', transition: 'transform 0.2s', ':active': { transform: 'scale(0.95)' } }} onClick={() => navigate('/profile')}>
+                        <div className="glass" style={{ padding: '6px 12px', borderRadius: 999, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => navigate('/profile')}>
                             <Star size={14} color="#FBBF24" fill="#FBBF24" />
-                            <span style={{ color: 'rgba(255,255,255,0.95)', fontSize: 13, fontWeight: 700 }}>{user?.rating?.toFixed(1) || '5.0'} Rating</span>
+                            <span style={{ color: 'white', fontSize: 13, fontWeight: 700 }}>{user?.rating?.toFixed(1) || '5.0'}</span>
+                        </div>
+                    </div>
+
+                    <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14, marginBottom: 4, fontWeight: 600, letterSpacing: '0.02em' }}>
+                        {new Date().getHours() < 12 ? 'GOOD MORNING' : new Date().getHours() < 18 ? 'GOOD AFTERNOON' : 'GOOD EVENING'} ⚡️
+                    </p>
+                    <h1 style={{ color: 'white', fontSize: 32, marginBottom: 8, letterSpacing: '-1px', fontWeight: 800 }}>{user?.name?.split(' ')[0]}</h1>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.9)', fontSize: 14, fontWeight: 500 }}>
+                        <span style={{ opacity: 0.8 }}>Living at</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.15)', padding: '2px 10px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <span style={{ fontSize: 12 }}>🏠</span>
+                            <span style={{ fontWeight: 700 }}>{user?.hostel} · {user?.room_no}</span>
                         </div>
                     </div>
                 </div>
@@ -325,35 +338,33 @@ export default function HomePage() {
                 )}
 
                 {/* Main Actions */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12, marginBottom: 24, padding: '0 4px' }}>
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        <button className="card action-card premium-card" style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 22, background: 'linear-gradient(145deg, #4F46E5, #6366f1)', color: 'white', border: '2px solid rgba(255,255,255,0.2)', position: 'relative', overflow: 'hidden', boxShadow: '0 12px 30px rgba(0,0,0,0.15)' }}
-                            onClick={() => navigate('/order/create')}>
-                            <div style={{ position: 'absolute', right: -20, bottom: -20, opacity: 0.1, transform: 'scale(1.5)' }}>
-                                <Package size={100} />
-                            </div>
-                            <div style={{ background: 'rgba(255,255,255,0.2)', padding: 10, borderRadius: 12, marginBottom: 16 }}>
-                                <Package size={24} color="white" />
-                            </div>
-                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 18, marginBottom: 4 }}>Create Order</div>
-                            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                Fast delivery <ArrowRight size={14} />
-                            </div>
-                        </button>
-
-                        <div className="card action-card toggle-card" style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #f0fdf4, #dcfce7)' : 'white', border: user?.is_available ? '1px solid #bbf7d0' : '1px solid var(--border)', boxShadow: '0 8px 25px rgba(0,0,0,0.06)', position: 'relative' }}>
-                            <div style={{ fontSize: 28, marginBottom: 4 }}>{user?.is_available ? '🚴' : '😴'}</div>
-                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 15, color: user?.is_available ? '#166534' : 'var(--text-primary)' }}>
-                                {user?.is_available ? 'Live Now' : 'Offline'}
-                            </div>
-                            <div style={{ fontSize: 11, color: user?.is_available ? '#15803d' : 'var(--text-muted)', marginBottom: 12, lineHeight: 1.2, fontWeight: 500 }}>
-                                {user?.is_available ? "Waiting for orders..." : "Go online to earn"}
-                            </div>
-                            <label className="toggle">
-                                <input type="checkbox" checked={!!user?.is_available} onChange={handleToggleAvail} disabled={togglingAvail} />
-                                <span className="toggle-slider" />
-                            </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 14, marginBottom: 24 }}>
+                    <button className="card action-card premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 24, background: 'linear-gradient(145deg, #6366f1, #4f46e5)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 12px 30px rgba(99,102,241,0.25)' }}
+                        onClick={() => navigate('/order/create')}>
+                        <div style={{ position: 'absolute', right: -15, bottom: -15, opacity: 0.1, transform: 'rotate(-15deg)' }}>
+                            <Package size={80} />
                         </div>
+                        <div style={{ background: 'rgba(255,255,255,0.25)', padding: 10, borderRadius: 14, marginBottom: 18, backdropFilter: 'blur(10px)' }}>
+                            <Package size={24} color="white" />
+                        </div>
+                        <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 19, marginBottom: 4 }}>Place Order</div>
+                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+                            Get it delivered <ArrowRight size={14} />
+                        </div>
+                    </button>
+
+                    <div className="card action-card toggle-card" style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #ECFDF5, #D1FAE5)' : 'white', border: user?.is_available ? '1px solid #A7F3D0' : '1px solid var(--border-strong)', boxShadow: '0 8px 25px rgba(0,0,0,0.04)', position: 'relative' }}>
+                        <div style={{ fontSize: 32, marginBottom: 8, filter: user?.is_available ? 'drop-shadow(0 4px 10px rgba(34,197,94,0.2))' : 'none' }}>{user?.is_available ? '🚴' : '😴'}</div>
+                        <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 16, color: user?.is_available ? '#065F46' : 'var(--text-primary)', marginBottom: 2 }}>
+                            {user?.is_available ? 'Live Now' : 'Offline'}
+                        </div>
+                        <div style={{ fontSize: 11, color: user?.is_available ? '#059669' : 'var(--text-muted)', marginBottom: 14, fontWeight: 600 }}>
+                            {user?.is_available ? "Active & Earning" : "Start a micro-gig"}
+                        </div>
+                        <label className="toggle">
+                            <input type="checkbox" checked={!!user?.is_available} onChange={handleToggleAvail} disabled={togglingAvail} />
+                            <span className="toggle-slider" />
+                        </label>
                     </div>
                 </div>
 
