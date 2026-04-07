@@ -51,9 +51,13 @@ const userSchema = new mongoose.Schema(
     // Delivery Partner Stats
     rating: {
       type: Number,
-      default: 5.0,
-      min: 1,
+      default: 0.0,
+      min: 0,
       max: 5,
+    },
+    total_reviews: {
+      type: Number,
+      default: 0,
     },
     total_deliveries: {
       type: Number,

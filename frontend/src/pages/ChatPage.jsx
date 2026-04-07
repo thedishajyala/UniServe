@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { getMessages, getOrderById, uploadImage } from '../services/api';
+import { getMessages, getOrderById, uploadImage, createPayment, settlePayment } from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Send, Phone, MapPin, Camera, ImagePlus, X } from 'lucide-react';
+import { ArrowLeft, Send, Phone, MapPin, Camera, ImagePlus, X, CreditCard } from 'lucide-react';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
@@ -34,6 +34,7 @@ export default function ChatPage() {
     const [typingPartner, setTypingPartner] = useState(false);
     const [imagePreview, setImagePreview] = useState(null); // { file, url }
     const [uploading, setUploading] = useState(false);
+    const [isPaying, setIsPaying] = useState(false);
     const endRef = useRef(null);
     const typingTimer = useRef(null);
     const galleryRef = useRef(null);
@@ -73,6 +74,10 @@ export default function ChatPage() {
             setOrder((o) => o ? { ...o, status } : o);
             toast(`Order status: ${status} 📦`, { icon: '✅' });
         });
+        socket.on('payment_settled', ({ payment_method }) => {
+            setOrder((o) => o ? { ...o, payment_method, payment_status: 'paid' } : o);
+            toast.success('Payment settled online! 💳', { duration: 5000 });
+        });
         socket.on('message_error', ({ error }) => {
             toast.error('SERVER ERROR: ' + error);
         });
@@ -81,9 +86,55 @@ export default function ChatPage() {
             socket.off('receive_message');
             socket.off('partner_typing');
             socket.off('order_status_changed');
+            socket.off('payment_settled');
             socket.off('message_error');
         };
     }, [socket, orderId, user]);
+
+    const handleSettlement = async () => {
+        setIsPaying(true);
+        try {
+            // Step 1: Create Order
+            const { data: rzpOrder } = await createPayment({
+                pickup_type: order.pickup_type,
+                pickup_location: order.pickup_location,
+            });
+
+            // Step 2: Modal
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: rzpOrder.amount,
+                currency: rzpOrder.currency,
+                name: 'UniServe Settlement',
+                description: `Pay for Delivery: ${order.pickup_location}`,
+                order_id: rzpOrder.id,
+                handler: async (response) => {
+                    try {
+                        await settlePayment({
+                            order_id: orderId,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                        });
+                        setIsPaying(false);
+                    } catch (err) {
+                        toast.error('Payment verified, but update failed. Contact support.');
+                    }
+                },
+                prefill: {
+                    name: user.name,
+                    email: user.email,
+                },
+                theme: { color: '#4F46E5' },
+                modal: { ondismiss: () => setIsPaying(false) }
+            };
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+        } catch (err) {
+            toast.error('Payment initialization failed');
+            setIsPaying(false);
+        }
+    };
 
     const handleSend = () => {
         if (!text.trim() || !socket) return;
@@ -175,6 +226,8 @@ export default function ChatPage() {
             : order.user_id)
         : null;
 
+    const isRequester = order?.user_id?._id === user?._id || order?.user_id === user?._id;
+
     const statusColors = {
         accepted: 'var(--primary)', picked: 'var(--secondary)',
         on_the_way: '#2563EB', delivered: 'var(--success)',
@@ -191,7 +244,9 @@ export default function ChatPage() {
                 <div className="avatar avatar-sm">{getInitials(partner?.name || '?')}</div>
                 <div style={{ flex: 1 }}>
                     <h1 style={{ fontSize: 15, fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>{partner?.name || 'Loading...'}</h1>
-                    <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{partner?.hostel} · {partner?.enrollment_no}</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        {partner?.hostel} · {partner?.total_reviews > 0 ? `⭐ ${partner.rating.toFixed(1)} (${partner.total_reviews})` : 'New Partner 🆕'}
+                    </p>
                 </div>
                 {order && (
                     <span style={{
@@ -202,7 +257,7 @@ export default function ChatPage() {
                         {order.status?.replace('_', ' ')}
                     </span>
                 )}
-                <a href={`tel:`} className="btn btn-icon btn-ghost"><Phone size={18} /></a>
+                <a href={`tel:${partner?.phone}`} className="btn btn-icon btn-ghost"><Phone size={18} /></a>
             </div>
 
             {/* ── ORDER INFO BANNER ── */}
@@ -210,21 +265,36 @@ export default function ChatPage() {
                 <div style={{ background: 'rgba(79,70,229,0.06)', borderBottom: '1px solid var(--border)', padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
                     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                         <MapPin size={14} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-                        <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                        <p style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1 }}>
                             <strong style={{ color: 'var(--text-primary)' }}>{order.pickup_location}</strong> → {order.delivery_hostel} Room {order.delivery_room}
                         </p>
-                        <button className="btn btn-sm btn-outline" style={{ marginLeft: 'auto', padding: '4px 12px', fontSize: 11 }}
-                            onClick={() => navigate(`/order/${orderId}/track`)}>
-                            Track Map
-                        </button>
-                    </div>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 26 }}>
-                        {order.is_prepaid ? (
-                            <span className="badge" style={{ background: 'var(--success-light)', color: '#065F46', padding: '2px 8px', fontSize: 10 }}>✅ Items Pre-Paid</span>
-                        ) : (
-                            <span className="badge" style={{ background: 'var(--warning-light)', color: '#92400E', padding: '2px 8px', fontSize: 10 }}>💵 Cash Required for Items</span>
+                        {isRequester && order.payment_method === 'cash' && order.status !== 'delivered' && (
+                            <button className="btn btn-sm btn-primary" style={{ padding: '6px 12px', fontSize: 11, borderRadius: 8 }}
+                                onClick={handleSettlement} disabled={isPaying}>
+                                {isPaying ? '⏳...' : <><CreditCard size={12} style={{ marginRight: 4 }} /> Pay Online</>}
+                            </button>
                         )}
-                        <span style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 600 }}>+ ₹{order.price} Delivery Fee</span>
+                        {(!isRequester || order.payment_method === 'online') && (
+                            <button className="btn btn-sm btn-outline" style={{ padding: '4px 12px', fontSize: 11 }}
+                                onClick={() => navigate(`/order/${orderId}/track`)}>
+                                Track Map
+                            </button>
+                        )}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 26, justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                            {order.payment_method === 'online' ? (
+                                <span className="badge" style={{ background: 'var(--success-light)', color: '#065F46', padding: '2px 8px', fontSize: 10 }}>💳 Online Paid</span>
+                            ) : (
+                                <span className="badge" style={{ background: 'var(--warning-light)', color: '#92400E', padding: '2px 8px', fontSize: 10 }}>💵 Cash Delivery</span>
+                            )}
+                            <span style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 600 }}>₹{order.price}</span>
+                        </div>
+                        {order.is_prepaid ? (
+                            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Items: Prepaid</span>
+                        ) : (
+                            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Items: Pay Partner</span>
+                        )}
                     </div>
                 </div>
             )}

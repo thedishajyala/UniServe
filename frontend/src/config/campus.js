@@ -40,6 +40,8 @@ export function getPricing(pickupType, pickupLocation) {
 
 export const UNIVERSITY_DOMAIN = 'bennett.edu.in';
 
+export const CAMPUS_COORDINATES = { lat: 28.4506, lng: 77.5842 };
+
 export const ORDER_STATUSES = [
     { key: 'accepted', label: 'Accepted', icon: '✅' },
     { key: 'picked', label: 'Picked Up', icon: '📦' },

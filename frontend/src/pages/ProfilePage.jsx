@@ -97,8 +97,12 @@ export default function ProfilePage() {
                 <div className="stat-grid" style={{ marginBottom: 24 }}>
                     <div className="stat-card">
                         <Star size={18} style={{ color: '#f59e0b', marginBottom: 6 }} />
-                        <div className="stat-value">{(user?.rating || 5).toFixed(1)}</div>
-                        <div className="stat-label">Rating</div>
+                        <div className="stat-value">
+                            {user?.total_reviews > 0 ? user.rating.toFixed(1) : '—'}
+                        </div>
+                        <div className="stat-label">
+                            {user?.total_reviews > 0 ? `⭐ (${user.total_reviews})` : 'New 🆕'}
+                        </div>
                     </div>
                     <div className="stat-card">
                         <Package size={18} style={{ color: 'var(--primary)', marginBottom: 6 }} />
@@ -135,6 +139,14 @@ export default function ProfilePage() {
                             <Mail size={14} /> Email
                         </label>
                         <input className="input" value={user?.email || ''} disabled
+                            style={{ opacity: 0.6, cursor: 'not-allowed' }} />
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 16 }}>
+                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                            <Phone size={14} /> Registered Phone
+                        </label>
+                        <input className="input" value={user?.phone || 'Not provided'} disabled
                             style={{ opacity: 0.6, cursor: 'not-allowed' }} />
                     </div>
 

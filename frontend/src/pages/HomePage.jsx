@@ -46,6 +46,19 @@ function statusBadge(status) {
     return <span className={`badge status-${status} badge-sm`} style={{ fontSize: 11, padding: '3px 10px' }}>{map[status] || status}</span>;
 }
 
+function getInitials(name = '') {
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function renderRating(rating, totalReviews) {
+    if (totalReviews === 0) return <span className="badge badge-info">New 🆕</span>;
+    return (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: '#F59E0B' }}>
+            ⭐ {rating.toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 11 }}>({totalReviews})</span>
+        </span>
+    );
+}
+
 export default function HomePage() {
     const { user, updateUser } = useAuth();
     const socket = useSocket();
@@ -251,6 +264,9 @@ export default function HomePage() {
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                                             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Deliver to</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                                                {renderRating(requester?.rating, requester?.total_reviews)}
+                                            </div>
                                             <span style={{ fontSize: 13, fontWeight: 600 }}>{order.delivery_hostel} · Room {order.delivery_room}</span>
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -413,7 +429,7 @@ export default function HomePage() {
                                     <div>
                                         <div style={{ fontSize: 13, fontWeight: 700 }}>{p.name.split(' ')[0]}</div>
                                         <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                            <Star size={10} color="#FBBF24" fill="#FBBF24" /> {p.rating.toFixed(1)} · {p.hostel}
+                                            {renderRating(p.rating, p.total_reviews)} · {p.hostel}
                                         </div>
                                     </div>
                                 </div>

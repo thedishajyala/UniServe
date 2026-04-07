@@ -49,6 +49,7 @@ router.post('/add', protect, async (req, res) => {
 
         await User.findByIdAndUpdate(order.delivery_partner_id, {
             rating: Math.round(avgRating * 10) / 10,
+            total_reviews: partnerReviews.length,
         });
 
         res.status(201).json({ review, message: 'Review submitted successfully' });

@@ -1,4 +1,6 @@
 const express = require('express');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 const Order = require('../models/Order');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
@@ -7,17 +9,63 @@ const { rankPartners } = require('../services/matchingEngine');
 
 const router = express.Router();
 
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
 // We'll attach io from server.js
 let _io;
 router.setIo = (io) => { _io = io; };
 
-// POST /api/orders/create
+// POST /api/orders/create-payment — Step 1: Generate Razorpay Order
+router.post('/create-payment', protect, async (req, res) => {
+    try {
+        const { pickup_type, pickup_location } = req.body;
+        const { price } = calculatePricing(pickup_type, pickup_location);
+
+        const options = {
+            amount: price * 100, // amount in the smallest currency unit (paise)
+            currency: 'INR',
+            receipt: `receipt_order_${Date.now()}`,
+        };
+
+        const razorpayOrder = await razorpay.orders.create(options);
+        res.json({
+            id: razorpayOrder.id,
+            amount: razorpayOrder.amount,
+            currency: razorpayOrder.currency,
+        });
+    } catch (error) {
+        console.error('Razorpay order error:', error);
+        res.status(500).json({ message: 'Error creating Razorpay order' });
+    }
+});
+
+// POST /api/orders/create — Step 2: Verify & Finalize Order
 router.post('/create', protect, async (req, res) => {
     try {
-        const { pickup_type, pickup_location, delivery_hostel, delivery_room, item_details, special_instructions, is_prepaid } = req.body;
+        const { 
+            pickup_type, pickup_location, delivery_hostel, delivery_room, 
+            item_details, special_instructions, is_prepaid,
+            razorpay_order_id, razorpay_payment_id, razorpay_signature 
+        } = req.body;
 
         if (!pickup_type || !pickup_location || !delivery_hostel || !delivery_room || !item_details) {
             return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        // Verify Payment if prepaid
+        if (is_prepaid) {
+            const body = razorpay_order_id + '|' + razorpay_payment_id;
+            const expectedSignature = crypto
+                .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+                .update(body.toString())
+                .digest('hex');
+
+            if (expectedSignature !== razorpay_signature) {
+                return res.status(400).json({ message: 'Payment verification failed' });
+            }
         }
 
         const { parcelOnly } = validateGate3IsParcel(pickup_location, item_details);
@@ -35,11 +83,13 @@ router.post('/create', protect, async (req, res) => {
             price,
             commission,
             delivery_earning,
-            payment_status: 'paid',
+            payment_status: is_prepaid ? 'paid' : 'pending',
+            razorpay_order_id,
+            razorpay_payment_id,
             status: 'pending',
         });
 
-        await order.populate('user_id', 'name email hostel room_no enrollment_no');
+        await order.populate('user_id', 'name email hostel room_no enrollment_no phone');
         res.status(201).json({ order, parcelOnly });
     } catch (error) {
         console.error('Create order error:', error);
@@ -72,7 +122,7 @@ router.post('/request', protect, async (req, res) => {
     try {
         const { order_id, partner_id } = req.body;
 
-        const order = await Order.findById(order_id).populate('user_id', 'name hostel room_no enrollment_no');
+        const order = await Order.findById(order_id).populate('user_id', 'name hostel room_no enrollment_no phone');
         if (!order) return res.status(404).json({ message: 'Order not found' });
         if (order.user_id._id.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized' });
@@ -191,7 +241,7 @@ router.get('/incoming', protect, async (req, res) => {
         const orders = await Order.find({
             requested_partner_id: req.user._id,
             status: 'requested',
-        }).populate('user_id', 'name hostel room_no enrollment_no');
+        }).populate('user_id', 'name hostel room_no enrollment_no phone');
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -243,12 +293,49 @@ router.post('/status', protect, async (req, res) => {
         }
 
         await order.save();
-        await order.populate(['user_id', 'delivery_partner_id'], 'name email hostel room_no enrollment_no rating');
+        await order.populate(['user_id', 'delivery_partner_id'], 'name email hostel room_no enrollment_no rating phone');
 
         res.json({ order, message: `Order status updated to ${status}` });
     } catch (error) {
         console.error('Update status error:', error);
         res.status(500).json({ message: 'Server error updating status' });
+    }
+});
+
+// POST /api/orders/settle-payment — For COD orders switching to Online in Chat
+router.post('/settle-payment', protect, async (req, res) => {
+    try {
+        const { order_id, razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+        const order = await Order.findById(order_id);
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+
+        // Verify Signature
+        const body = razorpay_order_id + '|' + razorpay_payment_id;
+        const expectedSignature = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(body.toString())
+            .digest('hex');
+
+        if (expectedSignature !== razorpay_signature) {
+            return res.status(400).json({ message: 'Payment verification failed' });
+        }
+
+        order.payment_method = 'online';
+        order.payment_status = 'paid';
+        order.razorpay_order_id = razorpay_order_id;
+        order.razorpay_payment_id = razorpay_payment_id;
+        await order.save();
+
+        // Notify both parties via socket
+        if (_io) {
+            _io.to(`order_${order_id}`).emit('payment_settled', { order_id, payment_method: 'online' });
+        }
+
+        res.json({ order, message: 'Payment settled successfully!' });
+    } catch (error) {
+        console.error('Settle payment error:', error);
+        res.status(500).json({ message: 'Server error settling payment' });
     }
 });
 
@@ -301,7 +388,7 @@ router.post('/cancel', protect, async (req, res) => {
 router.get('/my-orders', protect, async (req, res) => {
     try {
         const orders = await Order.find({ user_id: req.user._id })
-            .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no')
+            .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no phone')
             .sort({ createdAt: -1 });
         res.json(orders);
     } catch (error) {
@@ -313,7 +400,7 @@ router.get('/my-orders', protect, async (req, res) => {
 router.get('/my-deliveries', protect, async (req, res) => {
     try {
         const deliveries = await Order.find({ delivery_partner_id: req.user._id })
-            .populate('user_id', 'name email hostel room_no enrollment_no')
+            .populate('user_id', 'name email hostel room_no enrollment_no phone')
             .sort({ createdAt: -1 });
         res.json(deliveries);
     } catch (error) {
@@ -325,9 +412,9 @@ router.get('/my-deliveries', protect, async (req, res) => {
 router.get('/:orderId', protect, async (req, res) => {
     try {
         const order = await Order.findById(req.params.orderId)
-            .populate('user_id', 'name email hostel room_no enrollment_no')
-            .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no')
-            .populate('requested_partner_id', 'name hostel room_no enrollment_no');
+            .populate('user_id', 'name email hostel room_no enrollment_no phone')
+            .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no phone')
+            .populate('requested_partner_id', 'name hostel room_no enrollment_no phone');
 
         if (!order) return res.status(404).json({ message: 'Order not found' });
 

@@ -28,9 +28,11 @@ export const getEarnings = () => API.get('/users/earnings');
 export const getOnlinePartners = () => API.get('/users/online');
 
 // Orders
+export const createPayment = (data) => API.post('/orders/create-payment', data);
 export const createOrder = (data) => API.post('/orders/create', data);
 export const getAvailablePartners = (orderId) => API.get(`/orders/partners/${orderId}`);
-export const requestPartner = (data) => API.post('/orders/request', data);       // Requester → request a partner
+export const requestPartner = (data) => API.post('/orders/request', data);
+export const settlePayment = (data) => API.post('/orders/settle-payment', data);       // Requester → request a partner
 export const respondToOrder = (data) => API.post('/orders/respond', data);        // Partner → accept or decline
 export const getIncomingRequests = () => API.get('/orders/incoming');              // Partner → see requests sent to them
 export const cancelOrder = (data) => API.post('/orders/cancel', data);        // Cancel an order

@@ -74,12 +74,21 @@ const orderSchema = new mongoose.Schema(
             enum: ['pending', 'requested', 'accepted', 'picked', 'on_the_way', 'delivered', 'cancelled'],
             default: 'pending',
         },
+        payment_method: {
+            type: String,
+            enum: ['online', 'cash'],
+            default: 'online',
+        },
         payment_status: {
             type: String,
-            enum: ['pending', 'paid'],
+            enum: ['pending', 'paid', 'cash_on_delivery'],
             default: 'pending',
         },
 
+        // Payment Details
+        razorpay_order_id: String,
+        razorpay_payment_id: String,
+        
         // Timestamps for analytics
         accepted_at: Date,
         picked_at: Date,

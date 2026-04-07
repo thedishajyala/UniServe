@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getOrderById, updateOrderStatus, cancelOrder } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { ORDER_STATUSES } from '../config/campus';
+import { ORDER_STATUSES, CAMPUS_COORDINATES } from '../config/campus';
 import toast from 'react-hot-toast';
-import { ArrowLeft, MessageCircle, MapPin } from 'lucide-react';
+import { ArrowLeft, MessageCircle, MapPin, Star, Phone } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -22,6 +22,15 @@ L.Icon.Default.mergeOptions({
 
 function getInitials(name = '') {
     return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function renderRating(rating, totalReviews) {
+    if (totalReviews === 0) return <span className="badge badge-info" style={{ fontSize: 10 }}>New 🆕</span>;
+    return (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: '#F59E0B' }}>
+            ⭐ {rating.toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 11 }}>({totalReviews})</span>
+        </span>
+    );
 }
 
 // Leaflet Helper to re-center map when location updates
@@ -44,7 +53,7 @@ export default function TrackingPage() {
     const [cancelling, setCancelling] = useState(false);
     
     // Live Tracking State
-    const [partnerLocation, setPartnerLocation] = useState(null); // { lat, lng }
+    const [partnerLocation, setPartnerLocation] = useState(CAMPUS_COORDINATES);
     const [watchId, setWatchId] = useState(null);
 
     const loadOrder = useCallback(async () => {
@@ -177,10 +186,15 @@ export default function TrackingPage() {
         <div className="page">
             <div className="page-header">
                 <button className="btn btn-icon btn-ghost" onClick={() => navigate('/')}><ArrowLeft size={20} /></button>
-                <h1 className="page-title">Order Tracking</h1>
-                <button className="btn btn-icon btn-ghost" onClick={() => navigate(`/chat/${orderId}`)}>
-                    <MessageCircle size={20} />
-                </button>
+                <h1 className="page-title" style={{ flex: 1 }}>Order Tracking</h1>
+                <div style={{ display: 'flex', gap: 4 }}>
+                    <a href={`tel:${(isOwner ? partner : requester)?.phone}`} className="btn btn-icon btn-ghost">
+                        <Phone size={19} />
+                    </a>
+                    <button className="btn btn-icon btn-ghost" onClick={() => navigate(`/chat/${orderId}`)}>
+                        <MessageCircle size={20} />
+                    </button>
+                </div>
             </div>
 
             <div className="page-content">
@@ -224,14 +238,19 @@ export default function TrackingPage() {
                             <div className="avatar avatar-md">{getInitials((isOwner ? partner : requester)?.name || '?')}</div>
                             <div>
                                 <p style={{ fontWeight: 700, fontSize: 15 }}>{(isOwner ? partner : requester)?.name}</p>
-                                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                                    {(isOwner ? partner : requester)?.hostel} · {(isOwner ? partner : requester)?.enrollment_no}
-                                </p>
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    {renderRating((isOwner ? partner : requester)?.rating, (isOwner ? partner : requester)?.total_reviews)} · {(isOwner ? partner : requester)?.hostel}
+                                </div>
                             </div>
-                            <button className="btn btn-outline btn-sm" style={{ marginLeft: 'auto' }}
+                            <div style={{ display: 'flex', gap: 10, marginLeft: 'auto' }}>
+                            <a href={`tel:${(isOwner ? partner : requester)?.phone}`} className="btn btn-icon btn-outline btn-sm" style={{ borderRadius: '50%', width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Phone size={14} />
+                            </a>
+                            <button className="btn btn-outline btn-sm"
                                 onClick={() => navigate(`/chat/${orderId}`)}>
                                 💬 Chat
                             </button>
+                        </div>
                         </div>
                     ) : <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Waiting for partner...</p>}
                 </div>
@@ -255,8 +274,8 @@ export default function TrackingPage() {
                     </div>
                 </div>
 
-                {/* Live Map (Only visible if Picked/On The Way & Coordinates Exist) */}
-                {['picked', 'on_the_way'].includes(order.status) && partnerLocation && (
+                {/* Live Map (Visible if Picked/On The Way) */}
+                {['picked', 'on_the_way'].includes(order.status) && (
                     <div className="card slide-up" style={{ marginBottom: 20, padding: 16, overflow: 'hidden' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                             <MapPin size={18} color="var(--primary)" />

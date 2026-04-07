@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createOrder } from '../services/api';
+import { createOrder, createPayment } from '../services/api';
 import { OUTLETS, GATES, ALL_HOSTELS, getPricing } from '../config/campus';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -35,24 +35,78 @@ export default function CreateOrderPage() {
         setForm((f) => ({ ...f, pickup_type: type, pickup_location: '' }));
     };
 
-    const handleSubmit = async () => {
+    const handlePayment = async () => {
         setLoading(true);
         try {
-            const res = await createOrder({
+            // Step 1: Create Razorpay Order on server
+            const { data: rzpOrder } = await createPayment({
                 pickup_type: form.pickup_type,
                 pickup_location: form.pickup_location,
-                delivery_hostel: form.delivery_hostel,
-                delivery_room: form.delivery_room,
-                item_details: form.item_details,
-                is_prepaid: form.is_prepaid,
-                special_instructions: form.special_instructions,
             });
-            toast.success('Order placed! Finding delivery partners 🔍');
-            navigate(`/order/${res.data.order._id}/partners`);
+
+            // Step 2: Configure Checkout
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: rzpOrder.amount,
+                currency: rzpOrder.currency,
+                name: 'UniServe',
+                description: `Express Delivery: ${form.pickup_location}`,
+                image: '/favicon.svg',
+                order_id: rzpOrder.id,
+                handler: async (response) => {
+                    // Step 3: Payment captured, finalize order
+                    try {
+                        const res = await createOrder({
+                            ...form,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            is_prepaid: true, // Forcing true since payment was made
+                        });
+                        toast.success('Payment successful! Finding partners 🔍');
+                        navigate(`/order/${res.data.order._id}/partners`);
+                    } catch (err) {
+                        toast.error('Payment verified, but order creation failed. Please contact support.');
+                    }
+                },
+                prefill: {
+                    name: user.name,
+                    email: user.email,
+                    contact: user.phone || '',
+                },
+                theme: { color: '#4F46E5' },
+                modal: {
+                    ondismiss: () => setLoading(false)
+                }
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.open();
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to place order');
-        } finally {
+            toast.error(err.response?.data?.message || 'Failed to initialize payment');
             setLoading(false);
+        }
+    };
+
+    const handleSubmit = async () => {
+        if (form.payment_method === 'online') {
+            handlePayment();
+        } else {
+            // Cash on Delivery flow
+            setLoading(true);
+            try {
+                const res = await createOrder({
+                    ...form,
+                    is_prepaid: false, // In COD, item is usually not prepaid by requester
+                    payment_status: 'cash_on_delivery'
+                });
+                toast.success('Order placed! Finding partners 🔍');
+                navigate(`/order/${res.data.order._id}/partners`);
+            } catch (err) {
+                toast.error(err.response?.data?.message || 'Failed to place order');
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -204,16 +258,13 @@ export default function CreateOrderPage() {
                             <input className="input" name="special_instructions" placeholder="e.g. No spice please" value={form.special_instructions} onChange={handleChange} />
                         </div>
 
-                        {/* Prepaid options */}
+                        {/* Prepaid options (Item Status) */}
                         <div className="input-group">
-                            <label className="input-label">Payment Status of Items</label>
+                            <label className="input-label">Have you already paid for the item?</label>
                             <div style={{ display: 'flex', gap: 10 }}>
-                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: form.is_prepaid ? 'rgba(79,70,229,0.08)' : 'white' }} onClick={() => setForm(f => ({ ...f, is_prepaid: true }))}>✅ Already Paid (Online)</button>
-                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${!form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: !form.is_prepaid ? 'rgba(79,70,229,0.08)' : 'white' }} onClick={() => setForm(f => ({ ...f, is_prepaid: false }))}>💵 I will pay Partner</button>
+                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: form.is_prepaid ? 'rgba(79,70,229,0.08)' : 'white' }} onClick={() => setForm(f => ({ ...f, is_prepaid: true }))}>✅ Paid @ Shop</button>
+                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${!form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: !form.is_prepaid ? 'rgba(79,70,229,0.08)' : 'white' }} onClick={() => setForm(f => ({ ...f, is_prepaid: false }))}>💵 Cash @ Door</button>
                             </div>
-                            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
-                                If "Already Paid", partner only collects ₹{pricing?.price} delivery fee. Otherwise, partner buys the item with their own cash, and you pay them (Item Cost + ₹{pricing?.price}).
-                            </p>
                         </div>
 
                         <button className="btn btn-primary btn-w-full btn-lg"
@@ -248,27 +299,46 @@ export default function CreateOrderPage() {
                                     <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Delivery Fee</span>
                                     <span className="price-tag">₹{pricing?.price}</span>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-muted)' }}>
-                                    <span>Platform fee</span><span>₹{pricing?.commission}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-muted)' }}>
-                                    <span>Partner earns</span><span>₹{pricing?.partnerEarns}</span>
-                                </div>
                             </div>
                         </div>
 
-                        <div style={{ background: form.is_prepaid ? 'var(--success-light)' : 'var(--warning-light)', borderRadius: 12, padding: 14, display: 'flex', gap: 10, alignItems: 'center' }}>
-                            <span style={{ fontSize: 20 }}>{form.is_prepaid ? '💳' : '💵'}</span>
-                            <p style={{ fontSize: 13, color: form.is_prepaid ? '#065F46' : '#92400E', fontWeight: 500 }}>
-                                {form.is_prepaid 
-                                    ? "Items are pre-paid! You only owe the partner ₹" + pricing?.price + " for delivery upon arrival." 
-                                    : "Items are NOT paid. The partner will buy them entirely with their own money, and you will pay them exactly (Item Cost + ₹" + pricing?.price + " delivery fee) upon arrival."}
-                            </p>
+                        {/* SELECT PAYMENT METHOD */}
+                        <div className="input-group">
+                            <label className="input-label">Pay Delivery Fee via</label>
+                            <div style={{ display: 'flex', gap: 10 }}>
+                                <button className="btn" 
+                                    style={{ flex: 1, padding: '16px', borderRadius: 16, border: `2px solid ${form.payment_method === 'online' ? 'var(--primary)' : 'var(--border)'}`, background: form.payment_method === 'online' ? 'rgba(79,70,229,0.08)' : 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+                                    onClick={() => setForm(f => ({ ...f, payment_method: 'online' }))}>
+                                    <span style={{ fontSize: 20 }}>💳</span>
+                                    <span style={{ fontWeight: 700, fontSize: 12 }}>Pay Online</span>
+                                </button>
+                                <button className="btn" 
+                                    disabled={form.pickup_type === 'outlet'}
+                                    style={{ flex: 1, padding: '16px', borderRadius: 16, border: `2px solid ${form.payment_method === 'cash' ? 'var(--primary)' : 'var(--border)'}`, background: form.payment_method === 'cash' ? 'rgba(79,70,229,0.08)' : 'white', opacity: form.pickup_type === 'outlet' ? 0.5 : 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+                                    onClick={() => setForm(f => ({ ...f, payment_method: 'cash' }))}>
+                                    <span style={{ fontSize: 20 }}>💵</span>
+                                    <span style={{ fontWeight: 700, fontSize: 12 }}>Cash on Delivery</span>
+                                </button>
+                            </div>
+                            {form.pickup_type === 'outlet' && (
+                                <p style={{ fontSize: 11, color: '#ef4444', marginTop: 8, fontWeight: 600, textAlign: 'center' }}>
+                                    ⚠️ Online payment required for food orders.
+                                </p>
+                            )}
                         </div>
 
                         <button className="btn btn-primary btn-w-full btn-lg"
                             onClick={handleSubmit} disabled={loading}>
-                            {loading ? '⏳ Placing Order...' : `💳 Pay ₹${pricing?.price} & Find Partner`}
+                            {loading ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <div className="spinner-sm" />
+                                    <span>Processing...</span>
+                                </div>
+                            ) : (
+                                form.payment_method === 'online' 
+                                    ? `💳 Pay ₹${pricing?.price} & Find Partner` 
+                                    : `🤝 Confirm Order & Find Partner`
+                            )}
                         </button>
                     </div>
                 )}
