@@ -104,7 +104,7 @@ export default function LoginPage() {
                                 }}
                                 onClick={() => { setMode(m); setErrors({}); }}
                             >
-                                {m === 'login' ? '🔑 Sign In' : '✨ Sign Up'}
+                                {m === 'login' ? 'Sign In' : 'Sign Up'}
                             </button>
                         ))}
                     </div>
@@ -146,7 +146,7 @@ export default function LoginPage() {
                         )}
 
                         <button type="submit" className="btn btn-primary btn-w-full btn-lg" style={{ marginTop: 12, height: 60, fontSize: 17, fontWeight: 800, borderRadius: 18 }} disabled={loading}>
-                            {loading ? '⏳ Connecting...' : (mode === 'login' ? 'Sign In' : 'Create My Account')}
+                            {loading ? '⏳ Connecting...' : (mode === 'login' ? 'Sign In' : 'Sign Up')}
                         </button>
                     </form>
 
