@@ -19,15 +19,29 @@ export function SocketProvider({ children }) {
             // (Note: Socket URL is usually the same as the base backend URL without /api)
             return 'https://uniserve-backend-s2w0.onrender.com';
         };
-        const SOCKET_URL = getSocketURL();
-        const newSocket = io(SOCKET_URL, { 
-            autoConnect: true,
+        const url = getSocketURL();
+        console.log('🔌 Connecting to Socket Hub:', url);
+
+        const newSocket = io(url, {
             withCredentials: true,
+            transports: ['polling', 'websocket'], // Try polling first for maximum compatibility
+            reconnectionAttempts: 5,
+            timeout: 10000,
         });
+
         setSocket(newSocket);
+
+        newSocket.on('connect', () => {
+            console.log('✅ Connected to Signal Tower:', newSocket.id);
+        });
+
+        newSocket.on('connect_error', (err) => {
+            console.error('❌ Socket Sync Error:', err.message);
+        });
 
         return () => {
             newSocket.disconnect();
+            console.log('🔌 Disconnected from Signal Tower');
         };
     }, []);
 
