@@ -1,39 +1,34 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getOrderById, updateOrderStatus, cancelOrder } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { ORDER_STATUSES, CAMPUS_COORDINATES } from '../config/campus';
 import toast from 'react-hot-toast';
-import { ArrowLeft, MessageCircle, MapPin, Star, Phone } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { ArrowLeft, MessageCircle, MapPin, Star, Phone, Navigation, Package, Box } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: markerIcon2x,
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow,
-});
+// LUXE MARKER CUSTOMIZATION
+const createPulsingIcon = (color = '#4F46E5') => {
+    return L.divIcon({
+        className: 'custom-pulsing-icon',
+        html: `
+            <div style="position: relative; width: 24px; height: 24px;">
+                <div style="position: absolute; inset: 0; background: ${color}; border-radius: 50%; opacity: 0.2; animation: pulse-ring 1.5s infinite;"></div>
+                <div style="position: absolute; inset: 4px; background: ${color}; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"></div>
+            </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+    });
+};
 
 function getInitials(name = '') {
     return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }
 
-function renderRating(rating, totalReviews) {
-    if (totalReviews === 0) return <span className="badge badge-info" style={{ fontSize: 10 }}>New 🆕</span>;
-    return (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: '#F59E0B' }}>
-            ⭐ {rating.toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 11 }}>({totalReviews})</span>
-        </span>
-    );
-}
-
-// Leaflet Helper to re-center map when location updates
 function ChangeView({ center }) {
     const map = useMap();
     useEffect(() => {
@@ -52,7 +47,6 @@ export default function TrackingPage() {
     const [updating, setUpdating] = useState(false);
     const [cancelling, setCancelling] = useState(false);
     
-    // Live Tracking State
     const [partnerLocation, setPartnerLocation] = useState(CAMPUS_COORDINATES);
     const [watchId, setWatchId] = useState(null);
 
@@ -81,7 +75,6 @@ export default function TrackingPage() {
             setOrder((o) => o ? { ...o, status: 'cancelled' } : o);
         });
 
-        // Listen for live location updates from the partner
         socket.on('partner_location', (loc) => {
             setPartnerLocation(loc);
         });
@@ -93,11 +86,8 @@ export default function TrackingPage() {
         };
     }, [socket, orderId, user]);
 
-    // Partner: Start broadcasting location when 'picked' or 'on_the_way'
     useEffect(() => {
         const isPartner = order?.delivery_partner_id?._id === user?._id || order?.delivery_partner_id === user?._id;
-        
-        // Track once order is picked up
         const trackingActive = ['picked', 'on_the_way'].includes(order?.status);
         
         if (isPartner && trackingActive) {
@@ -105,7 +95,7 @@ export default function TrackingPage() {
                 const id = navigator.geolocation.watchPosition(
                     (pos) => {
                         const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                        setPartnerLocation(loc); // Show it locally too
+                        setPartnerLocation(loc);
                         if (socket) {
                             socket.emit('location_update', { orderId, lat: loc.lat, lng: loc.lng });
                         }
@@ -114,12 +104,9 @@ export default function TrackingPage() {
                     { enableHighAccuracy: true, maximumAge: 0 }
                 );
                 setWatchId(id);
-            } else {
-                toast.error("Geolocation is not supported by your browser");
             }
         }
 
-        // Cleanup watcher if status changes or unmount
         if (order?.status === 'delivered' && watchId) {
             navigator.geolocation.clearWatch(watchId);
             setWatchId(null);
@@ -149,7 +136,7 @@ export default function TrackingPage() {
 
     const handleCancel = async () => {
         const reason = window.prompt('Reason for cancellation? (optional)');
-        if (reason === null) return; // user hit Cancel on prompt
+        if (reason === null) return;
         setCancelling(true);
         try {
             await cancelOrder({ order_id: orderId, reason: reason || 'No reason given' });
@@ -163,10 +150,12 @@ export default function TrackingPage() {
     };
 
     if (loading) return (
-        <div className="full-center">
+        <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
-                <p style={{ color: 'var(--text-muted)', fontFamily: 'Outfit, sans-serif' }}>Loading order...</p>
+                <div style={{ width: 60, height: 60, background: '#4F46E5', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', animation: 'pulse-ring 2s infinite' }}>
+                    <Box color="#fff" size={28} />
+                </div>
+                <p style={{ color: '#4F46E5', fontWeight: 800, fontSize: 14 }}>SYNCING MISSION LOGS...</p>
             </div>
         </div>
     );
@@ -178,155 +167,146 @@ export default function TrackingPage() {
     const requester = order.user_id;
 
     const currentStatusIndex = ['accepted', 'picked', 'on_the_way', 'delivered'].indexOf(order.status);
-
     const nextStatusMap = { accepted: 'picked', picked: 'on_the_way', on_the_way: 'delivered' };
-    const nextStatusLabels = { picked: '📦 Mark as Picked Up', on_the_way: '🚗 Mark as On the Way', delivered: '🎉 Mark as Delivered' };
+    const nextStatusLabels = { picked: 'Mark as Picked', on_the_way: 'Share Live Location', delivered: 'Confirm Arrival' };
 
     return (
-        <div className="page">
-            <div className="page-header">
-                <button className="btn btn-icon btn-ghost" onClick={() => navigate('/')}><ArrowLeft size={20} /></button>
-                <h1 className="page-title" style={{ flex: 1 }}>Order Tracking</h1>
-                <div style={{ display: 'flex', gap: 4 }}>
-                    <a href={`tel:${(isOwner ? partner : requester)?.phone}`} className="btn btn-icon btn-ghost">
-                        <Phone size={19} />
+        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC', position: 'relative', overflow: 'hidden' }}>
+            {/* ── LUXE HEADER ── */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '20px', zIndex: 1000 }}>
+                <div style={{ 
+                    background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(12px)', borderRadius: 24, padding: '12px 20px', 
+                    display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 10px 30px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.5)' 
+                }}>
+                    <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 12, display: 'flex', alignItems: 'center', color: '#4F46E5' }}>
+                        <ArrowLeft size={20} />
+                    </button>
+                    <div style={{ flex: 1 }}>
+                        <h1 style={{ fontSize: 13, fontWeight: 800, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tracking Mission</h1>
+                        <p style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>ORDER #{order._id.slice(-6).toUpperCase()}</p>
+                    </div>
+                    <a href={`tel:${(isOwner ? partner : requester)?.phone}`} style={{ textDecoration: 'none', width: 40, height: 40, background: '#F1F5F9', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1E293B' }}>
+                        <Phone size={18} />
                     </a>
-                    <button className="btn btn-icon btn-ghost" onClick={() => navigate(`/chat/${orderId}`)}>
-                        <MessageCircle size={20} />
+                    <button onClick={() => navigate(`/chat/${orderId}`)} style={{ background: '#4F46E5', color: '#fff', border: 'none', width: 40, height: 40, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                        <MessageCircle size={18} />
                     </button>
                 </div>
             </div>
 
-            <div className="page-content">
-                {/* Order Info */}
-                <div className="card" style={{ marginBottom: 20, padding: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+            {/* ── LIVE MAP TERMINAL ── */}
+            <div style={{ flex: 1, position: 'relative', zIndex: 0 }}>
+                <MapContainer center={[partnerLocation.lat, partnerLocation.lng]} zoom={17} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+                    <ChangeView center={[partnerLocation.lat, partnerLocation.lng]} />
+                    <TileLayer
+                        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                        attribution='&copy; CARTO'
+                    />
+                    
+                    {/* Pulsing Partner Marker */}
+                    {['picked', 'on_the_way'].includes(order.status) && (
+                        <Marker position={[partnerLocation.lat, partnerLocation.lng]} icon={createPulsingIcon()}>
+                            <Popup>
+                                <div style={{ fontWeight: 800, color: '#4F46E5' }}>MISSION_PARTNER</div>
+                                <div style={{ fontSize: 11 }}>{(isOwner ? partner : requester)?.name} is moving</div>
+                            </Popup>
+                        </Marker>
+                    )}
+                </MapContainer>
+            </div>
+
+            {/* ── LUXE BOTTOM CONSOLE ── */}
+            <div style={{ 
+                position: 'absolute', bottom: 20, left: 20, right: 20, zIndex: 1000,
+                background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(16px)', borderRadius: 32, padding: 32,
+                boxShadow: '0 20px 60px rgba(0,0,0,0.12)', border: '1px solid rgba(255,255,255,0.8)'
+            }} className="slide-up">
+                
+                {/* MISSION STATUS HUD */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ width: 44, height: 44, background: '#F1F5F9', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {ORDER_STATUSES.find(s => s.key === order.status)?.icon || <Package size={20} />}
+                        </div>
                         <div>
-                            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 3 }}>FROM</p>
-                            <p style={{ fontWeight: 700, fontSize: 15 }}>{order.pickup_location}</p>
-                        </div>
-                        <div style={{ fontSize: 24 }}>→</div>
-                        <div style={{ textAlign: 'right' }}>
-                            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 3 }}>TO</p>
-                            <p style={{ fontWeight: 700, fontSize: 15 }}>{order.delivery_hostel}</p>
-                            <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Room {order.delivery_room}</p>
-                        </div>
-                    </div>
-                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>🛍️ {order.item_details}</p>
-                        
-                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                            {order.is_prepaid ? (
-                                <span className="badge" style={{ background: 'var(--success-light)', color: '#065F46' }}>✅ Items Pre-Paid</span>
-                            ) : (
-                                <span className="badge" style={{ background: 'var(--warning-light)', color: '#92400E' }}>💵 Pay Item Cost + Delivery</span>
-                            )}
-                            {order.special_instructions && (
-                                <span className="badge" style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--text-muted)' }}>📝 Has Instructions</span>
-                            )}
+                            <p style={{ fontSize: 10, fontWeight: 900, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Protocol_Status</p>
+                            <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B' }}>{order.status.replace('_', ' ').toUpperCase()}</h2>
                         </div>
                     </div>
                 </div>
 
-                {/* Partner / Requester Info */}
-                <div className="card" style={{ marginBottom: 20, padding: 20 }}>
-                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, fontWeight: 600, textTransform: 'uppercase' }}>
-                        {isOwner ? '🚴 Delivery Partner' : '👤 Order By'}
-                    </p>
-                    {(isOwner ? partner : requester) ? (
-                        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                            <div className="avatar avatar-md">{getInitials((isOwner ? partner : requester)?.name || '?')}</div>
-                            <div>
-                                <p style={{ fontWeight: 700, fontSize: 15 }}>{(isOwner ? partner : requester)?.name}</p>
-                                <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    {renderRating((isOwner ? partner : requester)?.rating, (isOwner ? partner : requester)?.total_reviews)} · {(isOwner ? partner : requester)?.hostel}
-                                </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: 10, marginLeft: 'auto' }}>
-                            <a href={`tel:${(isOwner ? partner : requester)?.phone}`} className="btn btn-icon btn-outline btn-sm" style={{ borderRadius: '50%', width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Phone size={14} />
-                            </a>
-                            <button className="btn btn-outline btn-sm"
-                                onClick={() => navigate(`/chat/${orderId}`)}>
-                                💬 Chat
-                            </button>
-                        </div>
-                        </div>
-                    ) : <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Waiting for partner...</p>}
-                </div>
-
-                {/* Status Stepper */}
-                <div className="card" style={{ marginBottom: 20, padding: 20 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 20, fontFamily: 'Outfit, sans-serif' }}>Order Status</p>
-                    <div className="stepper">
-                        {ORDER_STATUSES.map((s, i) => {
-                            const done = currentStatusIndex > i || order.status === s.key;
-                            const active = order.status === s.key;
-                            return (
-                                <div key={s.key} className={`stepper-item ${done ? 'done' : active ? 'active' : ''}`}>
-                                    <div className="stepper-dot">{s.icon}</div>
-                                    <div className="stepper-content">
-                                        <p className="stepper-label" style={{ color: done || active ? 'var(--text-primary)' : 'var(--text-muted)' }}>{s.label}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                {/* LOGISTICS DETAILS CAROUSEL-STYLE */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
+                    <div style={{ background: '#F8FAFC', borderRadius: 20, padding: 16 }}>
+                        <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', marginBottom: 4 }}>PICKUP_ORIGIN</p>
+                        <p style={{ fontSize: 14, fontWeight: 800, color: '#1E293B' }}>{order.pickup_location}</p>
+                    </div>
+                    <div style={{ background: '#F8FAFC', borderRadius: 20, padding: 16 }}>
+                        <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', marginBottom: 4 }}>DELIVERY_TARGET</p>
+                        <p style={{ fontSize: 14, fontWeight: 800, color: '#1E293B' }}>{order.delivery_hostel} • {order.delivery_room}</p>
                     </div>
                 </div>
 
-                {/* Live Map (Visible if Picked/On The Way) */}
-                {['picked', 'on_the_way'].includes(order.status) && (
-                    <div className="card slide-up" style={{ marginBottom: 20, padding: 16, overflow: 'hidden' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                            <MapPin size={18} color="var(--primary)" />
-                            <p style={{ fontWeight: 700, fontSize: 14 }}>Live Tracking 📍</p>
-                        </div>
-                        <div style={{ height: 300, borderRadius: 12, overflow: 'hidden', zIndex: 0 }}>
-                            <MapContainer center={[partnerLocation.lat, partnerLocation.lng]} zoom={17} style={{ height: '100%', width: '100%' }}>
-                                <ChangeView center={[partnerLocation.lat, partnerLocation.lng]} />
-                                <TileLayer
-                                    url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                                    attribution='&copy; <a href="https://osm.org/copyright">OSM</a>'
-                                />
-                                <Marker position={[partnerLocation.lat, partnerLocation.lng]}>
-                                    <Popup>
-                                        <b>{(isOwner ? partner : requester)?.name || 'Partner'}</b> is here!
-                                    </Popup>
-                                </Marker>
-                            </MapContainer>
+                {/* PARTNER SNAPSHOT */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'rgba(79, 70, 229, 0.04)', borderRadius: 24, marginBottom: 20 }}>
+                    <div style={{ width: 48, height: 48, background: '#4F46E5', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 900, fontSize: 16 }}>
+                        {getInitials((isOwner ? partner : requester)?.name)}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 15, fontWeight: 800, color: '#1E293B' }}>{(isOwner ? partner : requester)?.name}</p>
+                        <p style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>CAMPUS_LOGISTICS_OP • {isOwner ? 'Partner' : 'Owner'}</p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F59E0B', fontWeight: 800, fontSize: 14 }}>
+                            <Star size={14} fill="#F59E0B" /> {(isOwner ? partner : requester)?.rating?.toFixed(1) || '0.0'}
                         </div>
                     </div>
-                )}
+                </div>
 
-                {/* Partner Action: update status */}
-                {isPartner && nextStatusMap[order.status] && (
-                    <button className="btn btn-success btn-w-full btn-lg"
-                        onClick={() => handleUpdateStatus(nextStatusMap[order.status])}
-                        disabled={updating}>
-                        {updating ? '⏳ Updating...' : nextStatusLabels[nextStatusMap[order.status]]}
-                    </button>
-                )}
+                {/* ACTION TERMINAL */}
+                <div style={{ display: 'flex', gap: 12 }}>
+                    {isPartner && nextStatusMap[order.status] && (
+                        <button 
+                            onClick={() => handleUpdateStatus(nextStatusMap[order.status])}
+                            disabled={updating}
+                            style={{ 
+                                flex: 1, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 18, 
+                                fontSize: 15, fontWeight: 900, cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.4)', transition: 'all 0.2s ease'
+                            }}
+                        >
+                            {updating ? 'SYNCING...' : nextStatusLabels[nextStatusMap[order.status]]}
+                        </button>
+                    )}
+                    
+                    {isOwner && order.status === 'delivered' && (
+                        <button 
+                            onClick={() => navigate(`/order/${orderId}/review`)}
+                            style={{ flex: 1, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 18, fontSize: 15, fontWeight: 900 }}
+                        >
+                            CLOSE_LOGS & REVIEW
+                        </button>
+                    )}
 
-                {/* Owner: leave review after delivery */}
-                {isOwner && order.status === 'delivered' && (
-                    <button className="btn btn-primary btn-w-full btn-lg"
-                        onClick={() => navigate(`/order/${orderId}/review`)}>
-                        ⭐ Leave a Review
-                    </button>
-                )}
-
-                {/* Cancel button — requester or partner, only for cancellable statuses */}
-                {(isOwner || isPartner) && ['pending', 'requested', 'accepted'].includes(order.status) && (
-                    <button
-                        className="btn btn-w-full"
-                        onClick={handleCancel}
-                        disabled={cancelling}
-                        style={{ marginTop: 10, background: 'transparent', border: '1.5px solid #ef4444', color: '#ef4444', fontWeight: 600 }}
-                    >
-                        {cancelling ? '⏳ Cancelling...' : '❌ Cancel Order'}
-                    </button>
-                )}
+                    {(isOwner || isPartner) && ['pending', 'requested', 'accepted'].includes(order.status) && (
+                        <button 
+                            onClick={handleCancel}
+                            disabled={cancelling}
+                            style={{ width: 56, height: 56, background: '#FFF1F2', color: '#F43F5E', border: 'none', borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                            ❌
+                        </button>
+                    )}
+                </div>
             </div>
+
+            <style>{`
+                @keyframes pulse-ring {
+                    0% { transform: scale(1); opacity: 0.6; }
+                    100% { transform: scale(2.5); opacity: 0; }
+                }
+                .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+                @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            `}</style>
         </div>
     );
 }
