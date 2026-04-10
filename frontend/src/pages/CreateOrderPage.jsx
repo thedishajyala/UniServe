@@ -21,6 +21,7 @@ export default function CreateOrderPage() {
         item_details: '',
         is_prepaid: false,
         special_instructions: '',
+        payment_method: 'online',
     });
 
     const pricing = form.pickup_type && form.pickup_location
