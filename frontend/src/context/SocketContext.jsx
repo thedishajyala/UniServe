@@ -19,13 +19,13 @@ export function SocketProvider({ children }) {
             // (Note: Socket URL is usually the same as the base backend URL without /api)
             return 'https://uniserve-backend-s2w0.onrender.com';
         };
-        const url = getSocketURL();
+        const url = getSocketURL().replace(/\/$/, ""); // Ensure no trailing slash
         console.log('🔌 Connecting to Socket Hub:', url);
 
         const newSocket = io(url, {
             path: '/socket.io',
             withCredentials: true,
-            transports: ['polling', 'websocket'], 
+            transports: ['websocket', 'polling'], // WebSocket first!
             reconnectionAttempts: 7,
             timeout: 20000,
         });

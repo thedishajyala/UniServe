@@ -17,9 +17,14 @@ const messageRoutes = require('./routes/messages');
 const app = express();
 const server = http.createServer(app);
 
-// Root Middleware (CORS MUST COME FIRST)
+const ALLOWED_ORIGINS = [
+    'https://uniservebennett.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:5174',
+];
+
 app.use(cors({
-    origin: (origin, callback) => callback(null, true),
+    origin: ALLOWED_ORIGINS,
     credentials: true,
 }));
 app.use(express.json());
@@ -28,7 +33,7 @@ app.use(express.json());
 const io = new Server(server, {
     path: '/socket.io',
     cors: {
-        origin: (origin, callback) => callback(null, true),
+        origin: ALLOWED_ORIGINS,
         methods: ['GET', 'POST'],
         credentials: true,
     },
