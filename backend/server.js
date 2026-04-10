@@ -17,19 +17,25 @@ const messageRoutes = require('./routes/messages');
 const app = express();
 const server = http.createServer(app);
 
+// Root Middleware (CORS MUST COME FIRST)
+app.use(cors({
+    origin: (origin, callback) => callback(null, true),
+    credentials: true,
+}));
+app.use(express.json());
+
 // Socket.io setup
 const io = new Server(server, {
+    path: '/socket.io',
     cors: {
-        origin: (origin, callback) => callback(null, true), // Safely allow all origins with credentials
+        origin: (origin, callback) => callback(null, true),
         methods: ['GET', 'POST'],
         credentials: true,
     },
 });
-setupChatSockets(io);
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+console.log('📡 Signal Tower: Initializing Sockets...');
+setupChatSockets(io);
 
 // Serve uploaded images
 const path = require('path');

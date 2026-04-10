@@ -23,20 +23,25 @@ export function SocketProvider({ children }) {
         console.log('🔌 Connecting to Socket Hub:', url);
 
         const newSocket = io(url, {
+            path: '/socket.io',
             withCredentials: true,
-            transports: ['polling', 'websocket'], // Try polling first for maximum compatibility
-            reconnectionAttempts: 5,
-            timeout: 10000,
+            transports: ['polling', 'websocket'], 
+            reconnectionAttempts: 7,
+            timeout: 20000,
         });
 
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
-            console.log('✅ Connected to Signal Tower:', newSocket.id);
+            console.log('✅ SIGNAL_LOCKED:', newSocket.id);
         });
 
         newSocket.on('connect_error', (err) => {
-            console.error('❌ Socket Sync Error:', err.message);
+            console.warn('⚠️ CONNECTION_STUTTER:', err.message);
+        });
+
+        newSocket.on('reconnect', (attempt) => {
+            console.log('🔄 SIGNAL_REGAINED after', attempt, 'attempts');
         });
 
         return () => {
