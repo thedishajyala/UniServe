@@ -4,8 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { updateProfile } from '../services/api';
 import { BOYS_HOSTELS, GIRLS_HOSTELS } from '../config/campus';
 import toast from 'react-hot-toast';
+import { User, Home, CheckCircle2, ArrowRight, ArrowLeft, Box } from 'lucide-react';
 
-const steps = ['Personal Info', 'Hostel Details', 'Ready! 🎉'];
+const steps = ['Identity', 'Habitat', 'Finalized'];
 
 export default function ProfileSetupPage() {
     const { user, updateUser } = useAuth();
@@ -21,12 +22,11 @@ export default function ProfileSetupPage() {
     });
 
     const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-
     const handleNext = () => setStep((s) => s + 1);
 
     const handleSubmit = async () => {
         if (!form.name || !form.enrollment_no || !form.hostel || !form.room_no) {
-            toast.error('Please fill all fields');
+            toast.error('Mission data incomplete');
             return;
         }
         setLoading(true);
@@ -40,7 +40,7 @@ export default function ProfileSetupPage() {
             updateUser({ ...res.data, profile_complete: true });
             setStep(2);
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to save profile');
+            toast.error(err.response?.data?.message || 'Protocol failure during save');
         } finally {
             setLoading(false);
         }
@@ -49,105 +49,120 @@ export default function ProfileSetupPage() {
     const hostels = form.hostelGender === 'boys' ? BOYS_HOSTELS : form.hostelGender === 'girls' ? GIRLS_HOSTELS : [];
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
-            {/* Header */}
-            <div className="gradient-hero" style={{ padding: '48px 24px 72px' }}>
-                <h1 style={{ color: 'white', marginBottom: 8 }}>Set Up Your Profile</h1>
-                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>
-                    Your details are verified and visible to build campus trust
-                </p>
-                {/* Progress dots */}
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 24 }}>
-                    {steps.slice(0, 2).map((_, i) => (
-                        <div key={i} style={{
-                            width: i === step ? 24 : 8, height: 8,
-                            borderRadius: 4,
-                            background: i <= step ? 'white' : 'rgba(255,255,255,0.35)',
-                            transition: 'all 0.3s ease',
-                        }} />
-                    ))}
+        <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', fontFamily: 'Plus Jakarta Sans' }}>
+            {/* ── LUXE HUD HEADER ── */}
+            <div style={{ background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)', padding: '60px 24px 100px', position: 'relative', overflow: 'hidden' }}>
+                {/* Mesh Orbs */}
+                <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '40%', height: '80%', background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)', filter: 'blur(30px)' }} />
+                
+                <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <div style={{ width: 56, height: 56, background: 'rgba(255,255,255,0.2)', borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
+                        <User color="#fff" size={24} />
+                    </div>
+                    <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 8 }}>V4_PROFILE_INIT</h1>
+                    <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: 500 }}>INITIALIZE YOUR CAMPUS CREDENTIALS</p>
+                    
+                    {/* Progress Bar */}
+                    <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 32 }}>
+                        {steps.map((_, i) => (
+                            <div key={i} style={{
+                                width: step === i ? 40 : 12, height: 6, borderRadius: 10,
+                                background: step === i ? '#fff' : 'rgba(255,255,255,0.3)',
+                                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+                            }} />
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            <div style={{ maxWidth: 440, width: '100%', margin: '-48px auto 0', padding: '0 16px 32px', flex: 1 }}>
-                {step === 0 && (
-                    <div className="card slide-up" style={{ borderRadius: 24, padding: 32 }}>
-                        <h2 style={{ marginBottom: 24 }}>Personal Info</h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                            <div className="input-group">
-                                <label className="input-label">Full Name</label>
-                                <input className="input" name="name" placeholder="Your full name" value={form.name} onChange={handleChange} />
-                            </div>
-                            <div className="input-group">
-                                <label className="input-label">Enrollment Number</label>
-                                <input className="input" name="enrollment_no" placeholder="e.g. 22BCE001" value={form.enrollment_no} onChange={handleChange} />
-                            </div>
-                            <button className="btn btn-primary btn-w-full btn-lg" style={{ marginTop: 8 }}
-                                onClick={handleNext} disabled={!form.name || !form.enrollment_no}>
-                                Next →
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {step === 1 && (
-                    <div className="card slide-up" style={{ borderRadius: 24, padding: 32 }}>
-                        <h2 style={{ marginBottom: 24 }}>Hostel Details</h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                            <div className="input-group">
-                                <label className="input-label">I Stay In</label>
-                                <div style={{ display: 'flex', gap: 10 }}>
-                                    {['boys', 'girls'].map((g) => (
-                                        <button key={g}
-                                            className={`btn btn-w-full ${form.hostelGender === g ? 'btn-primary' : 'btn-ghost'}`}
-                                            onClick={() => setForm((f) => ({ ...f, hostelGender: g, hostel: '' }))}>
-                                            {g === 'boys' ? '🏠 Boys (C-Block)' : '🏠 Girls (D-Block)'}
-                                        </button>
-                                    ))}
+            {/* ── INTERACTIVE FORM ── */}
+            <div style={{ maxWidth: 460, width: '100%', margin: '-40px auto 0', padding: '0 20px 60px', position: 'relative', zIndex: 10 }}>
+                <div style={{ 
+                    background: '#fff', borderRadius: 32, padding: 40, 
+                    boxShadow: '0 40px 100px -20px rgba(0,0,0,0.1), 0 0 1px rgba(0,0,0,0.1)',
+                    border: '1px solid rgba(255,255,255,0.8)'
+                }}>
+                    
+                    {step === 0 && (
+                        <div className="slide-up">
+                            <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ width: 8, height: 18, background: '#4F46E5', borderRadius: 4 }} />
+                                IDENTITY_LINK
+                            </h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>LEGAL_NAME</label>
+                                    <input style={{ width: '100%', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} name="name" placeholder="Full Name" value={form.name} onChange={handleChange} />
                                 </div>
-                            </div>
-
-                            {form.hostelGender && (
-                                <div className="input-group">
-                                    <label className="input-label">Hostel Number</label>
-                                    <select className="input" name="hostel" value={form.hostel} onChange={handleChange}>
-                                        <option value="">Select your hostel</option>
-                                        {hostels.map((h) => <option key={h} value={h}>{h}</option>)}
-                                    </select>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENROLLMENT_KEY</label>
+                                    <input style={{ width: '100%', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} name="enrollment_no" placeholder="E23CSEUXXXX" value={form.enrollment_no} onChange={handleChange} />
                                 </div>
-                            )}
-
-                            <div className="input-group">
-                                <label className="input-label">Room Number</label>
-                                <input className="input" name="room_no" placeholder="e.g. 205" value={form.room_no} onChange={handleChange} />
-                            </div>
-
-                            <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-                                <button className="btn btn-ghost btn-w-full" onClick={() => setStep(0)}>← Back</button>
-                                <button className="btn btn-primary btn-w-full btn-lg"
-                                    onClick={handleSubmit}
-                                    disabled={loading || !form.hostel || !form.room_no}>
-                                    {loading ? '⏳ Saving...' : 'Finish Setup ✓'}
+                                <button onClick={handleNext} disabled={!form.name || !form.enrollment_no} style={{ marginTop: 8, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 10px 20px rgba(79, 70, 229, 0.3)' }}>
+                                    CONTINUE <ArrowRight size={18} />
                                 </button>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {step === 2 && (
-                    <div className="card slide-up" style={{ borderRadius: 24, padding: 32, textAlign: 'center' }}>
-                        <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-                        <h2 style={{ marginBottom: 8 }}>You&apos;re all set!</h2>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: 32, lineHeight: 1.6 }}>
-                            Your verified campus profile is ready.<br />
-                            Start ordering or earn by delivering!
-                        </p>
-                        <button className="btn btn-primary btn-w-full btn-lg" onClick={() => navigate('/')}>
-                            🚀 Go to Dashboard
-                        </button>
-                    </div>
-                )}
+                    {step === 1 && (
+                        <div className="slide-up">
+                            <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ width: 8, height: 18, background: '#7C3AED', borderRadius: 4 }} />
+                                HABITAT_LOCATOR
+                            </h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                    {['boys', 'girls'].map((g) => (
+                                        <button key={g} onClick={() => setForm((f) => ({ ...f, hostelGender: g, hostel: '' }))} style={{ height: 48, borderRadius: 12, border: 'none', fontSize: 12, fontWeight: 800, cursor: 'pointer', background: form.hostelGender === g ? '#4F46E5' : '#F1F5F9', color: form.hostelGender === g ? '#fff' : '#64748B', transition: 'all 0.2s ease' }}>
+                                            {g === 'boys' ? 'B-HOSTEL' : 'G-HOSTEL'}
+                                        </button>
+                                    ))}
+                                </div>
+                                {form.hostelGender && (
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>BLOCK_SELECT</label>
+                                        <select style={{ width: '100%', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} name="hostel" value={form.hostel} onChange={handleChange}>
+                                            <option value="">BLOCK_NO</option>
+                                            {hostels.map((h) => <option key={h} value={h}>{h}</option>)}
+                                        </select>
+                                    </div>
+                                )}
+                                <div>
+                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>CHAMBER_NO</label>
+                                    <input style={{ width: '100%', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} name="room_no" placeholder="E.g. 205" value={form.room_no} onChange={handleChange} />
+                                </div>
+                                <div style={{ display: 'flex', gap: 12 }}>
+                                    <button onClick={() => setStep(0)} style={{ flex: 1, height: 56, background: '#F1F5F9', color: '#64748B', border: 'none', borderRadius: 16, fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>BACK</button>
+                                    <button onClick={handleSubmit} disabled={loading || !form.hostel || !form.room_no} style={{ flex: 2, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 20px rgba(79, 70, 229, 0.3)' }}>
+                                        {loading ? 'SYNCING...' : 'FINALIZE_INIT'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div style={{ textAlign: 'center' }} className="slide-up">
+                            <div style={{ width: 80, height: 80, background: 'rgba(34, 197, 94, 0.1)', borderRadius: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', color: '#22C55E' }}>
+                                <CheckCircle2 size={40} />
+                            </div>
+                            <h2 style={{ fontSize: 24, fontWeight: 900, color: '#1E293B', marginBottom: 12 }}>Initialization Success</h2>
+                            <p style={{ color: '#64748B', marginBottom: 32, fontSize: 14, fontWeight: 500, lineHeight: 1.6 }}>
+                                YOUR CAMPUS IDENTITY IS NOW ACTIVE AND VERIFIED. <br /> PROCEED TO MISSION DASHBOARD.
+                            </p>
+                            <button onClick={() => navigate('/')} style={{ width: '100%', height: 56, background: '#1E293B', color: '#fff', border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                                DASHBOARD_HUB <ArrowRight size={18} />
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
+
+            <style>{`
+                .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+                @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            `}</style>
         </div>
     );
 }

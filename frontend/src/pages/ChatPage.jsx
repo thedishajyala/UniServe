@@ -6,7 +6,15 @@ import { getMessages, getOrderById, uploadImage, createPayment, settlePayment } 
 import toast from 'react-hot-toast';
 import { ArrowLeft, Send, Phone, MapPin, Camera, ImagePlus, X, CreditCard } from 'lucide-react';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
+const getBaseSocketURL = () => {
+    if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:5001';
+    }
+    return 'https://uniserve-backend-s2w0.onrender.com';
+};
+
+const SOCKET_URL = getBaseSocketURL();
 
 function getInitials(name = '') {
     return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
