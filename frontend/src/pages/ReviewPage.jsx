@@ -10,11 +10,28 @@ const QUICK_TAGS = ['RAPID_DELIVERY', 'RELIABLE_OP', 'PUNCTUAL_SYNC', 'PERFECT_L
 export default function ReviewPage() {
     const { orderId } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const [order, setOrder] = useState(null);
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [done, setDone] = useState(false);
+
+    React.useEffect(() => {
+        const load = async () => {
+            try {
+                const res = await getOrderById(orderId);
+                setOrder(res.data);
+            } catch {
+                toast.error('SYNC_ERROR');
+            }
+        };
+        load();
+    }, [orderId]);
+
+    const isRequester = order?.user_id?._id === user?._id || order?.user_id === user?._id;
+    const reviewee = isRequester ? order?.delivery_partner_id : order?.user_id;
 
     const handleSubmit = async () => {
         if (!rating) { toast.error('PROTOCOL_ERROR: SELECT_RATING'); return; }
@@ -29,6 +46,8 @@ export default function ReviewPage() {
             setLoading(false);
         }
     };
+
+    const getInitials = (n = '') => n.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
     if (done) return (
         <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
@@ -57,11 +76,23 @@ export default function ReviewPage() {
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                 <div style={{ maxWidth: 460, width: '100%', textAlign: 'center' }} className="slide-up">
-                    <div style={{ width: 64, height: 64, background: '#F1F5F9', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#4F46E5' }}>
-                        <Star size={32} />
+                    <div style={{ position: 'relative', margin: '0 auto 32px', width: 80, height: 80 }}>
+                        <div style={{ width: '100%', height: '100%', borderRadius: 28, background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 24, fontWeight: 800 }}>
+                            {reviewee ? getInitials(reviewee.name) : <Star size={32} />}
+                        </div>
+                        <div style={{ position: 'absolute', bottom: -10, right: -10, width: 36, height: 36, borderRadius: '50%', background: '#fff', border: '4px solid #F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F59E0B' }}>
+                            <Star size={16} fill="currentColor" />
+                        </div>
                     </div>
-                    <h1 style={{ fontSize: 28, fontWeight: 900, color: '#1E293B', letterSpacing: '-1px', marginBottom: 8 }}>Mission Debrief</h1>
-                    <p style={{ color: '#64748B', fontSize: 14, fontWeight: 500, marginBottom: 40 }}>RATE THE PERFORMANCE OF YOUR DELIVERY PARTNER</p>
+                    
+                    <h1 style={{ fontSize: 28, fontWeight: 900, color: '#1E293B', letterSpacing: '-px', marginBottom: 8 }}>
+                        {isRequester ? 'Rate Delivery Partner' : 'Rate Order Creator'}
+                    </h1>
+                    <p style={{ color: '#64748B', fontSize: 14, fontWeight: 500, marginBottom: 40, letterSpacing: '0.05em' }}>
+                        DEBRIEFING MISSION_ID: {orderId?.slice(-6).toUpperCase()}
+                    </p>
+
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#1E293B', marginBottom: 20 }}>How was your interaction with {reviewee?.name || 'the participant'}?</p>
 
                     {/* LUXE STAR TERMINAL */}
                     <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 20 }}>

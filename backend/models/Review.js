@@ -12,9 +12,15 @@ const reviewSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
-        delivery_partner_id: {
+        reviewee_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
+            required: true,
+        },
+        // 'partner' | 'requester' — who was on the RECEIVING end of this review
+        reviewee_role: {
+            type: String,
+            enum: ['partner', 'requester'],
             required: true,
         },
         rating: {
@@ -31,5 +37,8 @@ const reviewSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+// Compound index to ensure one user can only review another user ONCE per order
+reviewSchema.index({ order_id: 1, reviewer_id: 1 }, { unique: true });
 
 module.exports = mongoose.model('Review', reviewSchema);

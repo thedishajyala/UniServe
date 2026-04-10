@@ -12,50 +12,59 @@ router.post('/add', protect, async (req, res) => {
         const { order_id, rating, review_text } = req.body;
 
         if (!order_id || !rating) {
-            return res.status(400).json({ message: 'Order ID and rating are required' });
-        }
-
-        if (rating < 1 || rating > 5) {
-            return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+            return res.status(400).json({ message: 'PROTOCOL_ERROR: DATA_MISSING' });
         }
 
         const order = await Order.findById(order_id);
-        if (!order) return res.status(404).json({ message: 'Order not found' });
+        if (!order) return res.status(404).json({ message: 'MISSION_NOT_FOUND' });
         if (order.status !== 'delivered') {
-            return res.status(400).json({ message: 'Can only review delivered orders' });
-        }
-        if (order.user_id.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'Only the order requester can leave a review' });
+            return res.status(400).json({ message: 'DEBRIEF_LOCKED: MISSION_INCOMPLETE' });
         }
 
-        // Prevent duplicate reviews
-        const existing = await Review.findOne({ order_id });
+        // Identify roles
+        const isRequester = order.user_id.toString() === req.user._id.toString();
+        const isPartner = order.delivery_partner_id?.toString() === req.user._id.toString();
+
+        if (!isRequester && !isPartner) {
+            return res.status(403).json({ message: 'ACCESS_DENIED: NOT_INVOLVED_IN_MISSION' });
+        }
+
+        // Determine reviewee
+        const reviewee_id = isRequester ? order.delivery_partner_id : order.user_id;
+        const reviewee_role = isRequester ? 'partner' : 'requester';
+
+        if (!reviewee_id) {
+            return res.status(400).json({ message: 'SYNC_ERROR: NO_REVIEWEE' });
+        }
+
+        // Prevent duplicate reviews FROM THIS REVIEWER for THIS ORDER
+        const existing = await Review.findOne({ order_id, reviewer_id: req.user._id });
         if (existing) {
-            return res.status(400).json({ message: 'Review already submitted for this order' });
+            return res.status(400).json({ message: 'DEBRIEF_EXISTS: MISSION_ALREADY_RATED' });
         }
 
         const review = await Review.create({
             order_id,
             reviewer_id: req.user._id,
-            delivery_partner_id: order.delivery_partner_id,
+            reviewee_id,
+            reviewee_role,
             rating,
             review_text: review_text || '',
         });
 
-        // Recalculate delivery partner's average rating
-        const partnerReviews = await Review.find({ delivery_partner_id: order.delivery_partner_id });
-        const avgRating =
-            partnerReviews.reduce((sum, r) => sum + r.rating, 0) / partnerReviews.length;
+        // Recalculate reviewee's average rating
+        const allReviews = await Review.find({ reviewee_id });
+        const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
 
-        await User.findByIdAndUpdate(order.delivery_partner_id, {
+        await User.findByIdAndUpdate(reviewee_id, {
             rating: Math.round(avgRating * 10) / 10,
-            total_reviews: partnerReviews.length,
+            total_reviews: allReviews.length,
         });
 
-        res.status(201).json({ review, message: 'Review submitted successfully' });
+        res.status(201).json({ review, message: 'MISSION_DEBRIEF_SYNCED ✅' });
     } catch (error) {
         console.error('Review error:', error);
-        res.status(500).json({ message: 'Server error submitting review' });
+        res.status(500).json({ message: 'SYNC_FAILURE' });
     }
 });
 
