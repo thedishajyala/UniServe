@@ -98,7 +98,7 @@ export default function ProfilePage() {
                     <div className="stat-card">
                         <Star size={18} style={{ color: '#f59e0b', marginBottom: 6 }} />
                         <div className="stat-value">
-                            {user?.total_reviews > 0 ? user.rating.toFixed(1) : '—'}
+                            {user?.total_reviews > 0 ? Number(user.rating || 0).toFixed(1) : '—'}
                         </div>
                         <div className="stat-label">
                             {user?.total_reviews > 0 ? `⭐ (${user.total_reviews})` : 'New 🆕'}

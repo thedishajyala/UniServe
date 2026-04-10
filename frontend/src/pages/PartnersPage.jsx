@@ -190,11 +190,14 @@ export default function PartnersPage() {
                                             <p>{partner.hostel} · Room {partner.room_no}</p>
                                             <div className="partner-badges">
                                                 <span className="badge badge-primary">
-                                                    <Star size={10} fill="currentColor" /> {partner.rating?.toFixed(1)}
+                                                    <Star size={10} fill="currentColor" /> {Number(partner.rating || 0).toFixed(1)}
                                                 </span>
                                                 <span className="badge badge-secondary">
                                                     <Zap size={10} /> {partner.total_deliveries} deliveries
                                                 </span>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: 11, marginTop: 4 }}>
+                                                <Clock size={11} /> ~{Number(partner.avg_response_time || 0).toFixed(0)} min avg response
                                             </div>
                                         </div>
                                         <div className="match-score" style={{ color: getMatchColor(partner.matchScore) }}>

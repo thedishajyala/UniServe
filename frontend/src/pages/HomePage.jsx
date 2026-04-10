@@ -51,10 +51,10 @@ function getInitials(name = '') {
 }
 
 function renderRating(rating, totalReviews) {
-    if (totalReviews === 0) return <span className="badge badge-info">New 🆕</span>;
+    if (totalReviews === 0 || !rating) return <span className="badge badge-info">New 🆕</span>;
     return (
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: '#F59E0B' }}>
-            ⭐ {rating.toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 11 }}>({totalReviews})</span>
+            ⭐ {Number(rating).toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 11 }}>({totalReviews})</span>
         </span>
     );
 }
@@ -182,7 +182,7 @@ export default function HomePage() {
                         </div>
                         <div className="glass" style={{ padding: '6px 12px', borderRadius: 999, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => navigate('/profile')}>
                             <Star size={14} color="#FBBF24" fill="#FBBF24" />
-                            <span style={{ color: 'white', fontSize: 13, fontWeight: 700 }}>{user?.rating?.toFixed(1) || '5.0'}</span>
+                            <span style={{ color: 'white', fontSize: 13, fontWeight: 700 }}>{Number(user?.rating || 5.0).toFixed(1)}</span>
                         </div>
                     </div>
 
@@ -265,7 +265,7 @@ export default function HomePage() {
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                                             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Deliver to</span>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                                                {renderRating(requester?.rating, requester?.total_reviews)}
+                                              {requester?.hostel} · {requester?.total_reviews > 0 ? `⭐ ${Number(requester.rating || 0).toFixed(1)} (${requester.total_reviews})` : 'New User 🆕'}
                                             </div>
                                             <span style={{ fontSize: 13, fontWeight: 600 }}>{order.delivery_hostel} · Room {order.delivery_room}</span>
                                         </div>
@@ -395,7 +395,7 @@ export default function HomePage() {
                     <div className="stat-card">
                         <div className="stat-value">{user?.total_deliveries || 0}</div>
                         <div className="stat-label">
-                            {user?.total_deliveries > 0 ? "Deliveries Done 📦" : "Start your first delivery 🚀"}
+                            {user?.total_reviews > 0 ? Number(user.rating || 0).toFixed(1) : '—'} Deliveries Done 📦
                         </div>
                     </div>
                 </div>

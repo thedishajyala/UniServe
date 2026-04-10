@@ -245,7 +245,7 @@ export default function ChatPage() {
                 <div style={{ flex: 1 }}>
                     <h1 style={{ fontSize: 15, fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>{partner?.name || 'Loading...'}</h1>
                     <p style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        {partner?.hostel} · {partner?.total_reviews > 0 ? `⭐ ${partner.rating.toFixed(1)} (${partner.total_reviews})` : 'New Partner 🆕'}
+                        {partner?.hostel} · {partner?.total_reviews > 0 ? `⭐ ${Number(partner.rating || 0).toFixed(1)} (${partner.total_reviews})` : 'New Partner 🆕'}
                     </p>
                 </div>
                 {order && (
