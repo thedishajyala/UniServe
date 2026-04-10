@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { login, signup } from '../services/api';
 import { UNIVERSITY_DOMAIN } from '../config/campus';
 import toast from 'react-hot-toast';
+import { Box } from 'lucide-react';
 
 export default function LoginPage() {
     const { loginUser } = useAuth();
