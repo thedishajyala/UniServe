@@ -2,7 +2,14 @@ import axios from 'axios';
 
 const getBaseURL = () => {
     if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-    return 'http://localhost:5001/api';
+    
+    // Automatically switch based on environment
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:5001/api';
+    }
+    
+    // Fallback for Vercel deployment to hit the Render backend
+    return 'https://uniserve-backend-s2w0.onrender.com/api';
 };
 
 const API = axios.create({
