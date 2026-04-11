@@ -70,6 +70,7 @@ export default function HomePage() {
     const [incomingRequests, setIncomingRequests] = useState([]);
     const [respondingTo, setRespondingTo] = useState(null);
     const [activeDeliveries, setActiveDeliveries] = useState([]);
+    const [mode, setMode] = useState('order'); // 'order' or 'deliver'
 
     const [onlinePartners, setOnlinePartners] = useState([]);
 
@@ -180,9 +181,15 @@ export default function HomePage() {
                         <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
                             <span style={{ fontSize: 20 }}>🚀</span>
                         </div>
-                        <div className="glass" style={{ padding: '6px 12px', borderRadius: 999, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => navigate('/profile')}>
-                            <Star size={14} color="#FBBF24" fill="#FBBF24" />
-                            <span style={{ color: 'white', fontSize: 13, fontWeight: 700 }}>{Number(user?.rating || 5.0).toFixed(1)}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <div className="mode-toggle-container">
+                                <button className={`mode-toggle-btn ${mode === 'order' ? 'active' : ''}`} onClick={() => setMode('order')}>Order</button>
+                                <button className={`mode-toggle-btn ${mode === 'deliver' ? 'active' : ''}`} onClick={() => setMode('deliver')}>Deliver</button>
+                            </div>
+                            <div className="glass" style={{ padding: '6px 12px', borderRadius: 999, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => navigate('/profile')}>
+                                <Star size={14} color="#FBBF24" fill="#FBBF24" />
+                                <span style={{ color: 'white', fontSize: 13, fontWeight: 700 }}>{Number(user?.rating || 5.0).toFixed(1)}</span>
+                            </div>
                         </div>
                     </div>
 
@@ -201,283 +208,272 @@ export default function HomePage() {
             </div>
 
             <div className="page-content" style={{ marginTop: -48, position: 'relative', zIndex: 2 }}>
+                
+                {mode === 'order' ? (
+                    <div className="fade-in">
+                        {/* ── ORDER MODE CONTENT ── */}
+                        
+                        {/* Main Call to Action */}
+                        <button className="card action-card premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 24, background: 'linear-gradient(145deg, #6366f1, #4f46e5)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 12px 30px rgba(99,102,241,0.25)', width: '100%', marginBottom: 24 }}
+                            onClick={() => navigate('/order/create')}>
+                            <div style={{ position: 'absolute', right: -15, bottom: -15, opacity: 0.1, transform: 'rotate(-15deg)' }}>
+                                <Package size={80} />
+                            </div>
+                            <div style={{ background: 'rgba(255,255,255,0.25)', padding: 10, borderRadius: 14, marginBottom: 18, backdropFilter: 'blur(10px)' }}>
+                                <Package size={24} color="white" />
+                            </div>
+                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 19, marginBottom: 4 }}>Place Order</div>
+                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+                                Get it delivered directly to your room <ArrowRight size={14} />
+                            </div>
+                        </button>
 
-                {/* ── INCOMING REQUESTS PANEL (partner only, when online) ── */}
-                {user?.is_available && incomingRequests.length > 0 && (
-                    <div style={{ marginBottom: 20 }}>
-                        <div className="section-header">
-                            <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Bell size={16} color="var(--primary)" /> Incoming Requests
-                                <span style={{
-                                    background: 'var(--primary)', color: '#fff',
-                                    borderRadius: '50%', fontSize: 11, fontWeight: 700,
-                                    width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                }}>
-                                    {incomingRequests.length}
-                                </span>
-                            </h3>
-                        </div>
-
-                        {incomingRequests.map((req) => {
-                            // req can be a raw Order doc (from REST poll) OR socket payload { order, requester }
-                            const order = req.order || req;
-                            const requester = req.requester || req.user_id;
-                            const orderId = order._id;
-
-                            return (
-                                <div key={orderId} className="card" style={{
-                                    marginBottom: 12,
-                                    border: '1px solid var(--primary-light)',
-                                    background: 'linear-gradient(135deg, rgba(79,70,229,0.03), rgba(124,58,237,0.03))',
-                                    boxShadow: '0 10px 25px rgba(79,70,229,0.1)',
-                                }}>
-                                    {/* Requester info */}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                                        <div style={{
-                                            width: 40, height: 40, borderRadius: '50%',
-                                            background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            color: '#fff', fontWeight: 700, fontSize: 16,
-                                        }}>
-                                            {(requester?.name || 'U').charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <p style={{ fontWeight: 700, fontSize: 14 }}>{requester?.name || 'Student'}</p>
-                                            <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                                                {requester?.hostel} · Room {requester?.room_no}
-                                            </p>
-                                        </div>
-                                        <span style={{
-                                            marginLeft: 'auto', background: 'var(--primary)',
-                                            color: '#fff', borderRadius: 8, padding: '4px 10px',
-                                            fontSize: 13, fontWeight: 700,
-                                        }}>
-                                            +₹{order.delivery_earning}
-                                        </span>
-                                    </div>
-
-                                    {/* Order details */}
-                                    <div style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Pickup</span>
-                                            <span style={{ fontSize: 13, fontWeight: 600 }}>{order.pickup_location}</span>
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Deliver to</span>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                                              {requester?.hostel} · {requester?.total_reviews > 0 ? `⭐ ${Number(requester.rating || 0).toFixed(1)} (${requester.total_reviews})` : 'New User 🆕'}
+                        {/* Available Nearby Snippet */}
+                        {onlinePartners.length > 0 && (
+                            <div style={{ marginBottom: 24 }}>
+                                <div className="section-header">
+                                    <h3 className="section-title">👥 Available Nearby</h3>
+                                </div>
+                                <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px' }}>
+                                    {onlinePartners.map((p) => (
+                                        <div key={p._id} className="card partner-pill" style={{ minWidth: 160, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 12 }}>
+                                                {p.name.charAt(0)}
                                             </div>
-                                            <span style={{ fontSize: 13, fontWeight: 600 }}>{order.delivery_hostel} · Room {order.delivery_room}</span>
+                                            <div>
+                                                <div style={{ fontSize: 13, fontWeight: 700 }}>{p.name.split(' ')[0]}</div>
+                                                <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                    {renderRating(p.rating, p.total_reviews)} · {p.hostel}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Items</span>
-                                            <span style={{ fontSize: 13, fontWeight: 600 }}>{order.item_details?.slice(0, 30)}{order.item_details?.length > 30 ? '...' : ''}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Recent Orders */}
+                        <div>
+                            <div className="section-header">
+                                <h3 className="section-title">📋 Recent Orders</h3>
+                                <Link to="/order/create" style={{ color: 'var(--primary)', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>+ New</Link>
+                            </div>
+                            {orders.length === 0 ? (
+                                <div className="empty-state">
+                                    <div className="empty-state-icon">🛍️</div>
+                                    <p className="empty-state-title">No orders yet</p>
+                                    <p className="empty-state-sub">Create your first delivery request!</p>
+                                </div>
+                            ) : (
+                                orders.map((order) => (
+                                    <div key={order._id} className="order-card recent-order-card" style={{ cursor: 'pointer', padding: 16 }}
+                                        onClick={() => navigate(
+                                            order.status === 'delivered' ? `/order/${order._id}/review` :
+                                                order.status === 'accepted' ? `/chat/${order._id}` :
+                                                    `/order/${order._id}/track`
+                                        )}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                                            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                                                <div style={{ background: 'var(--bg)', padding: 8, borderRadius: 10 }}>
+                                                    {order.pickup_location.includes('Gate') ? <Package size={18} color="var(--primary)" /> : <span style={{ fontSize: 18 }}>🍔</span>}
+                                                </div>
+                                                <div>
+                                                    <p style={{ fontWeight: 700, fontSize: 15 }}>{order.pickup_location}</p>
+                                                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>→ {order.delivery_hostel}, Room {order.delivery_room}</p>
+                                                </div>
+                                            </div>
+                                            {statusBadge(order.status)}
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                                            <p style={{ fontSize: 12, color: 'var(--text-muted)', flex: 1 }}>{order.item_details.slice(0, 35)}{order.item_details.length > 35 ? '...' : ''}</p>
+                                            <span style={{ fontFamily: 'Outfit', fontWeight: 800, color: 'var(--primary-dark)', fontSize: 16 }}>₹{order.price}</span>
                                         </div>
                                     </div>
-
-                                    {/* Accept / Decline */}
-                                    <div style={{ display: 'flex', gap: 10 }}>
-                                        <button
-                                            className="btn btn-primary"
-                                            style={{ flex: 1, background: '#22c55e', borderColor: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-                                            onClick={() => handleRespond(orderId, 'accepted')}
-                                            disabled={respondingTo !== null}
-                                        >
-                                            <CheckCircle size={16} />
-                                            {respondingTo === orderId + 'accepted' ? 'Accepting...' : 'Accept'}
-                                        </button>
-                                        <button
-                                            className="btn btn-secondary"
-                                            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#ef4444', borderColor: '#ef4444' }}
-                                            onClick={() => handleRespond(orderId, 'declined')}
-                                            disabled={respondingTo !== null}
-                                        >
-                                            <XCircle size={16} />
-                                            {respondingTo === orderId + 'declined' ? 'Declining...' : 'Decline'}
-                                        </button>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="fade-in">
+                        {/* ── DELIVER MODE CONTENT ── */}
+                        
+                        {/* Go Online Toggle */}
+                        <div className="card action-card toggle-card" style={{ padding: '24px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: user?.is_available ? 'linear-gradient(145deg, #ECFDF5, #D1FAE5)' : 'white', border: user?.is_available ? '1px solid #A7F3D0' : '1px solid var(--border-strong)', boxShadow: '0 8px 25px rgba(0,0,0,0.04)', marginBottom: 20 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                                <div style={{ fontSize: 32, filter: user?.is_available ? 'drop-shadow(0 4px 10px rgba(34,197,94,0.2))' : 'none' }}>{user?.is_available ? '🚴' : '😴'}</div>
+                                <div>
+                                    <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 17, color: user?.is_available ? '#065F46' : 'var(--text-primary)' }}>
+                                        {user?.is_available ? 'Live Now' : 'Offline'}
+                                    </div>
+                                    <div style={{ fontSize: 12, color: user?.is_available ? '#059669' : 'var(--text-muted)', fontWeight: 600 }}>
+                                        {user?.is_available ? "Active & Earning" : "Start a micro-gig"}
                                     </div>
                                 </div>
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* ── ACTIVE DELIVERIES PANEL (partner's ongoing deliveries) ── */}
-                {activeDeliveries.length > 0 && (
-                    <div style={{ marginBottom: 20 }}>
-                        <div className="section-header">
-                            <h3 className="section-title">🚴 Active Deliveries</h3>
+                            </div>
+                            <label className="toggle">
+                                <input type="checkbox" checked={!!user?.is_available} onChange={handleToggleAvail} disabled={togglingAvail} />
+                                <span className="toggle-slider" />
+                            </label>
                         </div>
-                        {activeDeliveries.map((delivery) => (
-                            <div key={delivery._id} className="card" style={{
-                                marginBottom: 12,
-                                border: '2px solid #22c55e',
-                                background: 'linear-gradient(135deg, rgba(34,197,94,0.05), rgba(16,185,129,0.05))',
+
+                        {/* Demand Banner */}
+                        {demand?.isCurrentlyPeak && (
+                            <div className="demand-pill" style={{ 
+                                marginBottom: 20, background: 'linear-gradient(135deg, #F59E0B, #D97706)', 
+                                color: 'white', padding: '12px 16px', borderRadius: 20, display: 'flex', alignItems: 'center', 
+                                gap: 10, fontWeight: 700, fontSize: 13, boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)'
                             }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                    <div>
-                                        <p style={{ fontWeight: 700, fontSize: 14 }}>{delivery.pickup_location} → {delivery.delivery_hostel}</p>
-                                        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Room {delivery.delivery_room}</p>
-                                    </div>
-                                    <span style={{
-                                        background: '#22c55e22', color: '#16a34a',
-                                        borderRadius: 8, padding: '4px 10px', fontSize: 12, fontWeight: 700,
+                                <span style={{ fontSize: 20 }}>🔥</span> High Demand — Peak rates active!
+                            </div>
+                        )}
+
+                        {/* Incoming Requests */}
+                        {user?.is_available && incomingRequests.length > 0 && (
+                            <div style={{ marginBottom: 24 }}>
+                                <div className="section-header">
+                                    <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <Bell size={16} color="var(--primary)" /> Incoming Requests
+                                        <span style={{
+                                            background: 'var(--primary)', color: '#fff',
+                                            borderRadius: '50%', fontSize: 11, fontWeight: 700,
+                                            width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                        }}>
+                                            {incomingRequests.length}
+                                        </span>
+                                    </h3>
+                                </div>
+
+                                {incomingRequests.map((req) => {
+                                    const order = req.order || req;
+                                    const requester = req.requester || req.user_id;
+                                    const orderId = order._id;
+
+                                    return (
+                                        <div key={orderId} className="card" style={{
+                                            marginBottom: 12,
+                                            border: '1px solid var(--primary-light)',
+                                            background: 'linear-gradient(135deg, rgba(79,70,229,0.03), rgba(124,58,237,0.03))',
+                                            boxShadow: '0 10px 25px rgba(79,70,229,0.1)',
+                                            padding: 16
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                                                <div style={{
+                                                    width: 40, height: 40, borderRadius: '50%',
+                                                    background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    color: '#fff', fontWeight: 700, fontSize: 16,
+                                                }}>
+                                                    {(requester?.name || 'U').charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <p style={{ fontWeight: 700, fontSize: 14 }}>{requester?.name || 'Student'}</p>
+                                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', gap: 4 }}>
+                                                        {requester?.hostel} · Room {requester?.room_no} · {requester?.total_reviews > 0 ? `⭐ ${Number(requester.rating || 0).toFixed(1)}` : 'New'}
+                                                    </div>
+                                                </div>
+                                                <span style={{
+                                                    marginLeft: 'auto', background: 'var(--primary)',
+                                                    color: '#fff', borderRadius: 8, padding: '4px 10px',
+                                                    fontSize: 14, fontWeight: 800,
+                                                }}>
+                                                    +₹{order.delivery_earning}
+                                                </span>
+                                            </div>
+
+                                            <div style={{ background: 'var(--bg)', borderRadius: 12, padding: '12px', marginBottom: 12, border: '1px solid var(--border)' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Pickup</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700 }}>{order.pickup_location}</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Deliver to</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700 }}>{order.delivery_hostel} · Room {order.delivery_room}</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Items</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700 }}>{order.item_details?.slice(0, 30)}...</span>
+                                                </div>
+                                            </div>
+
+                                            <div style={{ display: 'flex', gap: 10 }}>
+                                                <button className="btn btn-primary" style={{ flex: 1, background: '#22c55e', borderColor: '#22c55e', height: 44, padding: 0 }}
+                                                    onClick={() => handleRespond(orderId, 'accepted')} disabled={respondingTo !== null}>
+                                                    {respondingTo === orderId + 'accepted' ? '...' : 'Accept'}
+                                                </button>
+                                                <button className="btn btn-secondary" style={{ flex: 1, color: '#ef4444', borderColor: '#ef4444', height: 44, padding: 0 }}
+                                                    onClick={() => handleRespond(orderId, 'declined')} disabled={respondingTo !== null}>
+                                                    Decline
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {/* Active Deliveries */}
+                        {activeDeliveries.length > 0 && (
+                            <div style={{ marginBottom: 24 }}>
+                                <div className="section-header">
+                                    <h3 className="section-title">🚴 Active Deliveries</h3>
+                                </div>
+                                {activeDeliveries.map((delivery) => (
+                                    <div key={delivery._id} className="card" style={{
+                                        marginBottom: 12,
+                                        border: '2px solid #22c55e',
+                                        background: 'linear-gradient(135deg, rgba(34,197,94,0.05), rgba(16,185,129,0.05))',
+                                        padding: 16
                                     }}>
-                                        {delivery.status === 'accepted' ? '✅ Accepted' : delivery.status === 'picked' ? '📦 Picked' : '🚗 On the Way'}
-                                    </span>
-                                </div>
-                                <div style={{ display: 'flex', gap: 8 }}>
-                                    <button className="btn btn-primary" style={{ flex: 1, fontSize: 13 }}
-                                        onClick={() => navigate(`/chat/${delivery._id}`)}>
-                                        💬 Open Chat
-                                    </button>
-                                    <button className="btn btn-secondary" style={{ flex: 1, fontSize: 13 }}
-                                        onClick={() => navigate(`/order/${delivery._id}/track`)}>
-                                        📍 Track
-                                    </button>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                            <div>
+                                                <p style={{ fontWeight: 800, fontSize: 15 }}>{delivery.pickup_location} → {delivery.delivery_hostel}</p>
+                                                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Room {delivery.delivery_room}</p>
+                                            </div>
+                                            <span style={{
+                                                background: '#22c55e22', color: '#16a34a',
+                                                borderRadius: 8, padding: '4px 10px', fontSize: 12, fontWeight: 800,
+                                            }}>
+                                                {delivery.status.toUpperCase()}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: 8 }}>
+                                            <button className="btn btn-primary btn-sm" style={{ flex: 1 }}
+                                                onClick={() => navigate(`/chat/${delivery._id}`)}>💬 Chat</button>
+                                            <button className="btn btn-secondary btn-sm" style={{ flex: 1 }}
+                                                onClick={() => navigate(`/order/${delivery._id}/track`)}>📍 Track</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Quick Stats */}
+                        <div className="stat-grid" style={{ marginBottom: 24 }}>
+                            <div className="stat-card">
+                                <div className="stat-value">₹{user?.total_earnings || 0}</div>
+                                <div className="stat-label">Total Earned</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-value">{user?.total_deliveries || 0}</div>
+                                <div className="stat-label">Deliveries Done</div>
+                            </div>
+                        </div>
+
+                        {/* Trending Outlets */}
+                        {demand?.popularOutlets?.length > 0 && (
+                            <div style={{ marginBottom: 20 }}>
+                                <div className="section-header"><h3 className="section-title">🔥 Trending Outlets</h3></div>
+                                <div className="chip-group">
+                                    {demand.popularOutlets.slice(0, 4).map((o) => (
+                                        <div key={o.name} className="chip" style={{ cursor: 'default' }}>
+                                            {o.name} <span style={{ opacity: 0.6 }}>({o.count})</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
+                        )}
                     </div>
                 )}
-
-                {/* Demand Banner Moved to Top */}
-                {demand?.isCurrentlyPeak && (
-                    <div className="demand-pill fade-in" style={{ 
-                        margin: '-20px auto 20px', width: '90%', background: 'linear-gradient(135deg, #F59E0B, #D97706)', 
-                        color: 'white', padding: '10px 16px', borderRadius: 999, display: 'flex', alignItems: 'center', 
-                        justifyContent: 'center', gap: 8, fontWeight: 600, fontSize: 13, position: 'relative', zIndex: 2,
-                        boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)'
-                    }}>
-                        <span>🔥</span> High Demand — Earn more right now
-                    </div>
-                )}
-
-                {/* Main Actions */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 14, marginBottom: 24 }}>
-                    <button className="card action-card premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 24, background: 'linear-gradient(145deg, #6366f1, #4f46e5)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 12px 30px rgba(99,102,241,0.25)' }}
-                        onClick={() => navigate('/order/create')}>
-                        <div style={{ position: 'absolute', right: -15, bottom: -15, opacity: 0.1, transform: 'rotate(-15deg)' }}>
-                            <Package size={80} />
-                        </div>
-                        <div style={{ background: 'rgba(255,255,255,0.25)', padding: 10, borderRadius: 14, marginBottom: 18, backdropFilter: 'blur(10px)' }}>
-                            <Package size={24} color="white" />
-                        </div>
-                        <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 19, marginBottom: 4 }}>Place Order</div>
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
-                            Get it delivered <ArrowRight size={14} />
-                        </div>
-                    </button>
-
-                    <div className="card action-card toggle-card" style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: user?.is_available ? 'linear-gradient(145deg, #ECFDF5, #D1FAE5)' : 'white', border: user?.is_available ? '1px solid #A7F3D0' : '1px solid var(--border-strong)', boxShadow: '0 8px 25px rgba(0,0,0,0.04)', position: 'relative' }}>
-                        <div style={{ fontSize: 32, marginBottom: 8, filter: user?.is_available ? 'drop-shadow(0 4px 10px rgba(34,197,94,0.2))' : 'none' }}>{user?.is_available ? '🚴' : '😴'}</div>
-                        <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 16, color: user?.is_available ? '#065F46' : 'var(--text-primary)', marginBottom: 2 }}>
-                            {user?.is_available ? 'Live Now' : 'Offline'}
-                        </div>
-                        <div style={{ fontSize: 11, color: user?.is_available ? '#059669' : 'var(--text-muted)', marginBottom: 14, fontWeight: 600 }}>
-                            {user?.is_available ? "Active & Earning" : "Start a micro-gig"}
-                        </div>
-                        <label className="toggle">
-                            <input type="checkbox" checked={!!user?.is_available} onChange={handleToggleAvail} disabled={togglingAvail} />
-                            <span className="toggle-slider" />
-                        </label>
-                    </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="stat-grid" style={{ marginBottom: 24 }}>
-                    <div className="stat-card">
-                        <div className="stat-value">₹{user?.total_earnings || 0}</div>
-                        <div className="stat-label">
-                            {user?.total_earnings > 0 ? "Total Earned 🎉" : "You haven't earned yet 👀"}
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-value">{user?.total_deliveries || 0}</div>
-                        <div className="stat-label">
-                            {user?.total_reviews > 0 ? Number(user.rating || 0).toFixed(1) : '—'} Deliveries Done 📦
-                        </div>
-                    </div>
-                </div>
-
-                {/* Popular Outlets */}
-                {demand?.popularOutlets?.length > 0 && (
-                    <div style={{ marginBottom: 20 }}>
-                        <div className="section-header"><h3 className="section-title">🔥 Trending Outlets</h3></div>
-                        <div className="chip-group">
-                            {demand.popularOutlets.slice(0, 4).map((o) => (
-                                <div key={o.name} className="chip" style={{ cursor: 'default' }}>
-                                    {o.name} <span style={{ opacity: 0.6 }}>({o.count})</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Available Nearby Snippet */}
-                {!user?.is_available && onlinePartners.length > 0 && (
-                    <div style={{ marginBottom: 24 }}>
-                        <div className="section-header">
-                            <h3 className="section-title">👥 Available Nearby</h3>
-                        </div>
-                        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px' }}>
-                            {onlinePartners.map((p) => (
-                                <div key={p._id} className="card partner-pill" style={{ minWidth: 160, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 12 }}>
-                                        {p.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: 13, fontWeight: 700 }}>{p.name.split(' ')[0]}</div>
-                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                            {renderRating(p.rating, p.total_reviews)} · {p.hostel}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Recent Orders */}
-                <div>
-                    <div className="section-header">
-                        <h3 className="section-title">📋 Recent Orders</h3>
-                        <Link to="/order/create" style={{ color: 'var(--primary)', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>+ New</Link>
-                    </div>
-                    {orders.length === 0 ? (
-                        <div className="empty-state">
-                            <div className="empty-state-icon">🛍️</div>
-                            <p className="empty-state-title">No orders yet</p>
-                            <p className="empty-state-sub">Create your first delivery request!</p>
-                        </div>
-                    ) : (
-                        orders.map((order) => (
-                            <div key={order._id} className="order-card recent-order-card" style={{ cursor: 'pointer', padding: 16 }}
-                                onClick={() => navigate(
-                                    order.status === 'delivered' ? `/order/${order._id}/review` :
-                                        order.status === 'accepted' ? `/chat/${order._id}` :
-                                            `/order/${order._id}/track`
-                                )}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                                        <div style={{ background: 'var(--bg)', padding: 8, borderRadius: 10 }}>
-                                            {order.pickup_location.includes('Gate') ? <Package size={18} color="var(--primary)" /> : <span style={{ fontSize: 18 }}>🍔</span>}
-                                        </div>
-                                        <div>
-                                            <p style={{ fontWeight: 700, fontSize: 15 }}>{order.pickup_location}</p>
-                                            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>→ {order.delivery_hostel}, Room {order.delivery_room}</p>
-                                        </div>
-                                    </div>
-                                    {statusBadge(order.status)}
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-                                    <p style={{ fontSize: 12, color: 'var(--text-muted)', flex: 1 }}>{order.item_details.slice(0, 35)}{order.item_details.length > 35 ? '...' : ''}</p>
-                                    <span style={{ fontFamily: 'Outfit', fontWeight: 800, color: 'var(--primary-dark)', fontSize: 16 }}>₹{order.price}</span>
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
             </div>
 
             <BottomNav />

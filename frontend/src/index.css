@@ -756,3 +756,39 @@ select.input {
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 10px 30px rgba(79, 70, 229, 0.1);
 }
+
+/* ===== MODE TOGGLE ===== */
+.mode-toggle-container {
+  display: flex;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px);
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 10;
+}
+
+.mode-toggle-btn {
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Outfit', sans-serif;
+}
+
+.mode-toggle-btn.active {
+  background: white;
+  color: var(--primary-dark);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.mode-toggle-btn:not(.active):hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
