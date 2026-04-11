@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Star, Send, CheckCircle2, ChevronRight, MessageSquare } from 'lucide-react';
 
-const REVIEW_LABELS = ['', 'CRITICAL_FAILURE', 'UNSATISFACTORY', 'OPERATIONAL', 'EXCEPTIONAL', 'PRISTINE_EXECUTION'];
-const QUICK_TAGS = ['RAPID_DELIVERY', 'RELIABLE_OP', 'PUNCTUAL_SYNC', 'PERFECT_LOGISTICS'];
+const REVIEW_LABELS = ['', 'POOR', 'FAIR', 'GOOD', 'EXCELLENT', 'PERFECT'];
+const QUICK_TAGS = ['FAST DELIVERY', 'RELIABLE', 'FRIENDLY', 'GREAT SERVICE'];
 
 export default function ReviewPage() {
     const { orderId } = useParams();
@@ -25,7 +25,7 @@ export default function ReviewPage() {
                 const res = await getOrderById(orderId);
                 setOrder(res.data);
             } catch {
-                toast.error('SYNC_ERROR');
+                toast.error('Failed to load order');
             }
         };
         load();
@@ -35,14 +35,14 @@ export default function ReviewPage() {
     const reviewee = isRequester ? order?.delivery_partner_id : order?.user_id;
 
     const handleSubmit = async () => {
-        if (!rating) { toast.error('PROTOCOL_ERROR: SELECT_RATING'); return; }
+        if (!rating) { toast.error('Please select a rating'); return; }
         setLoading(true);
         try {
             await addReview({ order_id: orderId, rating, review_text: text });
             setDone(true);
-            toast.success('DEBRIEF_COMPLETE');
+            toast.success('Review submitted');
         } catch (err) {
-            toast.error(err.response?.data?.message || 'SYNC_FAILURE');
+            toast.error(err.response?.data?.message || 'Submission failed');
         } finally {
             setLoading(false);
         }
@@ -56,12 +56,12 @@ export default function ReviewPage() {
                 <div style={{ width: 80, height: 80, background: 'rgba(34, 197, 94, 0.1)', borderRadius: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', color: '#22C55E' }}>
                     <CheckCircle2 size={40} />
                 </div>
-                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#1E293B', marginBottom: 12 }}>Mission Log Archived</h2>
+                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#1E293B', marginBottom: 12 }}>Feedback Submitted</h2>
                 <p style={{ color: '#64748B', marginBottom: 32, fontSize: 14, fontWeight: 500, lineHeight: 1.6 }}>
-                    YOUR FEEDBACK HAS BEEN INTEGRATED INTO THE UNISERVE PROTOCOL. <br /> THANK YOU FOR STRENGTHENING THE HUB.
+                    THANK YOU FOR YOUR FEEDBACK! <br /> IT HELPS US IMPROVE YOUR EXPERIENCE.
                 </p>
                 <button onClick={() => navigate('/')} style={{ width: '100%', height: 56, background: '#1E293B', color: '#fff', border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                    RETURN_TO_HUB <ChevronRight size={18} />
+                    BACK TO HOME <ChevronRight size={18} />
                 </button>
             </div>
         </div>
@@ -90,7 +90,7 @@ export default function ReviewPage() {
                         {isRequester ? 'Rate Delivery Partner' : 'Rate Order Creator'}
                     </h1>
                     <p style={{ color: '#64748B', fontSize: 14, fontWeight: 500, marginBottom: 40, letterSpacing: '0.05em' }}>
-                        DEBRIEFING MISSION_ID: {orderId?.slice(-6).toUpperCase()}
+                        ORDER ID: {orderId?.slice(-6).toUpperCase()}
                     </p>
 
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#1E293B', marginBottom: 20 }}>How was your interaction with {reviewee?.name || 'the participant'}?</p>
@@ -145,7 +145,7 @@ export default function ReviewPage() {
                     <div style={{ position: 'relative', width: '100%', marginBottom: 32 }}>
                         <textarea
                             style={{ width: '100%', minHeight: 120, background: '#fff', border: '1px solid #E2E8F0', borderRadius: 20, padding: 20, fontSize: 14, fontWeight: 500, outline: 'none', resize: 'none' }}
-                            placeholder="Detailed mission report (optional)..."
+                            placeholder="Write your feedback here (optional)..."
                             value={text}
                             onChange={(e) => setText(e.target.value)}
                         />
@@ -160,7 +160,7 @@ export default function ReviewPage() {
                             boxShadow: '0 20px 40px -10px rgba(79, 70, 229, 0.4)', transition: 'all 0.3s ease'
                         }}
                     >
-                        {loading ? 'ARCHIVING...' : 'SUBMIT_DEBRIEF'} <Send size={18} />
+                        {loading ? 'SUBMITTING...' : 'SUBMIT REVIEW'} <Send size={18} />
                     </button>
                 </div>
             </div>

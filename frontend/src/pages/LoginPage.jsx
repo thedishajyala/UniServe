@@ -90,7 +90,7 @@ export default function LoginPage() {
                     }}>U</div>
                 </div>
                 <h1 style={{ color: '#fff', fontSize: 42, fontWeight: 900, letterSpacing: '-2px', marginBottom: 8 }}>UniServe</h1>
-                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, fontWeight: 500, letterSpacing: '0.02em' }}>THE CAMPUS LOGISTICS HUB</p>
+                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, fontWeight: 500, letterSpacing: '0.02em' }}>Your Campus Delivery Partner</p>
             </div>
 
             {/* ── SECURITY CARD ── */}
@@ -122,7 +122,7 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                         {mode === 'signup' && (
                             <div>
-                                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>LEGAL_NAME</label>
+                                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>FULL NAME</label>
                                 <input 
                                     style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.name ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                     name="name" placeholder="E.g. Disha Jyala" value={form.name} onChange={handleChange} 
@@ -131,7 +131,7 @@ export default function LoginPage() {
                         )}
 
                         <div>
-                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>CAMPUS_IDENTITY</label>
+                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>UNIVERSITY EMAIL</label>
                             <input 
                                 style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.email ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                 type="email" name="email" placeholder={`id@${UNIVERSITY_DOMAIN}`} value={form.email} onChange={handleChange} 
@@ -139,7 +139,7 @@ export default function LoginPage() {
                         </div>
 
                         <div style={{ position: 'relative' }}>
-                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>SECURITY_KEY</label>
+                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>PASSWORD</label>
                             <input 
                                 style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.password ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                 type="password" name="password" placeholder="••••••••" value={form.password} onChange={handleChange} 
@@ -150,14 +150,14 @@ export default function LoginPage() {
                             <>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>MOBILE_LINK</label>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>PHONE NUMBER</label>
                                         <input 
                                             style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.phone ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                             type="tel" name="phone" placeholder="98XXXXXXXX" value={form.phone} onChange={handleChange} maxLength={10} 
                                         />
                                     </div>
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENTRY_NO</label>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENROLLMENT NO</label>
                                         <input 
                                             style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.enrollment_no ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                             name="enrollment_no" placeholder="E23CSEU..." value={form.enrollment_no} onChange={handleChange} 
@@ -187,8 +187,8 @@ export default function LoginPage() {
 
                     <div style={{ textAlign: 'center', marginTop: 32 }}>
                         <p style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600, lineHeight: 1.6 }}>
-                            AUTHORIZED ACCESS ONLY • BENNETT UNIVERSITY<br />
-                            <span style={{ color: '#4F46E5', fontWeight: 800 }}>V4_PROTOCOL_ACTIVE</span>
+                            BENNETT UNIVERSITY STUDENTS ONLY<br />
+                            <span style={{ color: '#4F46E5', fontWeight: 800 }}>SECURE STUDENT LOGIN</span>
                         </p>
                     </div>
                 </div>

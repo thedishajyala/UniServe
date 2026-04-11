@@ -6,7 +6,7 @@ import { BOYS_HOSTELS, GIRLS_HOSTELS } from '../config/campus';
 import toast from 'react-hot-toast';
 import { User, Home, CheckCircle2, ArrowRight, ArrowLeft, Box } from 'lucide-react';
 
-const steps = ['Identity', 'Habitat', 'Finalized'];
+const steps = ['Name', 'Location', 'Done'];
 
 export default function ProfileSetupPage() {
     const { user, updateUser } = useAuth();
@@ -59,8 +59,8 @@ export default function ProfileSetupPage() {
                     <div style={{ width: 56, height: 56, background: 'rgba(255,255,255,0.2)', borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
                         <User color="#fff" size={24} />
                     </div>
-                    <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 8 }}>V4_PROFILE_INIT</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: 500 }}>INITIALIZE YOUR CAMPUS CREDENTIALS</p>
+                    <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 8 }}>Complete Your Profile</h1>
+                    <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: 500 }}>JUST A FEW STEPS TO GET STARTED</p>
                     
                     {/* Progress Bar */}
                     <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 32 }}>
@@ -87,15 +87,15 @@ export default function ProfileSetupPage() {
                         <div className="slide-up">
                             <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
                                 <div style={{ width: 8, height: 18, background: '#4F46E5', borderRadius: 4 }} />
-                                IDENTITY_LINK
+                                Your Identity
                             </h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>LEGAL_NAME</label>
+                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>FULL NAME</label>
                                     <input style={{ width: '100%', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} name="name" placeholder="Full Name" value={form.name} onChange={handleChange} />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENROLLMENT_KEY</label>
+                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENROLLMENT NUMBER</label>
                                     <input style={{ width: '100%', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} name="enrollment_no" placeholder="E23CSEUXXXX" value={form.enrollment_no} onChange={handleChange} />
                                 </div>
                                 <button onClick={handleNext} disabled={!form.name || !form.enrollment_no} style={{ marginTop: 8, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 10px 20px rgba(79, 70, 229, 0.3)' }}>
@@ -109,19 +109,19 @@ export default function ProfileSetupPage() {
                         <div className="slide-up">
                             <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
                                 <div style={{ width: 8, height: 18, background: '#7C3AED', borderRadius: 4 }} />
-                                HABITAT_LOCATOR
+                                Your Location
                             </h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                                     {['boys', 'girls'].map((g) => (
                                         <button key={g} onClick={() => setForm((f) => ({ ...f, hostelGender: g, hostel: '' }))} style={{ height: 48, borderRadius: 12, border: 'none', fontSize: 12, fontWeight: 800, cursor: 'pointer', background: form.hostelGender === g ? '#4F46E5' : '#F1F5F9', color: form.hostelGender === g ? '#fff' : '#64748B', transition: 'all 0.2s ease' }}>
-                                            {g === 'boys' ? 'B-HOSTEL' : 'G-HOSTEL'}
+                                            {g === 'boys' ? 'BOYS HOSTEL' : 'GIRLS HOSTEL'}
                                         </button>
                                     ))}
                                 </div>
                                 {form.hostelGender && (
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>BLOCK_SELECT</label>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>SELECT BLOCK</label>
                                         <select style={{ width: '100%', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} name="hostel" value={form.hostel} onChange={handleChange}>
                                             <option value="">BLOCK_NO</option>
                                             {hostels.map((h) => <option key={h} value={h}>{h}</option>)}
@@ -129,13 +129,13 @@ export default function ProfileSetupPage() {
                                     </div>
                                 )}
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>CHAMBER_NO</label>
+                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ROOM NUMBER</label>
                                     <input style={{ width: '100%', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} name="room_no" placeholder="E.g. 205" value={form.room_no} onChange={handleChange} />
                                 </div>
                                 <div style={{ display: 'flex', gap: 12 }}>
                                     <button onClick={() => setStep(0)} style={{ flex: 1, height: 56, background: '#F1F5F9', color: '#64748B', border: 'none', borderRadius: 16, fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>BACK</button>
                                     <button onClick={handleSubmit} disabled={loading || !form.hostel || !form.room_no} style={{ flex: 2, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 20px rgba(79, 70, 229, 0.3)' }}>
-                                        {loading ? 'SYNCING...' : 'FINALIZE_INIT'}
+                                        {loading ? 'SAVING...' : 'FINISH SETUP'}
                                     </button>
                                 </div>
                             </div>
@@ -152,7 +152,7 @@ export default function ProfileSetupPage() {
                                 YOUR CAMPUS IDENTITY IS NOW ACTIVE AND VERIFIED. <br /> PROCEED TO MISSION DASHBOARD.
                             </p>
                             <button onClick={() => navigate('/')} style={{ width: '100%', height: 56, background: '#1E293B', color: '#fff', border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                                DASHBOARD_HUB <ArrowRight size={18} />
+                                GO TO DASHBOARD <ArrowRight size={18} />
                             </button>
                         </div>
                     )}

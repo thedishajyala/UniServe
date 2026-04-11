@@ -155,7 +155,7 @@ export default function TrackingPage() {
                 <div style={{ width: 60, height: 60, background: '#4F46E5', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', animation: 'pulse-ring 2s infinite' }}>
                     <Box color="#fff" size={28} />
                 </div>
-                <p style={{ color: '#4F46E5', fontWeight: 800, fontSize: 14 }}>SYNCING MISSION LOGS...</p>
+                <p style={{ color: '#4F46E5', fontWeight: 800, fontSize: 14 }}>LOADING ORDER...</p>
             </div>
         </div>
     );
@@ -182,8 +182,8 @@ export default function TrackingPage() {
                         <ArrowLeft size={20} />
                     </button>
                     <div style={{ flex: 1 }}>
-                        <h1 style={{ fontSize: 13, fontWeight: 800, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tracking Mission</h1>
-                        <p style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>ORDER #{order._id.slice(-6).toUpperCase()}</p>
+                        <h1 style={{ fontSize: 13, fontWeight: 800, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Order Tracking</h1>
+                        <p style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>ORDER ID: {order._id.slice(-6).toUpperCase()}</p>
                     </div>
                     <a href={`tel:${(isOwner ? partner : requester)?.phone}`} style={{ textDecoration: 'none', width: 40, height: 40, background: '#F1F5F9', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1E293B' }}>
                         <Phone size={18} />
@@ -207,7 +207,7 @@ export default function TrackingPage() {
                     {['picked', 'on_the_way'].includes(order.status) && (
                         <Marker position={[partnerLocation.lat, partnerLocation.lng]} icon={createPulsingIcon()}>
                             <Popup>
-                                <div style={{ fontWeight: 800, color: '#4F46E5' }}>MISSION_PARTNER</div>
+                                <div style={{ fontWeight: 800, color: '#4F46E5' }}>DELIVERY PARTNER</div>
                                 <div style={{ fontSize: 11 }}>{(isOwner ? partner : requester)?.name} is moving</div>
                             </Popup>
                         </Marker>
@@ -229,7 +229,7 @@ export default function TrackingPage() {
                             {ORDER_STATUSES.find(s => s.key === order.status)?.icon || <Package size={20} />}
                         </div>
                         <div>
-                            <p style={{ fontSize: 10, fontWeight: 900, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Protocol_Status</p>
+                            <p style={{ fontSize: 10, fontWeight: 900, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Order Status</p>
                             <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B' }}>{order.status.replace('_', ' ').toUpperCase()}</h2>
                         </div>
                     </div>
@@ -238,11 +238,11 @@ export default function TrackingPage() {
                 {/* LOGISTICS DETAILS CAROUSEL-STYLE */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
                     <div style={{ background: '#F8FAFC', borderRadius: 20, padding: 16 }}>
-                        <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', marginBottom: 4 }}>PICKUP_ORIGIN</p>
+                        <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', marginBottom: 4 }}>PICKUP LOCATION</p>
                         <p style={{ fontSize: 14, fontWeight: 800, color: '#1E293B' }}>{order.pickup_location}</p>
                     </div>
                     <div style={{ background: '#F8FAFC', borderRadius: 20, padding: 16 }}>
-                        <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', marginBottom: 4 }}>DELIVERY_TARGET</p>
+                        <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', marginBottom: 4 }}>DELIVER TO</p>
                         <p style={{ fontSize: 14, fontWeight: 800, color: '#1E293B' }}>{order.delivery_hostel} • {order.delivery_room}</p>
                     </div>
                 </div>
@@ -254,7 +254,7 @@ export default function TrackingPage() {
                     </div>
                     <div style={{ flex: 1 }}>
                         <p style={{ fontSize: 15, fontWeight: 800, color: '#1E293B' }}>{(isOwner ? partner : requester)?.name}</p>
-                        <p style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>CAMPUS_LOGISTICS_OP • {isOwner ? 'Partner' : 'Owner'}</p>
+                        <p style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>BENNETT STUDENT • {isOwner ? 'Partner' : 'Customer'}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F59E0B', fontWeight: 800, fontSize: 14 }}>
@@ -274,7 +274,7 @@ export default function TrackingPage() {
                                 fontSize: 15, fontWeight: 900, cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.4)', transition: 'all 0.2s ease'
                             }}
                         >
-                            {updating ? 'SYNCING...' : nextStatusLabels[nextStatusMap[order.status]]}
+                            {updating ? 'SAVING...' : nextStatusLabels[nextStatusMap[order.status]]}
                         </button>
                     )}
                     
@@ -283,7 +283,7 @@ export default function TrackingPage() {
                             onClick={() => navigate(`/order/${orderId}/review`)}
                             style={{ flex: 1, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 18, fontSize: 15, fontWeight: 900 }}
                         >
-                            CLOSE_LOGS & REVIEW
+                            REVIEW & COMPLETE
                         </button>
                     )}
 
