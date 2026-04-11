@@ -112,7 +112,7 @@ router.get('/online', protect, async (req, res) => {
     try {
         const users = await User.find({ is_available: true, _id: { $ne: req.user._id } })
             .limit(3)
-            .select('name rating hostel');
+            .select('name rating hostel total_deliveries total_reviews');
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

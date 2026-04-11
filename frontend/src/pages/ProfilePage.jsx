@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { updateProfile, toggleAvailability } from '../services/api';
+import { updateProfile, toggleAvailability, getPartnerReviews, replyToReview } from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Save, MapPin, Hash, User as UserIcon, Mail, Shield, Star, Package, DollarSign, Home, TrendingUp, Phone } from 'lucide-react';
+import { ArrowLeft, Save, MapPin, Hash, User as UserIcon, Mail, Shield, Star, Package, DollarSign, Home, TrendingUp, Phone, MessageSquare, Send } from 'lucide-react';
 import { HOSTELS } from '../config/campus';
 
 export default function ProfilePage() {
@@ -17,6 +17,10 @@ export default function ProfilePage() {
         enrollment_no: '',
         phone: '',
     });
+    const [reviews, setReviews] = useState([]);
+    const [replyingTo, setReplyingTo] = useState(null); // Review ID
+    const [replyText, setReplyText] = useState('');
+    const [submittingReply, setSubmittingReply] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -27,8 +31,16 @@ export default function ProfilePage() {
                 enrollment_no: user.enrollment_no || '',
                 phone: user.phone || '',
             });
+            loadReviews();
         }
     }, [user]);
+
+    const loadReviews = async () => {
+        try {
+            const { data } = await getPartnerReviews(user._id);
+            setReviews(data);
+        } catch { }
+    };
 
     const handleChange = (field, value) => setForm(f => ({ ...f, [field]: value }));
 
@@ -55,6 +67,22 @@ export default function ProfilePage() {
             toast.success(res.data.message);
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed');
+        }
+    };
+
+    const handleSendReply = async (reviewId) => {
+        if (!replyText.trim()) return;
+        setSubmittingReply(true);
+        try {
+            await replyToReview(reviewId, { reply_text: replyText });
+            toast.success('Your verdict has been posted! 💬');
+            setReplyText('');
+            setReplyingTo(null);
+            loadReviews(); // Refresh
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to reply');
+        } finally {
+            setSubmittingReply(false);
         }
     };
 
@@ -196,9 +224,72 @@ export default function ProfilePage() {
                 </div>
 
                 <button className="btn btn-primary btn-w-full btn-lg"
-                    onClick={handleSave} disabled={saving}>
+                    onClick={handleSave} disabled={saving} style={{ marginBottom: 32 }}>
                     {saving ? '⏳ Saving...' : <><Save size={16} style={{ marginRight: 6 }} /> Save Changes</>}
                 </button>
+
+                {/* Reviews Section */}
+                <div style={{ paddingBottom: 40 }}>
+                    <div className="section-header" style={{ marginBottom: 16 }}>
+                        <h3 className="section-title">💬 Feedback Received</h3>
+                    </div>
+                    {reviews.length === 0 ? (
+                        <div className="card" style={{ textAlign: 'center', padding: '32px 20px', color: 'var(--text-muted)' }}>
+                            <p style={{ fontSize: 13 }}>No reviews yet. Keep delivering to build your reputation!</p>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {reviews.map(review => (
+                                <div key={review._id} className="card" style={{ padding: 16 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--primary-light)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700 }}>
+                                                {review.reviewer_id?.name?.charAt(0) || 'S'}
+                                            </div>
+                                            <span style={{ fontSize: 13, fontWeight: 700 }}>{review.reviewer_id?.name || 'Student'}</span>
+                                        </div>
+                                        <div style={{ color: '#F59E0B', display: 'flex', gap: 2 }}>
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star key={i} size={12} fill={i < review.rating ? '#F59E0B' : 'transparent'} strokeWidth={2.5} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, fontStyle: review.review_text ? 'normal' : 'italic' }}>
+                                        {review.review_text || 'No comment provided.'}
+                                    </p>
+                                    
+                                    {review.reply_text ? (
+                                        <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(99,102,241,0.06)', borderRadius: 12, borderLeft: '3px solid var(--primary)' }}>
+                                            <p style={{ fontSize: 11, fontWeight: 800, color: 'var(--primary)', marginBottom: 4, textTransform: 'uppercase' }}>Your Verdict</p>
+                                            <p style={{ fontSize: 12, color: 'var(--text-primary)' }}>{review.reply_text}</p>
+                                        </div>
+                                    ) : (
+                                        replyingTo === review._id ? (
+                                            <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                                                <input className="input" style={{ flex: 1, padding: '8px 12px', fontSize: 13, height: 40 }}
+                                                    placeholder="Write your verdict..." value={replyText}
+                                                    onChange={e => setReplyText(e.target.value)} autoFocus />
+                                                <button className="btn btn-primary" style={{ padding: '0 12px', height: 40, borderRadius: 10 }}
+                                                    onClick={() => handleSendReply(review._id)} disabled={submittingReply || !replyText.trim()}>
+                                                    <Send size={16} />
+                                                </button>
+                                                <button className="btn btn-ghost" style={{ padding: '0 12px', height: 40, border: 'none' }}
+                                                    onClick={() => { setReplyingTo(null); setReplyText(''); }}>
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button className="btn btn-ghost" style={{ padding: '4px 8px', height: 'auto', fontSize: 11, marginTop: 10, color: 'var(--primary)', fontWeight: 700 }}
+                                                onClick={() => setReplyingTo(review._id)}>
+                                                <MessageSquare size={12} style={{ marginRight: 4 }} /> Reply to this review
+                                            </button>
+                                        )
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Bottom Nav */}

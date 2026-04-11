@@ -107,10 +107,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 /* ===== BUTTON ===== */
@@ -139,11 +146,11 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary {
   background: linear-gradient(135deg, #4F46E5 0%, #6366f1 100%);
   color: white;
-  box-shadow: var(--shadow-accent);
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
   border-top: 1px solid rgba(255,255,255,0.2);
 }
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.02);
   box-shadow: 0 10px 30px rgba(79,70,229,0.4);
 }
 .btn-primary:active:not(:disabled) {
@@ -482,7 +489,8 @@ select.input {
 .nav-item.active .nav-icon-wrapper {
   background: rgba(99, 102, 241, 0.1);
   color: var(--primary);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
 }
 
 /* ===== PRICE TAG ===== */
@@ -727,8 +735,12 @@ select.input {
   transform: scale(0.98);
 }
 .card:hover, .btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4), 0 10px 30px rgba(99,102,241,0.2);
 }
 
 /* Toggle Smooth Transition */

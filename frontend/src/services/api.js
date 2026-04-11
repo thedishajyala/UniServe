@@ -50,6 +50,7 @@ export const getOrderById = (orderId) => API.get(`/orders/${orderId}`);
 
 // Reviews
 export const addReview = (data) => API.post('/reviews/add', data);
+export const replyToReview = (reviewId, data) => API.post(`/reviews/${reviewId}/reply`, data);
 export const getPartnerReviews = (partnerId) => API.get(`/reviews/partner/${partnerId}`);
 
 // Analytics
@@ -58,6 +59,9 @@ export const getDemandAnalytics = () => API.get('/analytics/demand');
 // Messages
 export const getMessages = (orderId) => API.get(`/messages/order/${orderId}`);
 export const uploadImage = (formData) => API.post('/messages/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+});
+export const uploadVoice = (formData) => API.post('/messages/upload-voice', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
 });
 

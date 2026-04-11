@@ -12,10 +12,10 @@ const messageSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
-        // type: 'text' | 'image' | 'location'
+        // type: 'text' | 'image' | 'location' | 'voice'
         type: {
             type: String,
-            enum: ['text', 'image', 'location'],
+            enum: ['text', 'image', 'location', 'voice'],
             default: 'text',
         },
         content: {
@@ -24,6 +24,10 @@ const messageSchema = new mongoose.Schema(
             maxlength: 2000,
         },
         image_url: {
+            type: String,
+            default: null,
+        },
+        voice_url: {
             type: String,
             default: null,
         },

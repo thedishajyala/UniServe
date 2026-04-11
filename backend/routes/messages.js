@@ -23,13 +23,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
     fileFilter: (req, file, cb) => {
-        const allowed = /jpeg|jpg|png|gif|webp/;
+        const allowed = /jpeg|jpg|png|gif|webp|webm|mp3|ogg|wav|m4a/;
         const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
         const mimeOk = allowed.test(file.mimetype);
-        if (extOk && mimeOk) return cb(null, true);
-        cb(new Error('Only image files are allowed'));
+        if (extOk || mimeOk) return cb(null, true);
+        cb(new Error('File type not allowed'));
     },
 });
 
@@ -65,6 +65,41 @@ router.post('/upload', protect, upload.single('image'), async (req, res) => {
     } catch (err) {
         console.error('Image upload error:', err);
         res.status(500).json({ message: err.message || 'Upload failed' });
+    }
+});
+
+// POST /api/messages/upload-voice — upload audio and save as message
+router.post('/upload-voice', protect, upload.single('audio'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ message: 'No audio uploaded' });
+
+        const { order_id } = req.body;
+        if (!order_id) return res.status(400).json({ message: 'order_id is required' });
+
+        const voiceUrl = `/uploads/${req.file.filename}`;
+
+        const message = await Message.create({
+            order_id,
+            sender_id: req.user._id,
+            type: 'voice',
+            content: '',
+            voice_url: voiceUrl,
+        });
+
+        res.status(201).json({
+            message: {
+                _id: message._id,
+                order_id,
+                sender_id: req.user._id,
+                type: 'voice',
+                voice_url: voiceUrl,
+                content: '',
+                createdAt: message.createdAt,
+            },
+        });
+    } catch (err) {
+        console.error('Voice upload error:', err);
+        res.status(500).json({ message: err.message || 'Voice upload failed' });
     }
 });
 

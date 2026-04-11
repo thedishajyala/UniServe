@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { getMessages, getOrderById, uploadImage, createPayment, settlePayment } from '../services/api';
+import { uploadMessages, getMessages, getOrderById, uploadImage, uploadVoice, createPayment, settlePayment } from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Send, Phone, MapPin, Camera, ImagePlus, X, CreditCard } from 'lucide-react';
+import { ArrowLeft, Send, Phone, MapPin, Camera, ImagePlus, X, CreditCard, Mic, MicOff, Square, Play, Pause } from 'lucide-react';
 
 const getBaseSocketURL = () => {
     if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
@@ -47,6 +47,12 @@ export default function ChatPage() {
     const typingTimer = useRef(null);
     const galleryRef = useRef(null);
     const cameraRef = useRef(null);
+    const mediaRecorder = useRef(null);
+    const audioChunks = useRef([]);
+
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordTime, setRecordTime] = useState(0);
+    const timerRef = useRef(null);
 
     const loadData = useCallback(async () => {
         try {
@@ -228,6 +234,71 @@ export default function ChatPage() {
         }
     };
 
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder.current = new MediaRecorder(stream);
+            audioChunks.current = [];
+
+            mediaRecorder.current.ondataavailable = (e) => audioChunks.current.push(e.data);
+            mediaRecorder.current.onstop = async () => {
+                const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
+                await sendVoiceNote(audioBlob);
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.current.start();
+            setIsRecording(true);
+            setRecordTime(0);
+            timerRef.current = setInterval(() => setRecordTime(prev => prev + 1), 1000);
+        } catch (err) {
+            toast.error('Microphone access denied 🎙️');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorder.current && isRecording) {
+            mediaRecorder.current.stop();
+            setIsRecording(false);
+            clearInterval(timerRef.current);
+        }
+    };
+
+    const sendVoiceNote = async (blob) => {
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('audio', blob, 'voice_note.webm');
+            formData.append('order_id', orderId);
+
+            const { data } = await uploadVoice(formData);
+            const msg = data.message;
+
+            socket?.emit('send_message', {
+                orderId,
+                senderId: user._id,
+                type: 'voice',
+                voice_url: msg.voice_url,
+                content: '',
+            });
+
+            setMessages((prev) => [...prev, {
+                _id: msg._id,
+                sender_id: user._id,
+                type: 'voice',
+                voice_url: msg.voice_url,
+                content: '',
+                createdAt: msg.createdAt,
+            }]);
+            
+            toast.success('Voice note sent! 🎙️');
+        } catch (err) {
+            toast.error('Failed to send voice note');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const partner = order
         ? (order.user_id?._id === user?._id || order.user_id === user?._id
             ? order.delivery_partner_id
@@ -253,7 +324,7 @@ export default function ChatPage() {
                 <div style={{ flex: 1 }}>
                     <h1 style={{ fontSize: 15, fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>{partner?.name || 'Loading...'}</h1>
                     <p style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        {partner?.hostel} · {partner?.total_reviews > 0 ? `⭐ ${Number(partner.rating || 0).toFixed(1)} (${partner.total_reviews})` : 'New Partner 🆕'}
+                        {partner?.hostel} · {partner?.total_deliveries > 0 ? `⭐ ${Number(partner.rating || 0).toFixed(1)} (${partner.total_deliveries} Orders Delivered)` : 'New Partner 🆕'}
                     </p>
                 </div>
                 {order && (
@@ -282,12 +353,10 @@ export default function ChatPage() {
                                 {isPaying ? '⏳...' : <><CreditCard size={12} style={{ marginRight: 4 }} /> Pay Online</>}
                             </button>
                         )}
-                        {(!isRequester || order.payment_method === 'online') && (
-                            <button className="btn btn-sm btn-outline" style={{ padding: '4px 12px', fontSize: 11 }}
-                                onClick={() => navigate(`/order/${orderId}/track`)}>
-                                Track Map
-                            </button>
-                        )}
+                        <button className="btn btn-sm btn-outline" style={{ padding: '4px 12px', fontSize: 11 }}
+                            onClick={() => navigate(`/order/${orderId}/track`)}>
+                            Track Map
+                        </button>
                     </div>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 26, justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -370,6 +439,10 @@ export default function ChatPage() {
                                         onError={(e) => { e.target.src = ''; e.target.alt = 'Image unavailable'; }}
                                     />
                                 </div>
+                            ) : msg.type === 'voice' ? (
+                                <div className={`chat-bubble ${isMine ? 'mine' : 'theirs'}`} style={{ padding: '8px 12px' }}>
+                                    <audio src={resolveImageUrl(msg.voice_url)} controls style={{ height: 32, width: 200, filter: isMine ? 'invert(1)' : 'none' }} />
+                                </div>
                             ) : (
                                 <div className={`chat-bubble ${isMine ? 'mine' : 'theirs'}`}>{msg.content}</div>
                             )}
@@ -427,23 +500,43 @@ export default function ChatPage() {
                     <Camera size={20} />
                 </button>
 
-                <input
-                    className="input"
-                    style={{ flex: 1, padding: '11px 14px', margin: 0, fontSize: 14 }}
-                    placeholder="Type a message..."
-                    value={text}
-                    onChange={handleTyping}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                />
+                {isRecording ? (
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(239,68,68,0.08)', borderRadius: 12, padding: '0 16px', height: 44 }}>
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444', animation: 'pulse 1s infinite' }} />
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444', flex: 1 }}>Recording... {Math.floor(recordTime / 60)}:{(recordTime % 60).toString().padStart(2, '0')}</span>
+                        <button className="btn btn-icon btn-ghost" onClick={stopRecording} style={{ color: '#ef4444' }}>
+                            <Square size={18} fill="#ef4444" />
+                        </button>
+                    </div>
+                ) : (
+                    <input
+                        className="input"
+                        style={{ flex: 1, padding: '11px 14px', margin: 0, fontSize: 14 }}
+                        placeholder="Type a message..."
+                        value={text}
+                        onChange={handleTyping}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                    />
+                )}
 
-                <button
-                    className="btn btn-primary btn-icon"
-                    onClick={handleSend}
-                    disabled={!text.trim()}
-                    style={{ flexShrink: 0 }}
-                >
-                    <Send size={18} />
-                </button>
+                {text.trim() || isRecording ? (
+                    <button
+                        className="btn btn-primary btn-icon"
+                        onClick={handleSend}
+                        disabled={!text.trim() && !isRecording}
+                        style={{ flexShrink: 0 }}
+                    >
+                        <Send size={18} />
+                    </button>
+                ) : (
+                    <button
+                        className="btn btn-primary btn-icon"
+                        onClick={startRecording}
+                        style={{ flexShrink: 0, background: 'var(--primary)', borderColor: 'var(--primary)' }}
+                    >
+                        <Mic size={18} />
+                    </button>
+                )}
             </div>
         </div>
     );

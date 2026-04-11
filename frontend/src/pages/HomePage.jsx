@@ -50,11 +50,11 @@ function getInitials(name = '') {
     return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }
 
-function renderRating(rating, totalReviews) {
-    if (totalReviews === 0 || !rating) return <span className="badge badge-info">New 🆕</span>;
+function renderRating(rating, totalReviews, totalDeliveries = 0) {
+    if (totalDeliveries === 0) return <span className="badge badge-info" style={{ fontSize: 10 }}>New 🆕</span>;
     return (
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: '#F59E0B' }}>
-            ⭐ {Number(rating).toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 11 }}>({totalReviews})</span>
+            ⭐ {Number(rating || 0).toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 10 }}>({totalDeliveries} orders)</span>
         </span>
     );
 }
@@ -70,19 +70,23 @@ export default function HomePage() {
     const [incomingRequests, setIncomingRequests] = useState([]);
     const [respondingTo, setRespondingTo] = useState(null);
     const [activeDeliveries, setActiveDeliveries] = useState([]);
+    const [earnings, setEarnings] = useState(null);
     const [mode, setMode] = useState('order'); // 'order' or 'deliver'
 
     const [onlinePartners, setOnlinePartners] = useState([]);
+    const [unreadOrders, setUnreadOrders] = useState({}); // { orderId: true }
 
     const loadData = useCallback(async () => {
         try {
-            const [ordersRes, demandRes, deliveriesRes, partnersRes] = await Promise.all([
-                getMyOrders(), getDemandAnalytics(), getMyDeliveries(), getOnlinePartners().catch(() => ({ data: [] }))
+            const [ordersRes, demandRes, deliveriesRes, partnersRes, earningsRes] = await Promise.all([
+                getMyOrders(), getDemandAnalytics(), getMyDeliveries(), getOnlinePartners().catch(() => ({ data: [] })),
+                getEarnings().catch(() => ({ data: {} }))
             ]);
             setOrders(ordersRes.data.slice(0, 5));
             setDemand(demandRes.data);
             setActiveDeliveries(deliveriesRes.data.filter(d => ['accepted', 'picked', 'on_the_way'].includes(d.status)));
             setOnlinePartners(partnersRes.data || []);
+            setEarnings(earningsRes.data);
         } catch { }
     }, []);
 
@@ -132,8 +136,25 @@ export default function HomePage() {
             notify('🚫 Order Cancelled', `${cancelled_by}: ${reason}`, '/');
         });
 
+        socket.on('new_chat_message', (data) => {
+            // Only show if not already on the chat page for this order
+            if (window.location.pathname !== `/chat/${data.orderId}`) {
+                setUnreadOrders(prev => ({ ...prev, [data.orderId]: true }));
+                toast(`${data.senderName}: ${data.content}`, {
+                    icon: '💬',
+                    duration: 4000,
+                    onClick: () => navigate(`/chat/${data.orderId}`)
+                });
+                notify(`💬 New Message from ${data.senderName}`, data.content, `/chat/${data.orderId}`);
+            }
+        });
+
         return () => {
             socket.off('incoming_order_request');
+            socket.off('order_taken');
+            socket.off('order_request_response');
+            socket.off('order_cancelled');
+            socket.off('new_chat_message');
         };
     }, [socket, user]);
 
@@ -175,13 +196,13 @@ export default function HomePage() {
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Hero Header */}
-            <div className="gradient-hero" style={{ padding: '60px 24px 100px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 40, borderBottomRightRadius: 40 }}>
+            <div className="gradient-hero" style={{ padding: '60px 24px 120px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 40, borderBottomRightRadius: 40 }}>
                 {/* Decorative mesh circles */}
                 <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)', filter: 'blur(40px)' }} />
                 <div style={{ position: 'absolute', bottom: -60, left: -20, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)', filter: 'blur(30px)' }} />
                 
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
                         <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
                             <span style={{ fontSize: 20 }}>🚀</span>
                         </div>
@@ -197,15 +218,25 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14, marginBottom: 4, fontWeight: 600, letterSpacing: '0.02em' }}>
-                        {new Date().getHours() < 12 ? 'GOOD MORNING' : new Date().getHours() < 18 ? 'GOOD AFTERNOON' : 'GOOD EVENING'} ⚡️
-                    </p>
-                    <h1 style={{ color: 'white', fontSize: 32, marginBottom: 8, letterSpacing: '-1px', fontWeight: 800 }}>{user?.name?.split(' ')[0]}</h1>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.9)', fontSize: 14, fontWeight: 500 }}>
-                        <span style={{ opacity: 0.8 }}>Living at</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.15)', padding: '2px 10px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <span style={{ fontSize: 12 }}>🏠</span>
-                            <span style={{ fontWeight: 700 }}>{user?.hostel} · {user?.room_no}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <div>
+                            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, marginBottom: 4, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                                {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}
+                            </p>
+                            <h1 style={{ color: 'white', fontSize: 32, marginBottom: 0, letterSpacing: '-1.5px', fontWeight: 900 }}>Hey, {user?.name?.split(' ')[0]}!</h1>
+                        </div>
+
+                        {/* Glass Stats Card */}
+                        <div className="glass-card" style={{ padding: '12px 20px', borderRadius: 24, display: 'flex', gap: 20, marginBottom: -4 }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Deliveries</p>
+                                <p style={{ fontSize: 18, color: 'white', fontWeight: 900 }}>{activeDeliveries.length}</p>
+                            </div>
+                            <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.2)', alignSelf: 'center' }} />
+                            <div style={{ textAlign: 'center' }}>
+                                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Earned Today</p>
+                                <p style={{ fontSize: 18, color: 'white', fontWeight: 900 }}>₹{earnings?.today_earnings || 0}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -247,7 +278,7 @@ export default function HomePage() {
                                             <div>
                                                 <div style={{ fontSize: 13, fontWeight: 700 }}>{p.name.split(' ')[0]}</div>
                                                 <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                    {renderRating(p.rating, p.total_reviews)} · {p.hostel}
+                                                    {renderRating(p.rating, p.total_reviews, p.total_deliveries)} · {p.hostel}
                                                 </div>
                                             </div>
                                         </div>
@@ -271,15 +302,19 @@ export default function HomePage() {
                             ) : (
                                 orders.map((order) => (
                                     <div key={order._id} className="order-card recent-order-card" style={{ cursor: 'pointer', padding: 16 }}
-                                        onClick={() => navigate(
-                                            order.status === 'delivered' ? `/order/${order._id}/review` :
-                                                order.status === 'accepted' ? `/chat/${order._id}` :
-                                                    `/order/${order._id}/track`
-                                        )}>
+                                        onClick={() => {
+                                            setUnreadOrders(prev => ({ ...prev, [order._id]: false }));
+                                            navigate(
+                                                order.status === 'delivered' ? `/order/${order._id}/review` :
+                                                    order.status === 'accepted' ? `/chat/${order._id}` :
+                                                        `/order/${order._id}/track`
+                                            )
+                                        }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                                             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                                                <div style={{ background: 'var(--bg)', padding: 8, borderRadius: 10 }}>
+                                                <div style={{ background: 'var(--bg)', padding: 8, borderRadius: 10, position: 'relative' }}>
                                                     {order.pickup_location.includes('Gate') ? <Package size={18} color="var(--primary)" /> : <span style={{ fontSize: 18 }}>🍔</span>}
+                                                    {unreadOrders[order._id] && <div style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: '50%', background: '#EF4444', border: '2px solid white' }} />}
                                                 </div>
                                                 <div>
                                                     <p style={{ fontWeight: 700, fontSize: 15 }}>{order.pickup_location}</p>
@@ -372,7 +407,7 @@ export default function HomePage() {
                                                 <div>
                                                     <p style={{ fontWeight: 700, fontSize: 14 }}>{requester?.name || 'Student'}</p>
                                                     <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', gap: 4 }}>
-                                                        {requester?.hostel} · Room {requester?.room_no} · {requester?.total_reviews > 0 ? `⭐ ${Number(requester.rating || 0).toFixed(1)}` : 'New'}
+                                                        {requester?.hostel} · Room {requester?.room_no} · {requester?.total_deliveries > 0 ? `⭐ ${Number(requester.rating || 0).toFixed(1)} (${requester.total_deliveries} deli.)` : 'New'}
                                                     </div>
                                                 </div>
                                                 <span style={{
@@ -441,8 +476,14 @@ export default function HomePage() {
                                             </span>
                                         </div>
                                         <div style={{ display: 'flex', gap: 8 }}>
-                                            <button className="btn btn-primary btn-sm" style={{ flex: 1 }}
-                                                onClick={() => navigate(`/chat/${delivery._id}`)}>💬 Chat</button>
+                                            <button className="btn btn-primary btn-sm" style={{ flex: 1, position: 'relative' }}
+                                                onClick={() => {
+                                                    setUnreadOrders(prev => ({ ...prev, [delivery._id]: false }));
+                                                    navigate(`/chat/${delivery._id}`);
+                                                }}>
+                                                💬 Chat
+                                                {unreadOrders[delivery._id] && <div style={{ position: 'absolute', top: -4, right: -4, width: 12, height: 12, borderRadius: '50%', background: '#EF4444', border: '2px solid white', boxShadow: '0 0 10px rgba(239,68,68,0.5)' }} />}
+                                            </button>
                                             <button className="btn btn-secondary btn-sm" style={{ flex: 1 }}
                                                 onClick={() => navigate(`/order/${delivery._id}/track`)}>📍 Track</button>
                                         </div>

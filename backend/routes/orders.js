@@ -89,7 +89,7 @@ router.post('/create', protect, async (req, res) => {
             status: 'pending',
         });
 
-        await order.populate('user_id', 'name email hostel room_no enrollment_no phone');
+        await order.populate('user_id', 'name email hostel room_no enrollment_no phone total_deliveries total_reviews rating');
         res.status(201).json({ order, parcelOnly });
     } catch (error) {
         console.error('Create order error:', error);
@@ -201,7 +201,7 @@ router.post('/respond', protect, async (req, res) => {
             order.requested_partner_ids = []; // Clear other requests once accepted
             await order.save();
 
-            await order.populate('delivery_partner_id', 'name hostel room_no enrollment_no rating');
+            await order.populate('delivery_partner_id', 'name hostel room_no enrollment_no rating total_deliveries total_reviews');
 
             // Notify requester
             if (_io) {
@@ -312,7 +312,7 @@ router.post('/status', protect, async (req, res) => {
         }
 
         await order.save();
-        await order.populate(['user_id', 'delivery_partner_id'], 'name email hostel room_no enrollment_no rating phone');
+        await order.populate(['user_id', 'delivery_partner_id'], 'name email hostel room_no enrollment_no rating phone total_deliveries total_reviews');
 
         res.json({ order, message: `Order status updated to ${status}` });
     } catch (error) {
@@ -407,7 +407,7 @@ router.post('/cancel', protect, async (req, res) => {
 router.get('/my-orders', protect, async (req, res) => {
     try {
         const orders = await Order.find({ user_id: req.user._id })
-            .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no phone')
+            .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no phone total_deliveries total_reviews')
             .sort({ createdAt: -1 });
         res.json(orders);
     } catch (error) {
@@ -419,7 +419,7 @@ router.get('/my-orders', protect, async (req, res) => {
 router.get('/my-deliveries', protect, async (req, res) => {
     try {
         const deliveries = await Order.find({ delivery_partner_id: req.user._id })
-            .populate('user_id', 'name email hostel room_no enrollment_no phone')
+            .populate('user_id', 'name email hostel room_no enrollment_no phone total_deliveries total_reviews rating')
             .sort({ createdAt: -1 });
         res.json(deliveries);
     } catch (error) {
@@ -431,9 +431,9 @@ router.get('/my-deliveries', protect, async (req, res) => {
 router.get('/:orderId', protect, async (req, res) => {
     try {
         const order = await Order.findById(req.params.orderId)
-            .populate('user_id', 'name email hostel room_no enrollment_no phone')
-            .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no phone')
-            .populate('requested_partner_ids', 'name hostel room_no enrollment_no phone');
+            .populate('user_id', 'name email hostel room_no enrollment_no phone total_deliveries total_reviews rating')
+            .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no phone total_deliveries total_reviews')
+            .populate('requested_partner_ids', 'name hostel room_no enrollment_no phone rating total_deliveries total_reviews');
 
         if (!order) return res.status(404).json({ message: 'Order not found' });
 
