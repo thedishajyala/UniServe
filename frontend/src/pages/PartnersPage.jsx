@@ -15,9 +15,8 @@ export default function PartnersPage() {
     const [partners, setPartners] = useState([]);
     const [loading, setLoading] = useState(true);
     const [requesting, setRequesting] = useState(false);
-    const [requestedPartnerId, setRequestedPartnerId] = useState(null);
-    const [requestedPartnerName, setRequestedPartnerName] = useState('');
-    const [waitingResponse, setWaitingResponse] = useState(false);
+    const [requestedIds, setRequestedIds] = useState([]);
+    const [order, setOrder] = useState(null);
 
     // Profile Modal State
     const [selectedProfile, setSelectedProfile] = useState(null);
@@ -26,8 +25,13 @@ export default function PartnersPage() {
 
     const fetchPartners = useCallback(async () => {
         try {
-            const { data } = await getAvailablePartners(orderId);
-            setPartners(data.partners);
+            const [pRes, oRes] = await Promise.all([
+                getAvailablePartners(orderId),
+                getOrderById(orderId)
+            ]);
+            setPartners(pRes.data.partners);
+            setOrder(oRes.data);
+            setRequestedIds(oRes.data.requested_partner_ids.map(p => p._id || p));
         } catch {
             toast.error('Failed to load partners');
         } finally {
@@ -53,10 +57,6 @@ export default function PartnersPage() {
                 navigate(`/chat/${orderId}`);
             } else {
                 toast.error(`${partnerName} declined. Pick someone else.`);
-                setWaitingResponse(false);
-                setRequestedPartnerId(null);
-                setRequestedPartnerName('');
-                // Refresh partner list
                 fetchPartners();
             }
         });
@@ -67,14 +67,12 @@ export default function PartnersPage() {
     }, [socket, user, orderId, navigate, fetchPartners]);
 
     const handleRequest = async (partner) => {
-        if (requesting) return;
+        if (requesting || requestedIds.includes(partner._id)) return;
         setRequesting(true);
         try {
             await requestPartner({ order_id: orderId, partner_id: partner._id });
-            setRequestedPartnerId(partner._id);
-            setRequestedPartnerName(partner.name);
-            setWaitingResponse(true);
-            toast.success(`Request sent to ${partner.name}! Waiting for response...`);
+            setRequestedIds(prev => [...prev, partner._id]);
+            toast.success(`Request sent to ${partner.name}!`);
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to send request');
         } finally {
@@ -128,34 +126,6 @@ export default function PartnersPage() {
             </div>
 
             <div className="page-content" style={{ marginTop: -48 }}>
-                {/* Waiting overlay */}
-                {waitingResponse && (
-                    <div className="card" style={{
-                        background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-                        color: '#fff',
-                        textAlign: 'center',
-                        marginBottom: '1.5rem',
-                        padding: '2rem',
-                    }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>⏳</div>
-                        <h2 style={{ marginBottom: '0.5rem' }}>Waiting for {requestedPartnerName}...</h2>
-                        <p style={{ opacity: 0.85, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                            They'll accept or decline your request shortly
-                        </p>
-                        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
-                            <div className="typing-dot" style={{ background: '#fff' }}></div>
-                            <div className="typing-dot" style={{ background: '#fff', animationDelay: '0.2s' }}></div>
-                            <div className="typing-dot" style={{ background: '#fff', animationDelay: '0.4s' }}></div>
-                        </div>
-                        <button
-                            className="btn btn-secondary"
-                            onClick={handleCancelRequest}
-                            style={{ marginTop: '1.5rem', background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff' }}
-                        >
-                            Cancel & Pick Someone Else
-                        </button>
-                    </div>
-                )}
 
                 {loading ? (
                     <div className="loading-spinner">
@@ -231,14 +201,12 @@ export default function PartnersPage() {
                                         </button>
                                         <button
                                             className="btn btn-primary"
-                                            style={{ flex: 1.5 }}
+                                            style={{ flex: 1.5, background: requestedIds.includes(partner._id) ? 'var(--success)' : 'var(--primary)' }}
                                             onClick={() => handleRequest(partner)}
-                                            disabled={requesting || waitingResponse}
+                                            disabled={requesting || requestedIds.includes(partner._id)}
                                         >
-                                            {requestedPartnerId === partner._id ? (
-                                                '⏳ Waiting...'
-                                            ) : waitingResponse ? (
-                                                'Waiting...'
+                                            {requestedIds.includes(partner._id) ? (
+                                                '✅ Requested'
                                             ) : (
                                                 <><Send size={14} style={{ marginRight: 6 }} /> Request</>
                                             )}
@@ -325,11 +293,11 @@ export default function PartnersPage() {
                                 </div>
                             )}
                             
-                            <button className="btn btn-primary btn-w-full btn-lg" style={{ marginTop: 24, position: 'sticky', bottom: 0 }} onClick={() => {
+                            <button className="btn btn-primary btn-w-full btn-lg" style={{ marginTop: 24, position: 'sticky', bottom: 0, background: requestedIds.includes(selectedProfile._id) ? 'var(--success)' : 'var(--primary)' }} onClick={() => {
                                 handleRequest(selectedProfile);
                                 setSelectedProfile(null);
-                            }} disabled={requesting || waitingResponse || requestedPartnerId === selectedProfile._id}>
-                                {requestedPartnerId === selectedProfile._id ? 'Request Sent!' : '🚀 Send Delivery Request'}
+                            }} disabled={requesting || requestedIds.includes(selectedProfile._id)}>
+                                {requestedIds.includes(selectedProfile._id) ? '✅ Already Requested' : '🚀 Send Delivery Request'}
                             </button>
                         </div>
                     </div>

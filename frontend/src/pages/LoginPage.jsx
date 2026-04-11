@@ -147,22 +147,29 @@ export default function LoginPage() {
                         </div>
 
                         {mode === 'signup' && (
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>MOBILE_LINK</label>
-                                    <input 
-                                        style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.phone ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
-                                        type="tel" name="phone" placeholder="98XXXXXXXX" value={form.phone} onChange={handleChange} maxLength={10} 
-                                    />
+                            <>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>MOBILE_LINK</label>
+                                        <input 
+                                            style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.phone ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
+                                            type="tel" name="phone" placeholder="98XXXXXXXX" value={form.phone} onChange={handleChange} maxLength={10} 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENTRY_NO</label>
+                                        <input 
+                                            style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.enrollment_no ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
+                                            name="enrollment_no" placeholder="E23CSEU..." value={form.enrollment_no} onChange={handleChange} 
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENTRY_NO</label>
-                                    <input 
-                                        style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.enrollment_no ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
-                                        name="enrollment_no" placeholder="E23CSEU..." value={form.enrollment_no} onChange={handleChange} 
-                                    />
+                                <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)', borderRadius: 12, padding: '10px 14px' }}>
+                                    <p style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, lineHeight: 1.4 }}>
+                                        ⚠️ WARNING: Registered Email and Phone Number <strong>cannot be changed</strong> later for security reasons.
+                                    </p>
                                 </div>
-                            </div>
+                            </>
                         )}
 
                         <button 

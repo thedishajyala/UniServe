@@ -15,6 +15,7 @@ export default function ProfilePage() {
         hostel: '',
         room_no: '',
         enrollment_no: '',
+        phone: '',
     });
 
     useEffect(() => {
@@ -24,6 +25,7 @@ export default function ProfilePage() {
                 hostel: user.hostel || '',
                 room_no: user.room_no || '',
                 enrollment_no: user.enrollment_no || '',
+                phone: user.phone || '',
             });
         }
     }, [user]);
@@ -140,14 +142,21 @@ export default function ProfilePage() {
                         </label>
                         <input className="input" value={user?.email || ''} disabled
                             style={{ opacity: 0.6, cursor: 'not-allowed' }} />
+                        <p style={{ fontSize: 10, color: '#EF4444', marginTop: 4, fontWeight: 600 }}>🔒 This cannot be changed.</p>
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 16 }}>
                         <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                             <Phone size={14} /> Registered Phone
                         </label>
-                        <input className="input" value={user?.phone || 'Not provided'} disabled
-                            style={{ opacity: 0.6, cursor: 'not-allowed' }} />
+                        <input className="input" value={form.phone}
+                            onChange={(e) => handleChange('phone', e.target.value)}
+                            disabled={!!user?.phone}
+                            style={{ opacity: user?.phone ? 0.6 : 1, cursor: user?.phone ? 'not-allowed' : 'text' }}
+                            placeholder="e.g. 98XXXXXXXX" />
+                        <p style={{ fontSize: 10, color: user?.phone ? '#EF4444' : 'var(--primary)', marginTop: 4, fontWeight: 600 }}>
+                            {user?.phone ? '🔒 This cannot be changed.' : '⚠️ Once saved, this cannot be changed.'}
+                        </p>
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 16 }}>

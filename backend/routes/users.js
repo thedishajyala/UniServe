@@ -18,7 +18,7 @@ router.get('/profile', protect, async (req, res) => {
 // PUT /api/users/profile
 router.put('/profile', protect, async (req, res) => {
     try {
-        const { name, hostel, room_no, enrollment_no } = req.body;
+        const { name, hostel, room_no, enrollment_no, phone } = req.body;
         const user = await User.findById(req.user._id);
 
         if (name && name !== user.name) {
@@ -31,8 +31,9 @@ router.put('/profile', protect, async (req, res) => {
         if (hostel) user.hostel = hostel;
         if (room_no) user.room_no = room_no;
         if (enrollment_no) user.enrollment_no = enrollment_no;
+        if (phone) user.phone = phone;
 
-        user.profile_complete = !!(user.name && user.enrollment_no && user.hostel && user.room_no);
+        user.profile_complete = !!(user.name && user.enrollment_no && user.hostel && user.room_no && user.phone);
         user.last_active = new Date();
 
         const updatedUser = await user.save();

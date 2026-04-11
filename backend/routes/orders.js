@@ -127,7 +127,8 @@ router.post('/request', protect, async (req, res) => {
         if (order.user_id._id.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized' });
         }
-        if (order.status !== 'pending') {
+
+        if (order.status !== 'pending' && order.status !== 'requested') {
             return res.status(400).json({ message: 'Order already has a partner' });
         }
 
@@ -136,7 +137,11 @@ router.post('/request', protect, async (req, res) => {
             return res.status(400).json({ message: 'Partner not available' });
         }
 
-        order.requested_partner_id = partner_id;
+        // Add to array if not already there
+        if (!order.requested_partner_ids.includes(partner_id)) {
+            order.requested_partner_ids.push(partner_id);
+        }
+        
         order.status = 'requested';
         await order.save();
 
@@ -180,7 +185,7 @@ router.post('/respond', protect, async (req, res) => {
         const order = await Order.findById(order_id).populate('user_id', 'name hostel room_no enrollment_no');
         if (!order) return res.status(404).json({ message: 'Order not found' });
 
-        if (order.requested_partner_id?.toString() !== req.user._id.toString()) {
+        if (!order.requested_partner_ids.includes(req.user._id.toString())) {
             return res.status(403).json({ message: 'This request was not sent to you' });
         }
         if (order.status !== 'requested') {
@@ -188,10 +193,12 @@ router.post('/respond', protect, async (req, res) => {
         }
 
         if (response === 'accepted') {
+            const otherRequestedPartners = [...order.requested_partner_ids];
+
             order.delivery_partner_id = req.user._id;
             order.status = 'accepted';
             order.accepted_at = new Date();
-            order.requested_partner_id = null;
+            order.requested_partner_ids = []; // Clear other requests once accepted
             await order.save();
 
             await order.populate('delivery_partner_id', 'name hostel room_no enrollment_no rating');
@@ -202,6 +209,7 @@ router.post('/respond', protect, async (req, res) => {
                     order_id,
                     response: 'accepted',
                     partner: {
+                        _id: req.user._id,
                         name: req.user.name,
                         hostel: req.user.hostel,
                         room_no: req.user.room_no,
@@ -209,13 +217,24 @@ router.post('/respond', protect, async (req, res) => {
                         rating: req.user.rating,
                     },
                 });
+
+                // Notify other partners to remove the request from their UI
+                otherRequestedPartners.forEach(pid => {
+                    if (pid.toString() !== req.user._id.toString()) {
+                        _io.to(pid.toString()).emit('order_taken', { order_id });
+                    }
+                });
             }
 
             res.json({ order, message: 'Order accepted! Chat is now open.' });
         } else {
-            // Declined — reset to pending so requester can pick someone else
-            order.status = 'pending';
-            order.requested_partner_id = null;
+            // Declined — remove this partner from the requested array
+            order.requested_partner_ids = order.requested_partner_ids.filter(id => id.toString() !== req.user._id.toString());
+            
+            // If no more partners are requested, move back to pending
+            if (order.requested_partner_ids.length === 0) {
+                order.status = 'pending';
+            }
             await order.save();
 
             // Notify requester
@@ -239,7 +258,7 @@ router.post('/respond', protect, async (req, res) => {
 router.get('/incoming', protect, async (req, res) => {
     try {
         const orders = await Order.find({
-            requested_partner_id: req.user._id,
+            requested_partner_ids: req.user._id,
             status: 'requested',
         }).populate('user_id', 'name hostel room_no enrollment_no phone');
         res.json(orders);
@@ -360,7 +379,7 @@ router.post('/cancel', protect, async (req, res) => {
         }
 
         order.status = 'cancelled';
-        order.requested_partner_id = null;
+        order.requested_partner_ids = [];
         await order.save();
 
         // Notify the other party via socket
@@ -414,14 +433,14 @@ router.get('/:orderId', protect, async (req, res) => {
         const order = await Order.findById(req.params.orderId)
             .populate('user_id', 'name email hostel room_no enrollment_no phone')
             .populate('delivery_partner_id', 'name email hostel room_no rating enrollment_no phone')
-            .populate('requested_partner_id', 'name hostel room_no enrollment_no phone');
+            .populate('requested_partner_ids', 'name hostel room_no enrollment_no phone');
 
         if (!order) return res.status(404).json({ message: 'Order not found' });
 
         const isInvolved =
             order.user_id._id.toString() === req.user._id.toString() ||
             order.delivery_partner_id?._id?.toString() === req.user._id.toString() ||
-            order.requested_partner_id?._id?.toString() === req.user._id.toString();
+            order.requested_partner_ids.some(p => p._id.toString() === req.user._id.toString() || p.toString() === req.user._id.toString());
 
         if (!isInvolved) return res.status(403).json({ message: 'Not authorized' });
 

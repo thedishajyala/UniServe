@@ -12,10 +12,10 @@ const orderSchema = new mongoose.Schema(
             ref: 'User',
             default: null,
         },
-        requested_partner_id: {
-            type: mongoose.Schema.Types.ObjectId,
+        requested_partner_ids: {
+            type: [mongoose.Schema.Types.ObjectId],
             ref: 'User',
-            default: null,
+            default: [],
         },
 
         // Pickup

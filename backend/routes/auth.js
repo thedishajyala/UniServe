@@ -93,6 +93,7 @@ router.post('/login', async (req, res) => {
             name: user.name,
             email: user.email,
             enrollment_no: user.enrollment_no,
+            phone: user.phone,
             hostel: user.hostel,
             room_no: user.room_no,
             rating: user.rating,

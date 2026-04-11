@@ -116,6 +116,10 @@ export default function HomePage() {
             notify('🛵 New Delivery Request!', `Earn ₹${data.order?.delivery_earning} — from ${data.requester?.name}`, '/');
         });
 
+        socket.on('order_taken', ({ order_id }) => {
+            setIncomingRequests((prev) => prev.filter((r) => (r._id || r.order?._id) !== order_id));
+        });
+
         socket.on('order_request_response', ({ order_id, response, partner, partnerName }) => {
             if (response === 'accepted') {
                 notify('✅ Partner Accepted!', `${partner?.name} is on the way`, `/chat/${order_id}`);
