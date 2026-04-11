@@ -1,5 +1,5 @@
 // UniServe Service Worker — caches shell, handles background push
-const CACHE_NAME = 'uniserve-v2';
+const CACHE_NAME = 'uniserve-v3';
 const SHELL = ['/', '/index.html'];
 
 self.addEventListener('install', (e) => {
