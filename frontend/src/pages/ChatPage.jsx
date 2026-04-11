@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { uploadMessages, getMessages, getOrderById, uploadImage, uploadVoice, createPayment, settlePayment } from '../services/api';
+import { getMessages, getOrderById, uploadImage, uploadVoice, createPayment, settlePayment } from '../services/api';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Send, Phone, MapPin, Camera, ImagePlus, X, CreditCard, Mic, MicOff, Square, Play, Pause } from 'lucide-react';
 
