@@ -128,7 +128,7 @@ router.post('/request', protect, async (req, res) => {
             return res.status(403).json({ message: 'Not authorized' });
         }
 
-        if (order.status !== 'pending' && order.status !== 'requested') {
+        if (order.delivery_partner_id) {
             return res.status(400).json({ message: 'Order already has a partner' });
         }
 
