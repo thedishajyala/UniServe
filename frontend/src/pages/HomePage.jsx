@@ -1,14 +1,29 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { toggleAvailability, getMyOrders, getDemandAnalytics, getIncomingRequests, respondToOrder, getMyDeliveries, getOnlinePartners } from '../services/api';
+import { toggleAvailability, getMyOrders, getDemandAnalytics, getIncomingRequests, respondToOrder, getMyDeliveries, getOnlinePartners, getEarnings } from '../services/api';
 import toast from 'react-hot-toast';
-import { Home, Package, TrendingUp, User, CheckCircle, XCircle, Bell, ArrowRight, Star } from 'lucide-react';
+import { Home, Package, TrendingUp, User, Bell, ArrowRight, Star, RotateCcw } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
+import { OUTLETS } from '../config/campus';
+
+/** Pickup locations that are campus food outlets, sorted by how often this user ordered. */
+function getTopRestaurantsFromOrders(orders, limit = 6) {
+    const counts = {};
+    for (const o of orders) {
+        if (o.status === 'cancelled') continue;
+        if (!OUTLETS.includes(o.pickup_location)) continue;
+        const name = o.pickup_location;
+        counts[name] = (counts[name] || 0) + 1;
+    }
+    return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit)
+        .map(([name, count]) => ({ name, count }));
+}
 
 function BottomNav() {
-    const navigate = useNavigate();
     const path = window.location.pathname;
 
     return (
@@ -16,10 +31,6 @@ function BottomNav() {
             <Link to="/" className={`nav-item ${path === '/' ? 'active' : ''}`}>
                 <div className={`nav-icon-wrapper ${path === '/' ? 'active-pill' : ''}`}><Home size={20} /></div>
                 <span className="nav-label">Home</span>
-            </Link>
-            <Link to="/order/create" className={`nav-item ${path === '/order/create' ? 'active' : ''}`}>
-                <div className={`nav-icon-wrapper ${path === '/order/create' ? 'active-pill' : ''}`}><Package size={20} /></div>
-                <span className="nav-label">Order</span>
             </Link>
             <Link to="/earnings" className={`nav-item ${path === '/earnings' ? 'active' : ''}`}>
                 <div className={`nav-icon-wrapper ${path === '/earnings' ? 'active-pill' : ''}`}><TrendingUp size={20} /></div>
@@ -76,13 +87,17 @@ export default function HomePage() {
     const [onlinePartners, setOnlinePartners] = useState([]);
     const [unreadOrders, setUnreadOrders] = useState({}); // { orderId: true }
 
+    const topRestaurants = useMemo(() => getTopRestaurantsFromOrders(orders, 6), [orders]);
+    const recentOrdersList = useMemo(() => orders.slice(0, 5), [orders]);
+    const reorderCandidates = useMemo(() => orders.slice(0, 3), [orders]);
+
     const loadData = useCallback(async () => {
         try {
             const [ordersRes, demandRes, deliveriesRes, partnersRes, earningsRes] = await Promise.all([
                 getMyOrders(), getDemandAnalytics(), getMyDeliveries(), getOnlinePartners().catch(() => ({ data: [] })),
                 getEarnings().catch(() => ({ data: {} }))
             ]);
-            setOrders(ordersRes.data.slice(0, 5));
+            setOrders(ordersRes.data);
             setDemand(demandRes.data);
             setActiveDeliveries(deliveriesRes.data.filter(d => ['accepted', 'picked', 'on_the_way'].includes(d.status)));
             setOnlinePartners(partnersRes.data || []);
@@ -193,6 +208,37 @@ export default function HomePage() {
         }
     };
 
+    const goReorderFromOrder = (order) => {
+        navigate('/order/create', {
+            state: {
+                reorder: {
+                    pickup_type: order.pickup_type,
+                    pickup_location: order.pickup_location,
+                    delivery_hostel: order.delivery_hostel,
+                    delivery_room: order.delivery_room,
+                    item_details: order.item_details,
+                    special_instructions: order.special_instructions || '',
+                    is_prepaid: !!order.is_prepaid,
+                    payment_method: order.payment_method === 'cash' ? 'cash' : 'online',
+                },
+            },
+        });
+    };
+
+    const goOrderFromOutlet = (pickup_location) => {
+        navigate('/order/create', {
+            state: {
+                reorder: {
+                    pickup_type: 'outlet',
+                    pickup_location,
+                    delivery_hostel: user?.hostel || '',
+                    delivery_room: user?.room_no || '',
+                    item_details: '',
+                },
+            },
+        });
+    };
+
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Hero Header */}
@@ -206,7 +252,7 @@ export default function HomePage() {
                         <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
                             <span style={{ fontSize: 20 }}>🚀</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
                             <div className="mode-toggle-container">
                                 <button className={`mode-toggle-btn ${mode === 'order' ? 'active' : ''}`} onClick={() => setMode('order')}>Order</button>
                                 <button className={`mode-toggle-btn ${mode === 'deliver' ? 'active' : ''}`} onClick={() => setMode('deliver')}>Deliver</button>
@@ -226,8 +272,12 @@ export default function HomePage() {
                             <h1 style={{ color: 'white', fontSize: 32, marginBottom: 0, letterSpacing: '-1.5px', fontWeight: 900 }}>Hey, {user?.name?.split(' ')[0]}!</h1>
                         </div>
 
-                        {/* Glass Stats Card */}
-                        <div className="glass-card" style={{ padding: '12px 20px', borderRadius: 24, display: 'flex', gap: 20, marginBottom: -4 }}>
+                        {/* Delivery stats capsule — only visible in Deliver mode */}
+                        <div className="hero-stats-slot" style={{ marginBottom: -4 }}>
+                        <div
+                            className={`glass-card home-mode-panel ${mode === 'deliver' ? 'is-visible' : 'is-hidden'}`}
+                            style={{ padding: '12px 20px', borderRadius: 24, display: 'flex', gap: 20 }}
+                        >
                             <div style={{ textAlign: 'center' }}>
                                 <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Deliveries</p>
                                 <p style={{ fontSize: 18, color: 'white', fontWeight: 900 }}>{activeDeliveries.length}</p>
@@ -238,20 +288,20 @@ export default function HomePage() {
                                 <p style={{ fontSize: 18, color: 'white', fontWeight: 900 }}>₹{earnings?.today_earnings || 0}</p>
                             </div>
                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div className="page-content" style={{ marginTop: -48, position: 'relative', zIndex: 2 }}>
-                
-                {mode === 'order' ? (
-                    <div className="fade-in">
-                        {/* ── ORDER MODE CONTENT ── */}
-                        
+                <div className="home-mode-stack">
+                    <div className={`home-mode-panel ${mode === 'order' ? 'is-visible' : 'is-hidden'}`}>
+                        {/* ── ORDER MODE CONTENT — shifted up from Place Order through list below ── */}
+                        <div style={{ marginTop: -36 }}>
                         {/* Main Call to Action */}
                         <button className="card action-card premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 24, background: 'linear-gradient(145deg, #6366f1, #4f46e5)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 12px 30px rgba(99,102,241,0.25)', width: '100%', marginBottom: 24 }}
                             onClick={() => navigate('/order/create')}>
-                            <div style={{ position: 'absolute', right: -15, bottom: -15, opacity: 0.1, transform: 'rotate(-15deg)' }}>
+                            <div style={{ position: 'absolute', right: -15, bottom: -1, opacity: 0.1, transform: 'rotate(-15deg)' }}>
                                 <Package size={80} />
                             </div>
                             <div style={{ background: 'rgba(255,255,255,0.25)', padding: 10, borderRadius: 14, marginBottom: 18, backdropFilter: 'blur(10px)' }}>
@@ -262,6 +312,78 @@ export default function HomePage() {
                                 Get it delivered directly to your room <ArrowRight size={14} />
                             </div>
                         </button>
+
+                        {topRestaurants.length > 0 && (
+                            <div style={{ marginBottom: 20 }}>
+                                <div className="section-header">
+                                    <h3 className="section-title">🔥 Your top restaurants</h3>
+                                </div>
+                                <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px', WebkitOverflowScrolling: 'touch' }}>
+                                    {topRestaurants.map(({ name, count }) => (
+                                        <button
+                                            key={name}
+                                            type="button"
+                                            className="card"
+                                            onClick={() => goOrderFromOutlet(name)}
+                                            style={{
+                                                flexShrink: 0,
+                                                minWidth: 132,
+                                                padding: '14px 16px',
+                                                borderRadius: 16,
+                                                border: '1px solid var(--border)',
+                                                background: 'linear-gradient(160deg, #ffffff 0%, #f9f9ff 100%)',
+                                                cursor: 'pointer',
+                                                textAlign: 'left',
+                                                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                            }}
+                                        >
+                                            <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 14, marginBottom: 4, color: 'var(--text-primary)' }}>{name}</p>
+                                            <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{count} {count === 1 ? 'order' : 'orders'}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {reorderCandidates.length > 0 && (
+                            <div style={{ marginBottom: 24 }}>
+                                <div className="section-header">
+                                    <h3 className="section-title">↩️ Order again</h3>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                    {reorderCandidates.map((order) => (
+                                        <div
+                                            key={order._id}
+                                            className="card"
+                                            style={{
+                                                padding: '14px 16px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 12,
+                                                border: '1px solid var(--border)',
+                                            }}
+                                        >
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <p style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>{order.pickup_location}</p>
+                                                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.35 }}>
+                                                    {order.item_details?.slice(0, 72)}
+                                                    {(order.item_details?.length || 0) > 72 ? '…' : ''}
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary btn-sm"
+                                                style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12 }}
+                                                onClick={() => goReorderFromOrder(order)}
+                                            >
+                                                <RotateCcw size={14} />
+                                                Reorder
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Available Nearby Snippet */}
                         {onlinePartners.length > 0 && (
@@ -289,18 +411,18 @@ export default function HomePage() {
 
                         {/* Recent Orders */}
                         <div>
-                            <div className="section-header">
+                            {/* <div className="section-header">
                                 <h3 className="section-title">📋 Recent Orders</h3>
                                 <Link to="/order/create" style={{ color: 'var(--primary)', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>+ New</Link>
                             </div>
-                            {orders.length === 0 ? (
+                            {recentOrdersList.length === 0 ? (
                                 <div className="empty-state">
                                     <div className="empty-state-icon">🛍️</div>
                                     <p className="empty-state-title">No orders yet</p>
                                     <p className="empty-state-sub">Create your first delivery request!</p>
                                 </div>
                             ) : (
-                                orders.map((order) => (
+                                recentOrdersList.map((order) => (
                                     <div key={order._id} className="order-card recent-order-card" style={{ cursor: 'pointer', padding: 16 }}
                                         onClick={() => {
                                             setUnreadOrders(prev => ({ ...prev, [order._id]: false }));
@@ -329,11 +451,13 @@ export default function HomePage() {
                                         </div>
                                     </div>
                                 ))
-                            )}
+                            )} */}
+                        </div>
                         </div>
                     </div>
-                ) : (
-                    <div className="fade-in">
+                    <div className={`home-mode-panel ${mode === 'deliver' ? 'is-visible' : 'is-hidden'}`}>
+                    <div style={{ marginTop: -36 }}>
+
                         {/* ── DELIVER MODE CONTENT ── */}
                         
                         {/* Go Online Toggle */}
@@ -518,10 +642,11 @@ export default function HomePage() {
                             </div>
                         )}
                     </div>
-                )}
+                </div>
             </div>
 
             <BottomNav />
+        </div>
         </div>
     );
 }

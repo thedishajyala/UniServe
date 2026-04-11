@@ -298,10 +298,6 @@ export default function ProfilePage() {
                     <div className="nav-icon-wrapper"><Home size={20} /></div>
                     <span className="nav-label">Home</span>
                 </Link>
-                <Link to="/order/create" className="nav-item">
-                    <div className="nav-icon-wrapper"><Package size={20} /></div>
-                    <span className="nav-label">Order</span>
-                </Link>
                 <Link to="/earnings" className="nav-item">
                     <div className="nav-icon-wrapper"><TrendingUp size={20} /></div>
                     <span className="nav-label">Earnings</span>
