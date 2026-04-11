@@ -9,6 +9,7 @@ import { ArrowLeft, MessageCircle, MapPin, Star, Phone, Navigation, Package, Box
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import confetti from 'canvas-confetti';
 
 // LUXE MARKER CUSTOMIZATION
 const createPulsingIcon = (color = '#4F46E5') => {
@@ -125,6 +126,12 @@ export default function TrackingPage() {
             socket?.emit('status_update', { orderId, status: newStatus, userId: user._id });
             toast.success(`Status updated to "${newStatus.replace('_', ' ')}" ✅`);
             if (newStatus === 'delivered') {
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#4F46E5', '#10B981', '#F59E0B']
+                });
                 setTimeout(() => navigate(`/order/${orderId}/review`), 1500);
             }
         } catch (err) {

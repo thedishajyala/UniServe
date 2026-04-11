@@ -4,6 +4,7 @@ import { addReview, getOrderById } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Star, Send, CheckCircle2, ChevronRight, MessageSquare } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 const REVIEW_LABELS = ['', 'POOR', 'FAIR', 'GOOD', 'EXCELLENT', 'PERFECT'];
 const QUICK_TAGS = ['FAST DELIVERY', 'RELIABLE', 'FRIENDLY', 'GREAT SERVICE'];
@@ -40,6 +41,11 @@ export default function ReviewPage() {
         try {
             await addReview({ order_id: orderId, rating, review_text: text });
             setDone(true);
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
             toast.success('Review submitted');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Submission failed');

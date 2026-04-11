@@ -56,6 +56,34 @@ export default function EarningsPage() {
                         <p style={{ fontSize: 14 }}>{demand.demandMessage}</p>
                     </div>
                 )}
+                
+                {/* DAILY GOAL HUD */}
+                <div className="card fade-in" style={{ padding: 24, marginBottom: 20, background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: -10, right: -10, width: 80, height: 80, background: 'rgba(79, 70, 229, 0.1)', borderRadius: '50%' }} />
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16 }}>
+                            <div>
+                                <p style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Daily Goal</p>
+                                <h2 style={{ fontSize: 28, fontWeight: 900 }}>₹{earnings?.today_earnings || 0} <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>/ ₹500</span></h2>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <p style={{ fontSize: 16, fontWeight: 900, color: '#10B981' }}>{Math.min(100, Math.round(((earnings?.today_earnings || 0) / 500) * 100))}%</p>
+                            </div>
+                        </div>
+                        <div style={{ height: 8, background: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'hidden' }}>
+                            <div style={{ 
+                                height: '100%', 
+                                width: `${Math.min(100, ((earnings?.today_earnings || 0) / 500) * 100)}%`, 
+                                background: 'linear-gradient(90deg, #4F46E5 0%, #10B981 100%)',
+                                borderRadius: 4,
+                                transition: 'width 1s cubic-bezier(0.16, 1, 0.3, 1)'
+                            }} />
+                        </div>
+                        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 12, fontWeight: 500 }}>
+                            {earnings?.today_earnings >= 500 ? "Amazing! You've hit your goal! 🎉" : `Just ₹${500 - (earnings?.today_earnings || 0)} more to reach your daily target.`}
+                        </p>
+                    </div>
+                </div>
 
                 {/* Stats */}
                 <div className="stat-grid" style={{ marginBottom: 16 }}>
