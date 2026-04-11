@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAvailablePartners, requestPartner, getPartnerReviews } from '../services/api';
+import { getAvailablePartners, requestPartner, getPartnerReviews, getOrderById } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import toast from 'react-hot-toast';
@@ -24,6 +24,7 @@ export default function PartnersPage() {
     const [loadingProfile, setLoadingProfile] = useState(false);
 
     const fetchPartners = useCallback(async () => {
+        setLoading(true);
         try {
             const [pRes, oRes] = await Promise.all([
                 getAvailablePartners(orderId),
@@ -133,11 +134,19 @@ export default function PartnersPage() {
                         <p>Finding partners near you...</p>
                     </div>
                 ) : partners.length === 0 ? (
-                    <div className="empty-state">
-                        <div style={{ fontSize: '3rem' }}>😴</div>
-                        <h3>No partners online</h3>
-                        <p>No delivery partners are available right now. Try again in a few minutes!</p>
-                        <button className="btn btn-primary" onClick={fetchPartners}>Refresh</button>
+                    <div className="empty-state fade-in" style={{ background: 'white', borderRadius: 24, padding: '60px 24px', boxShadow: 'var(--shadow-sm)', marginTop: 20 }}>
+                        <div className="empty-state-icon" style={{ fontSize: '4rem', marginBottom: 20 }}>😴</div>
+                        <h3 className="empty-state-title" style={{ fontSize: 20, marginBottom: 12 }}>No partners online</h3>
+                        <p className="empty-state-sub" style={{ marginBottom: 32, maxWidth: 280, margin: '0 auto 32px' }}>
+                            No delivery partners are available right now. Try again in a few minutes!
+                        </p>
+                        <button 
+                            className="btn btn-primary btn-lg" 
+                            onClick={fetchPartners}
+                            style={{ minWidth: 200, boxShadow: '0 10px 25px rgba(79, 70, 229, 0.2)' }}
+                        >
+                            🔄 Check Again
+                        </button>
                     </div>
                 ) : (
                     <>
