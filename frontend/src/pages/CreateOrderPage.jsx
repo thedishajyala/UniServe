@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { createOrder, createPayment } from '../services/api';
 import { OUTLETS, GATES, ALL_HOSTELS, getPricing } from '../config/campus';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,7 @@ const STEPS = ['Pickup', 'Delivery', 'Confirm'];
 export default function CreateOrderPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [step, setStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
@@ -29,6 +30,23 @@ export default function CreateOrderPage() {
         : null;
 
     const isGate3 = form.pickup_location === 'Gate 3';
+
+    useEffect(() => {
+        const r = location.state?.reorder;
+        if (!r?.pickup_type) return;
+        setForm((prev) => ({
+            ...prev,
+            pickup_type: r.pickup_type,
+            pickup_location: r.pickup_location ?? '',
+            delivery_hostel: r.delivery_hostel ?? prev.delivery_hostel,
+            delivery_room: r.delivery_room ?? prev.delivery_room,
+            item_details: r.item_details ?? '',
+            special_instructions: r.special_instructions ?? '',
+            ...(typeof r.is_prepaid === 'boolean' ? { is_prepaid: r.is_prepaid } : {}),
+            ...(r.payment_method === 'cash' || r.payment_method === 'online' ? { payment_method: r.payment_method } : {}),
+        }));
+        setStep(1);
+    }, [location.state]);
 
     const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 

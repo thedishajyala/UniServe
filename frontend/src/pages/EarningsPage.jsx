@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getEarnings, getMyDeliveries, getDemandAnalytics } from '../services/api';
 import toast from 'react-hot-toast';
-import { Home, Package, TrendingUp, User, Globe, Activity, Star } from 'lucide-react';
+import { Home, TrendingUp, User, Globe, Activity, Star } from 'lucide-react';
 
 export default function EarningsPage() {
     const { user, logoutUser } = useAuth();
@@ -174,10 +174,6 @@ export default function EarningsPage() {
                 <Link to="/" className="nav-item">
                     <div className="nav-icon-wrapper"><Home size={20} /></div>
                     <span className="nav-label">Home</span>
-                </Link>
-                <Link to="/order/create" className="nav-item">
-                    <div className="nav-icon-wrapper"><Package size={20} /></div>
-                    <span className="nav-label">Order</span>
                 </Link>
                 <Link to="/earnings" className="nav-item active">
                     <div className="nav-icon-wrapper active-pill"><TrendingUp size={20} /></div>

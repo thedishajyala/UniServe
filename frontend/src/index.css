@@ -804,3 +804,34 @@ select.input {
   color: white;
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* Home: crossfade between Order / Deliver panels */
+.home-mode-stack {
+  display: grid;
+}
+.home-mode-stack > .home-mode-panel {
+  grid-area: 1 / 1;
+  transition:
+    opacity 0.45s cubic-bezier(0.33, 1, 0.68, 1),
+    transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.home-mode-panel.is-hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+.home-mode-panel.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero delivery capsule: no reserved space when hidden (Order mode) */
+.hero-stats-slot {
+  position: relative;
+  align-self: flex-end;
+}
+.hero-stats-slot > .home-mode-panel.is-hidden {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
