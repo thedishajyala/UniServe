@@ -16,6 +16,7 @@ import TrackingPage from './pages/TrackingPage';
 import ReviewPage from './pages/ReviewPage';
 import EarningsPage from './pages/EarningsPage';
 import ProfilePage from './pages/ProfilePage';
+import MyOrdersPage from './pages/MyOrdersPage';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -99,6 +100,8 @@ function AppRoutes() {
       <Route path="/order/:orderId/track" element={<ProtectedRoute><TrackingPage /></ProtectedRoute>} />
       <Route path="/order/:orderId/review" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
       <Route path="/earnings" element={<ProtectedRoute><EarningsPage /></ProtectedRoute>} />
+      <Route path="/my-orders" element={<ProtectedRoute><MyOrdersPage /></ProtectedRoute>} />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

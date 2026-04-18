@@ -58,7 +58,7 @@ export default function EarningsPage() {
                 )}
                 
                 {/* DAILY GOAL HUD */}
-                <div className="card fade-in" style={{ padding: 24, marginBottom: 20, background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden' }}>
+                {/* <div className="card fade-in" style={{ padding: 24, marginBottom: 20, background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', top: -10, right: -10, width: 80, height: 80, background: 'rgba(79, 70, 229, 0.1)', borderRadius: '50%' }} />
                     <div style={{ position: 'relative', zIndex: 1 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16 }}>
@@ -83,7 +83,153 @@ export default function EarningsPage() {
                             {earnings?.today_earnings >= 500 ? "Amazing! You've hit your goal! 🎉" : `Just ₹${500 - (earnings?.today_earnings || 0)} more to reach your daily target.`}
                         </p>
                     </div>
-                </div>
+                </div> */}
+                <div
+  className="card fade-in"
+  style={{
+    padding: 24,
+    marginTop: -20,
+    marginBottom: 20,
+    background: "linear-gradient(135deg, #312E81 0%, #1E1B4B 50%, #0F172A 100%)",
+    color: "white",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 20,
+    position: "relative",
+    overflow: "hidden",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+  }}
+>
+  {/* Glow Circles */}
+  <div
+    style={{
+      position: "absolute",
+      top: -20,
+      right: -20,
+      width: 120,
+      height: 120,
+      background: "rgba(99,102,241,0.25)",
+      borderRadius: "50%",
+      filter: "blur(20px)",
+    }}
+  />
+  <div
+    style={{
+      position: "absolute",
+      bottom: -30,
+      left: -30,
+      width: 140,
+      height: 140,
+      background: "rgba(16,185,129,0.18)",
+      borderRadius: "50%",
+      filter: "blur(25px)",
+    }}
+  />
+
+  <div style={{ position: "relative", zIndex: 1 }}>
+    {/* Top Row */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-end",
+        marginBottom: 18,
+      }}
+    >
+      <div>
+        <p
+          style={{
+            fontSize: 12,
+            fontWeight: 800,
+            color: "rgba(255,255,255,0.7)",
+            textTransform: "uppercase",
+            letterSpacing: "0.12em",
+            marginBottom: 6,
+          }}
+        >
+          Daily Goal
+        </p>
+
+        <h2
+          style={{
+            fontSize: 32,
+            fontWeight: 900,
+            color: "#FFFFFF",
+            margin: 0,
+          }}
+        >
+          ₹{earnings?.today_earnings || 0}
+          <span
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.65)",
+              marginLeft: 6,
+            }}
+          >
+            / ₹500
+          </span>
+        </h2>
+      </div>
+
+      <div style={{ textAlign: "right" }}>
+        <p
+          style={{
+            fontSize: 18,
+            fontWeight: 900,
+            color: "#34D399",
+            margin: 0,
+          }}
+        >
+          {Math.min(
+            100,
+            Math.round(((earnings?.today_earnings || 0) / 500) * 100)
+          )}
+          %
+        </p>
+      </div>
+    </div>
+
+    {/* Progress Bar */}
+    <div
+      style={{
+        height: 10,
+        background: "rgba(255,255,255,0.12)",
+        borderRadius: 999,
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          height: "100%",
+          width: `${Math.min(
+            100,
+            ((earnings?.today_earnings || 0) / 500) * 100
+          )}%`,
+          background:
+            "linear-gradient(90deg, #6366F1 0%, #8B5CF6 50%, #10B981 100%)",
+          borderRadius: 999,
+          transition: "width 1s ease",
+          boxShadow: "0 0 10px rgba(16,185,129,0.6)",
+        }}
+      />
+    </div>
+
+    {/* Bottom Text */}
+    <p
+      style={{
+        fontSize: 13,
+        color: "rgba(255,255,255,0.82)",
+        marginTop: 14,
+        fontWeight: 600,
+        lineHeight: 1.5,
+      }}
+    >
+      {earnings?.today_earnings >= 500
+        ? "Amazing! You've hit your goal! 🎉"
+        : `Just ₹${500 - (earnings?.today_earnings || 0)} more to reach your daily target.`}
+    </p>
+  </div>
+</div>
 
                 {/* Stats */}
                 <div className="stat-grid" style={{ marginBottom: 16 }}>
