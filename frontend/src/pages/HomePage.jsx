@@ -436,7 +436,7 @@ export default function HomePage() {
                                             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                                                 <div style={{ background: 'var(--bg)', padding: 8, borderRadius: 10, position: 'relative' }}>
                                                     {order.pickup_location.includes('Gate') ? <Package size={18} color="var(--primary)" /> : <span style={{ fontSize: 18 }}>🍔</span>}
-                                                    {unreadOrders[order._id] && <div style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: '50%', background: '#EF4444', border: '2px solid white' }} />}
+                                                    {unreadOrders[order._id] && <div style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: '50%', background: '#EF4444', border: '2px solid var(--bg)' }} />}
                                                 </div>
                                                 <div>
                                                     <p style={{ fontWeight: 700, fontSize: 15 }}>{order.pickup_location}</p>
@@ -461,14 +461,14 @@ export default function HomePage() {
                         {/* ── DELIVER MODE CONTENT ── */}
                         
                         {/* Go Online Toggle */}
-                        <div className="card action-card toggle-card" style={{ padding: '24px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: user?.is_available ? 'linear-gradient(145deg, #ECFDF5, #D1FAE5)' : 'white', border: user?.is_available ? '1px solid #A7F3D0' : '1px solid var(--border-strong)', boxShadow: '0 8px 25px rgba(0,0,0,0.04)', marginBottom: 20 }}>
+                        <div className="card action-card toggle-card" style={{ padding: '24px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: user?.is_available ? 'rgba(16, 185, 129, 0.15)' : 'var(--card)', border: user?.is_available ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid var(--border-strong)', boxShadow: '0 8px 25px rgba(0,0,0,0.04)', marginBottom: 20 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                                 <div style={{ fontSize: 32, filter: user?.is_available ? 'drop-shadow(0 4px 10px rgba(34,197,94,0.2))' : 'none' }}>{user?.is_available ? '🚴' : '😴'}</div>
                                 <div>
-                                    <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 17, color: user?.is_available ? '#065F46' : 'var(--text-primary)' }}>
+                                    <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 17, color: user?.is_available ? '#34d399' : 'var(--text-primary)' }}>
                                         {user?.is_available ? 'Live Now' : 'Offline'}
                                     </div>
-                                    <div style={{ fontSize: 12, color: user?.is_available ? '#059669' : 'var(--text-muted)', fontWeight: 600 }}>
+                                    <div style={{ fontSize: 12, color: user?.is_available ? '#10b981' : 'var(--text-muted)', fontWeight: 600 }}>
                                         {user?.is_available ? "Active & Earning" : "Start a micro-gig"}
                                     </div>
                                 </div>
@@ -606,7 +606,7 @@ export default function HomePage() {
                                                     navigate(`/chat/${delivery._id}`);
                                                 }}>
                                                 💬 Chat
-                                                {unreadOrders[delivery._id] && <div style={{ position: 'absolute', top: -4, right: -4, width: 12, height: 12, borderRadius: '50%', background: '#EF4444', border: '2px solid white', boxShadow: '0 0 10px rgba(239,68,68,0.5)' }} />}
+                                                {unreadOrders[delivery._id] && <div style={{ position: 'absolute', top: -4, right: -4, width: 12, height: 12, borderRadius: '50%', background: '#EF4444', border: '2px solid var(--bg)', boxShadow: '0 0 10px rgba(239,68,68,0.5)' }} />}
                                             </button>
                                             <button className="btn btn-secondary btn-sm" style={{ flex: 1 }}
                                                 onClick={() => navigate(`/order/${delivery._id}/track`)}>📍 Track</button>
