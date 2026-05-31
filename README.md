@@ -1,109 +1,81 @@
-# 🚀 UniServe: The Hyper-Local University Delivery Engine
+# 🚀 UniServe: Peer-to-Peer Campus Delivery Engine
+[![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?logo=node.js)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb)](https://www.mongodb.com/)
+[![Socket.io](https://img.shields.io/badge/Socket.io-Real--time-010101?logo=socket.io)](https://socket.io/)
+[![Razorpay](https://img.shields.io/badge/Razorpay-Payment-02042B?logo=razorpay)](https://razorpay.com/)
 
-[![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=node.js)](https://nodejs.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
-[![Socket.io](https://img.shields.io/badge/Socket.io-Real--time-010101?style=for-the-badge&logo=socket.io)](https://socket.io/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![Razorpay](https://img.shields.io/badge/Razorpay-Payment-02042B?style=for-the-badge&logo=razorpay)](https://razorpay.com/)
-
-**UniServe** is a high-performance, real-time peer-to-peer delivery ecosystem engineered exclusively for university campuses. It bridges the gap between students needing essentials and those willing to deliver them, creating a self-sustaining micro-economy with 0% overhead for the students.
+**UniServe** is a high-performance, real-time delivery platform engineered specifically for university ecosystems. It facilitates a peer-to-peer economy where students coordinate localized deliveries—from food outlets to campus gates—leveraging real-time tracking, secure payments, and an AI-driven matching engine.
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ Technical Architecture
+UniServe is built on a resilient **MERN** stack with a focus on low-latency state synchronization.
 
-UniServe is built on a custom-architected MERN stack designed for sub-second latency and absolute data integrity.
+### 📡 Real-time Communication Layer (Socket.io)
+The app uses a dual-room socket architecture to ensure messages and location updates never miss a beat:
+-   **User-Specific Rooms (`user_{id}`)**: For global notifications across the app (Incoming requests, general alerts).
+-   **Order-Specific Rooms (`order_{id}`)**: Isolated data lanes for real-time chat and high-frequency coordinate broadcasting during "Active Delivery."
 
-### 📡 Real-Time Dispatch Engine (Socket.io)
-At the heart of UniServe is a sophisticated signal-broadcasting system:
-- **Parallel Dispatch**: Requesters can broadcast delivery requests to multiple high-rated partners simultaneously. The first to accept locks the order, while the system automatically revokes the request from other partners' feeds in real-time.
-- **Dual-Channel Sockets**:
-    - `user_{id}`: Global high-priority notification lane for incoming requests and status alerts.
-    - `order_{id}`: Dedicated data lane for real-time chat, image sharing, and coordinate broadcasting.
+### 🛡️ Smart Hybrid Payment System (Razorpay SDK)
+Implemented a custom "Smart Payment" logic to balance user convenience with partner security:
+-   **Outlet (Food) Orders**: Force Online Payment via Razorpay. *Rationale*: Protects delivery partners from high-value out-of-pocket costs and no-shows.
+-   **Parcel/Gate Orders**: Flexible selection between **Online (Prepaid)** and **Cash (Postpaid)**.
+-   **Mid-Chat Settlement**: Logic that allows users who chose Cash to securely switch to Online payment during the active delivery phase.
 
-### 🛡️ Secure Financial Layer (Razorpay SDK)
-A multi-tier payment logic that ensures trust in a pseudo-anonymous campus environment:
-- **Smart Gateway Integration**: Full Razorpay checkout flow with HMAC-based signature verification.
-- **Dynamic Settlement**: Supports full pre-payment (Prepaid) or post-delivery (Cash).
-- **In-Chat Conversion**: Unique "Mid-Chat Settlement" logic allowing users to securely switch from Cash to Online payment mid-delivery if they run out of physical currency.
-
-### 🧠 AI-Driven Matching Engine
-Our proprietary `matchingEngine.js` ranks delivery partners not just by proximity, but by a "Trust Index":
-- **Weighted Ranking**: Proximity to delivery hostel, historical rating, and `avg_response_time`.
-- **Cold-Start Protection**: New partners are incentivized with a "New Partner 🆕" status to ensure a fair entry into the ecosystem.
+### 🗺️ Geolocation Tracking Engine (Leaflet.js)
+Leverages the browser's `navigator.geolocation` API with **High-Accuracy mode** to track partners down to within 5-10 meters. Coordinates are broadcast via Sockets and rendered on a lightweight Leaflet.js map, providing a "Uber-like" tracking experience with zero API-cost overhead.
 
 ---
 
-## ✨ Key Features
-
-| Feature | Description |
-| :--- | :--- |
-| **🔐 University Auth** | Enforced university-domain email validation (e.g., `@bennett.edu.in`). |
-| **💬 Live Chat** | Full-duplex messaging with image sharing and typing indicators. |
-| **📍 Geolocation** | Leaflet-powered tracking with high-accuracy GPS broadcasting. |
-| **🏆 Partner Dashboard** | Real-time earnings tracking, success rate analytics, and response metrics. |
-| **📱 Mobile-First UI** | Premium Aesthetics with Glassmorphism, Mesh Gradients, and micro-animations. |
-| **💸 Flat Pricing** | Transparent pricing (Flat ₹49) calculated via the dedicated `pricingEngine.js`. |
+## 🧠 Engineering Highlights
+-   **Custom Matching Engine**: Rankings are calculated using a weighted algorithm based on partner rating, proximity to the delivery hostel, and historical completion rates.
+-   **Reputation Recovery Logic**: New users start at a `0.0` rating with a "New Partner 🆕" status to prevent cold-start penalties and ensure a fair entry into the platform's economy.
+-   **Scalable File Handling**: Image-sharing in chat is handled via an optimized HTTP-upload flow that fires socket notifications only after successful persistence.
 
 ---
 
-## 🛠️ Tech Stack & Dependencies
-
-### Frontend
-- **React 19** + **Vite**: Ultra-fast HMR and optimized production bundles.
-- **Tailwind CSS**: Utility-first styling with custom glassmorphism extensions.
-- **Socket.io-client**: Persistent WebSocket connections.
-- **Leaflet.js**: Lightweight mapping and coordinate rendering.
-
-### Backend
-- **Node.js** + **Express**: Scalable RESTful API and socket server.
-- **MongoDB Atlas**: Cloud-hosted NoSQL database with Mongoose ODM.
-- **JWT & Passport**: Secure stateless authentication.
-- **Razorpay**: Robust payment processing gateway.
+## ✨ Features at a Glance
+-   **🔐 Secure Auth**: University-domain enforced login (e.g., `@bennett.edu.in`).
+-   **💬 Real-time Chat**: Full image support and typing indicators.
+-   **🏆 Elite Partner Ranking**: AI-driven "Nearby Best Picks."
+-   **📱 One-Tap Dial**: Deep-linked `tel:` integration for instant coordination.
+-   **📈 Earnings Dashboard**: Real-time tracking of successful gigs and daily income.
 
 ---
 
 ## 🚀 Installation & Local Development
 
-### 1. Prerequisites
-- **Node.js** (v18 or higher)
-- **MongoDB** (Atlas cluster or local instance)
-- **Razorpay Keys** (Obtainable from [Razorpay Dashboard](https://dashboard.razorpay.com))
+### 1. Prerequisite
+- Node.js (v18+) & MongoDB (Atlas or Local)
+- Razorpay API Keys (Test Mode)
 
-### 2. Backend Initialization
+### 2. Backend Setup
 ```bash
 cd backend
 npm install
-# Create .env file with:
-# MONGO_URI=your_mongodb_uri
-# JWT_SECRET=your_secret_key
-# RAZORPAY_KEY_ID=your_key_id
-# RAZORPAY_KEY_SECRET=your_key_secret
+# Create .env with MONGO_URI, JWT_SECRET, RAZORPAY_KEY_ID, and RAZORPAY_KEY_SECRET
 npm start
 ```
 
-### 3. Frontend Initialization
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
-# Create .env file with:
-# VITE_API_URL=http://localhost:5000/api
-# VITE_SOCKET_URL=http://localhost:5000
-# VITE_RAZORPAY_KEY_ID=your_key_id
+# Create .env with VITE_API_URL, VITE_SOCKET_URL, and VITE_RAZORPAY_KEY_ID
 npm run dev
 ```
 
 ---
 
-## 🗺️ Future Roadmap
-- [ ] **PWA Support**: Native mobile install and background push notifications.
-- [ ] **Geo-Fencing**: Dynamic pricing based on walking distance and terrain complexity.
-- [ ] **Gamification**: Badge system for top performers and "Rush Hour" multipliers.
+## 🔭 Future Scope
+-   **PWA Integration**: Native push notifications for background order alerts.
+-   **Advanced Geo-fencing**: Dynamic pricing based on cross-campus walking distance.
 
 ---
 
-### 🔥 Developer Note
-UniServe was built to solve a real-world logistics gap within university campuses. It demonstrates mastery over **distributed state synchronization**, **secure financial transactions**, and **real-time geolocation systems**.
+### 🔥 For Recruiters
+UniServe demonstrates a full-stack proficiency in handling **distributed state**, **secure financial transactions**, and **real-time geolocation data**. It solves a real-world logistics problem with an engineering-first mindset.
 
-⭐ **Star the repo** if you find this project impressive!
+⭐ **Like the project?** Star the repository to show support!
+

@@ -69,7 +69,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', fontFamily: 'Plus Jakarta Sans' }}>
+        <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', fontFamily: 'Plus Jakarta Sans' }}>
             {/* ── LUXE MESH BACKGROUND ── */}
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45vh', background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)', zIndex: 0 }}>
                 {/* Animated Gradient Orbs */}
@@ -85,8 +85,8 @@ export default function LoginPage() {
                     border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
                 }}>
                     <div style={{ 
-                        width: 36, height: 36, background: 'var(--primary)', borderRadius: 10, 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: 'white', fontSize: 20
+                        width: 36, height: 36, background: '#fff', borderRadius: 10, 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#4F46E5', fontSize: 20
                     }}>U</div>
                 </div>
                 <h1 style={{ color: '#fff', fontSize: 42, fontWeight: 900, letterSpacing: '-2px', marginBottom: 8 }}>UniServe</h1>
@@ -96,21 +96,21 @@ export default function LoginPage() {
             {/* ── SECURITY CARD ── */}
             <div style={{ maxWidth: 460, width: '100%', margin: '-40px auto 0', padding: '0 20px 60px', position: 'relative', zIndex: 10 }}>
                 <div style={{ 
-                    background: 'var(--card)', backdropFilter: 'blur(16px)', borderRadius: 32, padding: 40, 
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-                    border: '1px solid var(--border)'
+                    background: '#fff', borderRadius: 32, padding: 40, 
+                    boxShadow: '0 40px 100px -20px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1)',
+                    border: '1px solid rgba(255,255,255,0.8)'
                 }}>
                     {/* MODE TERMINAL */}
-                    <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: 18, padding: 6, marginBottom: 32, border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: 18, padding: 6, marginBottom: 32 }}>
                         {['login', 'signup'].map((m) => (
                              <button key={m}
                                 type="button"
                                 style={{
                                     flex: 1, borderRadius: 14, padding: '12px 0', fontSize: 14, fontWeight: 800,
-                                    background: mode === m ? 'rgba(139, 92, 246, 0.2)' : 'transparent',
-                                    color: mode === m ? 'white' : 'var(--text-muted)',
-                                    boxShadow: mode === m ? '0 4px 12px rgba(139, 92, 246, 0.3)' : 'none',
-                                    border: mode === m ? '1px solid rgba(139, 92, 246, 0.5)' : '1px solid transparent',
+                                    background: mode === m ? '#fff' : 'transparent',
+                                    color: mode === m ? '#4F46E5' : '#64748B',
+                                    boxShadow: mode === m ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+                                    border: 'none', cursor: 'pointer', transition: 'all 0.3s ease'
                                 }}
                                 onClick={() => { setMode(m); setErrors({}); }}
                             >
@@ -122,26 +122,26 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                         {mode === 'signup' && (
                             <div>
-                                    <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 8, letterSpacing: '0.05em' }}>FULL NAME</label>
+                                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>FULL NAME</label>
                                 <input 
-                                    style={{ width: '100%', background: 'rgba(255,255,255,0.04)', color: 'white', border: `1px solid ${errors.name ? 'var(--error)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
+                                    style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.name ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                     name="name" placeholder="E.g. Disha Jyala" value={form.name} onChange={handleChange} 
                                 />
                             </div>
                         )}
 
                         <div>
-                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 8, letterSpacing: '0.05em' }}>UNIVERSITY EMAIL</label>
+                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>UNIVERSITY EMAIL</label>
                             <input 
-                                style={{ width: '100%', background: 'rgba(255,255,255,0.04)', color: 'white', border: `1px solid ${errors.email ? 'var(--error)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
+                                style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.email ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                 type="email" name="email" placeholder={`id@${UNIVERSITY_DOMAIN}`} value={form.email} onChange={handleChange} 
                             />
                         </div>
 
                         <div style={{ position: 'relative' }}>
-                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 8, letterSpacing: '0.05em' }}>PASSWORD</label>
+                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>PASSWORD</label>
                             <input 
-                                style={{ width: '100%', background: 'rgba(255,255,255,0.04)', color: 'white', border: `1px solid ${errors.password ? 'var(--error)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
+                                style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.password ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                 type="password" name="password" placeholder="••••••••" value={form.password} onChange={handleChange} 
                             />
                         </div>
@@ -150,16 +150,16 @@ export default function LoginPage() {
                             <>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 8, letterSpacing: '0.05em' }}>PHONE NUMBER</label>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>PHONE NUMBER</label>
                                         <input 
-                                            style={{ width: '100%', background: 'rgba(255,255,255,0.04)', color: 'white', border: `1px solid ${errors.phone ? 'var(--error)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
+                                            style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.phone ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                             type="tel" name="phone" placeholder="98XXXXXXXX" value={form.phone} onChange={handleChange} maxLength={10} 
                                         />
                                     </div>
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 8, letterSpacing: '0.05em' }}>ENROLLMENT NO</label>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENROLLMENT NO</label>
                                         <input 
-                                            style={{ width: '100%', background: 'rgba(255,255,255,0.04)', color: 'white', border: `1px solid ${errors.enrollment_no ? 'var(--error)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
+                                            style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.enrollment_no ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
                                             name="enrollment_no" placeholder="E23CSEU..." value={form.enrollment_no} onChange={handleChange} 
                                         />
                                     </div>
@@ -175,8 +175,8 @@ export default function LoginPage() {
                         <button 
                             type="submit" 
                             style={{ 
-                                marginTop: 8, height: 56, background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, 
-                                fontSize: 16, fontWeight: 800, cursor: 'pointer', boxShadow: 'var(--shadow-glow)', transition: 'all 0.2s ease'
+                                marginTop: 8, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 16, 
+                                fontSize: 16, fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.4)', transition: 'all 0.2s ease'
                             }} 
                             className="btn-luxe"
                             disabled={loading}
