@@ -66,7 +66,8 @@ export default function LoginPage() {
         <div className="login-split-page">
             {/* Top Navbar specifically for auth page */}
             <nav className="auth-nav">
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', boxShadow: '0 0 40px rgba(124,58,237,0.3)', borderRadius: '50%', zIndex: -1, pointerEvents: 'none' }}></div>
                     <Link to="/" className="nav-brand" style={{ lineHeight: 1 }}>UniServe</Link>
                     <span style={{ fontSize: '0.65rem', color: 'var(--lp-text-sec)', fontWeight: 600, letterSpacing: '0.05em', marginTop: 4 }}>CAMPUS DELIVERY NETWORK</span>
                 </div>
@@ -118,7 +119,7 @@ export default function LoginPage() {
                         </div>
 
                         {/* Visual Floating Element */}
-                        <div style={{ 
+                        <div className="floating-card visual-element" style={{ 
                             marginTop: '3rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', 
                             borderRadius: 16, padding: '1.5rem', width: 'fit-content', backdropFilter: 'blur(10px)',
                             boxShadow: '0 20px 40px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden'
@@ -173,6 +174,11 @@ export default function LoginPage() {
                                     value={form.email} onChange={handleChange} 
                                     className={errors.email ? 'error-input' : ''}
                                 />
+                                {mode === 'signup' && (
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--lp-text-sec)', marginTop: '0.4rem', fontWeight: 500 }}>
+                                        Only verified university email addresses are allowed.
+                                    </p>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -206,17 +212,17 @@ export default function LoginPage() {
                             )}
 
                             <button type="submit" className="btn-submit" disabled={loading}>
-                                {loading ? 'Processing...' : (mode === 'login' ? 'Sign In' : 'Get Started')}
+                                {loading ? (mode === 'login' ? 'Signing In... ⏳' : 'Creating Account... ⏳') : (mode === 'login' ? 'Sign In' : 'Get Started')}
                             </button>
 
                             {mode === 'login' && (
                                 <div style={{ textAlign: 'center', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--lp-text-sec)' }}>
-                                    New to UniServe? <span onClick={() => { setMode('signup'); setErrors({}); }} style={{ color: 'var(--lp-text)', cursor: 'pointer', fontWeight: 600, borderBottom: '1px solid var(--lp-text)' }}>Create Account →</span>
+                                    New to UniServe? <span onClick={() => { setMode('signup'); setErrors({}); }} className="auth-toggle-link">Create Account →</span>
                                 </div>
                             )}
                             {mode === 'signup' && (
                                 <div style={{ textAlign: 'center', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--lp-text-sec)' }}>
-                                    Already have an account? <span onClick={() => { setMode('login'); setErrors({}); }} style={{ color: 'var(--lp-text)', cursor: 'pointer', fontWeight: 600, borderBottom: '1px solid var(--lp-text)' }}>Sign In →</span>
+                                    Already have an account? <span onClick={() => { setMode('login'); setErrors({}); }} className="auth-toggle-link">Sign In →</span>
                                 </div>
                             )}
                         </form>

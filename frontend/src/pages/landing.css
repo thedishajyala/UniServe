@@ -356,7 +356,7 @@
   align-items: flex-start;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.5rem;
   border-radius: 12px;
 }
 
@@ -473,4 +473,26 @@
   .hero-title { font-size: 3rem; }
   .nav-links { display: none; }
   .features-grid { grid-template-columns: 1fr; }
+}
+
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.floating-card {
+  animation: floatCard 5s ease-in-out infinite;
+}
+
+.auth-toggle-link {
+  color: var(--lp-text);
+  cursor: pointer;
+  font-weight: 600;
+  border-bottom: 1px solid var(--lp-text);
+  transition: all 0.2s ease;
+}
+
+.auth-toggle-link:hover {
+  color: var(--lp-glow);
+  border-bottom-color: var(--lp-glow);
 }

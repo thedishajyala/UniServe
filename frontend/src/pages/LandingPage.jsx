@@ -16,7 +16,8 @@ export default function LandingPage() {
         <div className="landing-page">
             {/* Navbar */}
             <nav className="landing-nav">
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', boxShadow: '0 0 40px rgba(124,58,237,0.3)', borderRadius: '50%', zIndex: -1, pointerEvents: 'none' }}></div>
                     <Link to="/" className="nav-brand" style={{ lineHeight: 1 }}>UniServe</Link>
                     <span style={{ fontSize: '0.65rem', color: 'var(--lp-text-sec)', fontWeight: 600, letterSpacing: '0.05em', marginTop: 4 }}>CAMPUS DELIVERY NETWORK</span>
                 </div>
