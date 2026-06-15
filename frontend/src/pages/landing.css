@@ -229,12 +229,13 @@
 
 .feature-card h3 {
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
+  color: #FFFFFF;
   margin-bottom: 0.5rem;
 }
 
 .feature-card p {
-  color: var(--lp-text-sec);
+  color: #A1A1AA;
   font-size: 0.95rem;
   line-height: 1.5;
 }
@@ -357,11 +358,13 @@
 
 .auth-feature-item h3 {
   font-size: 1.2rem;
+  font-weight: 600;
+  color: #FFFFFF;
   margin-bottom: 0.2rem;
 }
 
 .auth-feature-item p {
-  color: var(--lp-text-sec);
+  color: #A1A1AA;
   font-size: 0.95rem;
 }
 
@@ -385,11 +388,13 @@
 
 .auth-header h2 {
   font-size: 2rem;
+  font-weight: 600;
+  color: #FFFFFF;
   margin-bottom: 0.5rem;
 }
 
 .auth-header p {
-  color: var(--lp-text-sec);
+  color: #A1A1AA;
 }
 
 .auth-form {
