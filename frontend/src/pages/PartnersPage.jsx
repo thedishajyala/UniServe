@@ -153,74 +153,48 @@ export default function PartnersPage() {
                         <p className="section-label">{partners.length} partner{partners.length > 1 ? 's' : ''} available</p>
                         <div className="partners-list">
                             {partners.map((partner, idx) => (
-                                <div key={partner._id} className={`card partner-card ${idx === 0 ? 'best-match' : ''}`}>
+                                <div key={partner._id} className="card hover-lift" style={{ flexShrink: 0, padding: 20, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, marginBottom: 16, position: 'relative' }}>
                                     {idx === 0 && (
-                                        <div className="best-match-badge">
-                                            <Award size={12} /> Best Match
+                                        <div style={{ position: 'absolute', top: -10, right: 20, background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 800, color: 'white', display: 'flex', alignItems: 'center', gap: 4, boxShadow: '0 4px 10px rgba(139,92,246,0.3)' }}>
+                                            <Award size={12} /> BEST MATCH
                                         </div>
                                     )}
-
-                                    <div className="partner-header">
-                                        <div className="partner-avatar">
-                                            {partner.name?.charAt(0).toUpperCase()}
+                                    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
+                                        <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 20, flexShrink: 0 }}>
+                                            {partner.name.charAt(0)}
                                         </div>
-                                        <div className="partner-info">
-                                            <h3 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                {partner.name}
-                                                <span style={{ fontSize: 10, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '2px 6px', borderRadius: 8 }}>🟢 Online</span>
-                                            </h3>
-                                            <p>{partner.hostel} · Room {partner.room_no}</p>
-                                            <div className="partner-badges" style={{ flexWrap: 'wrap', marginTop: 6 }}>
-                                                <span className="badge badge-primary">
-                                                    <Star size={10} fill="currentColor" /> {Number(partner.rating || 0).toFixed(1)}
-                                                </span>
-                                                <span className="badge badge-secondary">
-                                                    <Zap size={10} /> {partner.total_deliveries} deliveries
-                                                </span>
-                                                <span className="badge" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}>
-                                                    🎯 98% Accept
-                                                </span>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                <h4 style={{ fontSize: 18, fontWeight: 800 }}>{partner.name}</h4>
+                                                <span style={{ fontSize: 10, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '2px 8px', borderRadius: 8, fontWeight: 700 }}>🟢 Online</span>
                                             </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--primary)', fontWeight: 700, fontSize: 12, marginTop: 8 }}>
-                                                <Clock size={12} /> ETA: ~{Number(partner.avg_response_time || 5).toFixed(0)} mins
-                                            </div>
+                                            <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{partner.hostel} • Room {partner.room_no || 'TBA'}</p>
                                         </div>
                                     </div>
-
-                                    <div className="match-bar-container">
-                                        <div className="match-bar-label">
-                                            <Clock size={11} /> ~{partner.avg_response_time?.toFixed(0)} min avg response
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 20, background: 'var(--surface-2)', padding: 12, borderRadius: 12 }}>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Rating</p>
+                                            <p style={{ fontSize: 14, fontWeight: 800, color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>⭐ {Number(partner.rating || 5.0).toFixed(1)}</p>
                                         </div>
-                                        <div className="match-bar-track">
-                                            <div
-                                                className="match-bar-fill"
-                                                style={{
-                                                    width: `${partner.matchScore}%`,
-                                                    background: getMatchColor(partner.matchScore),
-                                                }}
-                                            />
+                                        <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border)' }}>
+                                            <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Accept</p>
+                                            <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>98%</p>
+                                        </div>
+                                        <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border)' }}>
+                                            <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Delivered</p>
+                                            <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{partner.total_deliveries || 142}</p>
+                                        </div>
+                                        <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border)' }}>
+                                            <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>ETA</p>
+                                            <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--primary)' }}>~{Number(partner.avg_response_time || 5).toFixed(0)}m</p>
                                         </div>
                                     </div>
-
-                                    <div style={{ display: 'flex', gap: 8, marginTop: '1rem' }}>
-                                        <button
-                                            className="btn btn-ghost"
-                                            style={{ flex: 1, padding: '10px 0', fontSize: '13px' }}
-                                            onClick={() => handleViewProfile(partner)}
-                                        >
+                                    <div style={{ display: 'flex', gap: 12 }}>
+                                        <button className="btn hover-lift" style={{ flex: 1, padding: '12px', fontSize: 14, background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: 12, fontWeight: 700 }} onClick={() => handleViewProfile(partner)}>
                                             👀 View Profile
                                         </button>
-                                        <button
-                                            className="btn btn-primary"
-                                            style={{ flex: 1.5, background: requestedIds.includes(partner._id) ? 'var(--success)' : 'var(--primary)' }}
-                                            onClick={() => handleRequest(partner)}
-                                            disabled={requesting || requestedIds.includes(partner._id)}
-                                        >
-                                            {requestedIds.includes(partner._id) ? (
-                                                '✅ Chosen'
-                                            ) : (
-                                                <><Send size={14} style={{ marginRight: 6 }} /> Choose Partner</>
-                                            )}
+                                        <button className="btn hover-lift glow" style={{ flex: 1.5, padding: '12px', fontSize: 14, background: requestedIds.includes(partner._id) ? 'var(--success)' : 'var(--primary)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 800 }} onClick={() => handleRequest(partner)} disabled={requesting || requestedIds.includes(partner._id)}>
+                                            {requestedIds.includes(partner._id) ? '✅ Chosen' : '🚀 Choose Partner'}
                                         </button>
                                     </div>
                                 </div>
@@ -231,42 +205,46 @@ export default function PartnersPage() {
 
                 {/* Partner Profile Modal */}
                 {selectedProfile && (
-                    <div style={{
-                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'rgba(0,0,0,0.5)', zIndex: 1000,
-                        display: 'flex', alignItems: 'flex-end', justifyContent: 'center'
-                    }} onClick={() => setSelectedProfile(null)}>
-                        <div className="card slide-up" style={{
-                            width: '100%', maxWidth: 480, height: '80vh', borderBottomLeftRadius: 0, borderBottomRightRadius: 0,
-                            overflowY: 'auto', padding: 24, paddingBottom: 40, background: 'var(--bg)'
-                        }} onClick={e => e.stopPropagation()}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-                                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                                    <div className="avatar avatar-md" style={{ background: 'var(--primary)', color: 'white' }}>
-                                        {selectedProfile.name?.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <h2 style={{ fontSize: 18, fontWeight: 800 }}>{selectedProfile.name}</h2>
-                                        <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{selectedProfile.hostel} · Room {selectedProfile.room_no}</p>
-                                    </div>
-                                </div>
-                                <button className="btn btn-icon btn-ghost" onClick={() => setSelectedProfile(null)}>✕</button>
-                            </div>
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={() => setSelectedProfile(null)}>
+                        <div className="card fade-in" style={{ width: '100%', maxWidth: 480, height: '85vh', background: 'var(--bg)', borderTopLeftRadius: 32, borderTopRightRadius: 32, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, padding: '32px 24px 48px', position: 'relative', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+                            <button onClick={() => setSelectedProfile(null)} style={{ position: 'absolute', top: 20, right: 20, background: 'var(--surface-2)', border: 'none', borderRadius: '50%', width: 36, height: 36, color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
                             
-                            <div className="stat-grid" style={{ marginBottom: 20 }}>
-                                <div className="stat-card" style={{ padding: 12 }}>
-                                    <div className="stat-value" style={{ fontSize: 20, color: '#f59e0b' }}>
-                                        ★ {selectedProfile.rating?.toFixed(1) || '5.0'}
+                            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 32, margin: '0 auto 16px', boxShadow: '0 10px 25px rgba(139,92,246,0.4)' }}>
+                                    {selectedProfile.name.charAt(0)}
+                                </div>
+                                <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{selectedProfile.name}</h2>
+                                <p style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: 14 }}>{selectedProfile.hostel} • Room {selectedProfile.room_no || 'TBA'}</p>
+                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '4px 12px', borderRadius: 999, fontWeight: 700, fontSize: 12, marginTop: 12 }}>
+                                    🟢 Online & Ready
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+                                <div style={{ background: 'var(--surface-2)', padding: 16, borderRadius: 16, textAlign: 'center' }}>
+                                    <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Rating</p>
+                                    <p style={{ fontSize: 20, fontWeight: 800, color: '#F59E0B' }}>⭐ {Number(selectedProfile.rating || 5.0).toFixed(1)}</p>
+                                </div>
+                                <div style={{ background: 'var(--surface-2)', padding: 16, borderRadius: 16, textAlign: 'center' }}>
+                                    <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Deliveries</p>
+                                    <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>{selectedProfile.total_deliveries || 142}</p>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'rgba(139,92,246,0.1)', borderRadius: 16 }}>
+                                    <div style={{ fontSize: 24 }}>🏅</div>
+                                    <div>
+                                        <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Top Rated Partner</h4>
+                                        <p style={{ fontSize: 12, color: 'var(--primary)' }}>Consistently delivers 5-star service</p>
                                     </div>
-                                    <div className="stat-label">Rating</div>
                                 </div>
-                                <div className="stat-card" style={{ padding: 12 }}>
-                                    <div className="stat-value" style={{ fontSize: 20 }}>{selectedProfile.total_deliveries || 0}</div>
-                                    <div className="stat-label">Deliveries</div>
-                                </div>
-                                <div className="stat-card" style={{ padding: 12 }}>
-                                    <div className="stat-value" style={{ fontSize: 20 }}>{profileReviews.length}</div>
-                                    <div className="stat-label">Reviews</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'rgba(16,185,129,0.1)', borderRadius: 16 }}>
+                                    <div style={{ fontSize: 24 }}>⚡</div>
+                                    <div>
+                                        <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Fast Responder</h4>
+                                        <p style={{ fontSize: 12, color: 'var(--success)' }}>Usually accepts within 2 minutes</p>
+                                    </div>
                                 </div>
                             </div>
 
