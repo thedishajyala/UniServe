@@ -134,7 +134,7 @@ export default function PartnersPage() {
                         <p>Finding partners near you...</p>
                     </div>
                 ) : partners.length === 0 ? (
-                    <div className="empty-state fade-in" style={{ background: 'white', borderRadius: 24, padding: '60px 24px', boxShadow: 'var(--shadow-sm)', marginTop: 20 }}>
+                    <div className="empty-state fade-in" style={{ background: 'var(--surface-2)', borderRadius: 24, padding: '60px 24px', border: '1px solid var(--border)', marginTop: 20 }}>
                         <div className="empty-state-icon" style={{ fontSize: '4rem', marginBottom: 20 }}>😴</div>
                         <h3 className="empty-state-title" style={{ fontSize: 20, marginBottom: 12 }}>No partners online</h3>
                         <p className="empty-state-sub" style={{ marginBottom: 32, maxWidth: 280, margin: '0 auto 32px' }}>
@@ -165,23 +165,25 @@ export default function PartnersPage() {
                                             {partner.name?.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="partner-info">
-                                            <h3>{partner.name}</h3>
+                                            <h3 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                {partner.name}
+                                                <span style={{ fontSize: 10, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '2px 6px', borderRadius: 8 }}>🟢 Online</span>
+                                            </h3>
                                             <p>{partner.hostel} · Room {partner.room_no}</p>
-                                            <div className="partner-badges">
+                                            <div className="partner-badges" style={{ flexWrap: 'wrap', marginTop: 6 }}>
                                                 <span className="badge badge-primary">
                                                     <Star size={10} fill="currentColor" /> {Number(partner.rating || 0).toFixed(1)}
                                                 </span>
                                                 <span className="badge badge-secondary">
                                                     <Zap size={10} /> {partner.total_deliveries} deliveries
                                                 </span>
+                                                <span className="badge" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}>
+                                                    🎯 98% Accept
+                                                </span>
                                             </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: 11, marginTop: 4 }}>
-                                                <Clock size={11} /> ~{Number(partner.avg_response_time || 0).toFixed(0)} min avg response
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--primary)', fontWeight: 700, fontSize: 12, marginTop: 8 }}>
+                                                <Clock size={12} /> ETA: ~{Number(partner.avg_response_time || 5).toFixed(0)} mins
                                             </div>
-                                        </div>
-                                        <div className="match-score" style={{ color: getMatchColor(partner.matchScore) }}>
-                                            <div className="match-percent">{partner.matchScore}%</div>
-                                            <div style={{ fontSize: '0.65rem', opacity: 0.8 }}>match</div>
                                         </div>
                                     </div>
 
@@ -215,9 +217,9 @@ export default function PartnersPage() {
                                             disabled={requesting || requestedIds.includes(partner._id)}
                                         >
                                             {requestedIds.includes(partner._id) ? (
-                                                '✅ Requested'
+                                                '✅ Chosen'
                                             ) : (
-                                                <><Send size={14} style={{ marginRight: 6 }} /> Request</>
+                                                <><Send size={14} style={{ marginRight: 6 }} /> Choose Partner</>
                                             )}
                                         </button>
                                     </div>

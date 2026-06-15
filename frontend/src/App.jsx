@@ -102,7 +102,7 @@ function AppRoutes() {
       <Route path="/order/:orderId/track" element={<ProtectedRoute><TrackingPage /></ProtectedRoute>} />
       <Route path="/order/:orderId/review" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
       <Route path="/earnings" element={<ProtectedRoute><EarningsPage /></ProtectedRoute>} />
-      <Route path="/my-orders" element={<ProtectedRoute><MyOrdersPage /></ProtectedRoute>} />
+      <Route path="/orders" element={<ProtectedRoute><MyOrdersPage /></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -121,11 +121,14 @@ export default function App() {
             toastOptions={{
               duration: 3000,
               style: {
-                borderRadius: '12px',
+                borderRadius: '16px',
                 fontFamily: 'Outfit, sans-serif',
                 fontWeight: 600,
                 fontSize: 14,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+                boxShadow: 'var(--shadow-lg)',
+                background: 'var(--surface-2)',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
               },
             }}
           />

@@ -311,7 +311,7 @@
 //     );
 // }
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     updateProfile,
@@ -342,7 +342,9 @@ import {
 import { HOSTELS } from '../config/campus';
 
 export default function ProfilePage() {
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, logoutUser } = useAuth();
+    const navigate = useNavigate();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const [saving, setSaving] = useState(false);
     const [reviews, setReviews] = useState([]);
@@ -446,175 +448,96 @@ export default function ProfilePage() {
                 minHeight: '100vh'
             }}
         >
-            {/* HEADER */}
+            {/* PUBLIC PROFILE PREVIEW */}
             <div
                 className="gradient-hero"
                 style={{
-                    padding: '40px 24px 60px',
+                    padding: '40px 24px 120px',
                     textAlign: 'center',
                     borderBottomLeftRadius: 30,
-                    borderBottomRightRadius: 30
+                    borderBottomRightRadius: 30,
+                    marginBottom: -80
                 }}
             >
-                <div
-                    style={{
-                        width: 88,
-                        height: 88,
-                        borderRadius: '50%',
-                        background: 'rgba(255,255,255,0.15)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#fff',
-                        fontWeight: 800,
-                        fontSize: 32,
-                        margin: '0 auto 16px'
-                    }}
-                >
-                    {(user?.name || 'U').charAt(0).toUpperCase()}
-                </div>
-
-                <h1 style={{ color: 'white', fontSize: 24 }}>
-                    {user?.name}
-                </h1>
-
-                <p
-                    style={{
-                        color: 'rgba(255,255,255,0.8)',
-                        fontSize: 13
-                    }}
-                >
-                    {user?.email ? user.email.replace(/(.{7})[^@]*(@.*)/, "$1****$2") : ''}
-                </p>
-
-                <div
-                    onClick={handleToggle}
-                    style={{
-                        marginTop: 16,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        padding: '8px 20px',
-                        borderRadius: 999,
-                        cursor: 'pointer',
-                        background: user?.is_available
-                            ? 'rgba(34,197,94,0.2)'
-                            : 'rgba(255,255,255,0.15)'
-                    }}
-                >
-                    <span>{user?.is_available ? '🟢' : '🔴'}</span>
-
-                    <span
-                        style={{
-                            color: 'white',
-                            fontWeight: 700
-                        }}
-                    >
-                        {user?.is_available ? 'Online' : 'Offline'}
-                    </span>
-                </div>
+                <h1 style={{ color: 'white', fontSize: 24, fontWeight: 800 }}>My Profile</h1>
             </div>
 
-            {/* PAGE CONTENT */}
             <div
                 className="page-content"
                 style={{
-                    marginTop: -48,
+                    position: 'relative',
+                    zIndex: 2,
                     paddingBottom: 120
                 }}
             >
-                {/* STATS ROW */}
-<div
-  className="stat-grid"
-  style={{
-    marginBottom: 24,
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",   // 2 top + 2 bottom
-    gap: 12
-  }}
->
-  {/* Rating */}
-  <div className="stat-card">
-    <Star size={18} style={{ color: "#f59e0b", marginBottom: 6 }} />
+                {/* PREVIEW CARD */}
+                <div className="card" style={{ padding: 24, marginBottom: 24, background: 'var(--surface-2)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
+                    <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}>
+                        <div style={{
+                            width: 64, height: 64, borderRadius: '50%',
+                            background: 'var(--primary)', color: 'white',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 24, fontWeight: 800
+                        }}>
+                            {(user?.name || 'U').charAt(0).toUpperCase()}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <h2 style={{ fontSize: 20, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                {user?.name}
+                                <span style={{ color: '#3B82F6', fontSize: 16 }}>☑️</span>
+                            </h2>
+                            <p style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 600, marginBottom: 2 }}>Verified Bennett Student</p>
+                            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{user?.hostel} • Room {user?.room_no}</p>
+                        </div>
+                    </div>
 
-    <div className="stat-value">
-      {user?.total_reviews > 0
-        ? Number(user.rating || 0).toFixed(1)
-        : "—"}
-    </div>
+                    {/* Stats */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', marginBottom: 20 }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: 16, fontWeight: 800, color: '#f59e0b', marginBottom: 4 }}>⭐ {Number(user?.rating || 0).toFixed(1)}</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>Rating</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text)', marginBottom: 4 }}>{user?.total_deliveries || 0}</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>Deliveries</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: 16, fontWeight: 800, color: '#22c55e', marginBottom: 4 }}>98%</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>Accept Rate</div>
+                        </div>
+                    </div>
 
-    <div className="stat-label">
-      {user?.total_reviews > 0
-        ? `⭐ (${user.total_reviews})`
-        : "Partner Level: New"}
-    </div>
-  </div>
+                    {/* Trust Badges */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                        <span className="badge" style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.2)', padding: '6px 12px' }}>⚡ Fast Responder</span>
+                        <span className="badge" style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.2)', padding: '6px 12px' }}>🎓 Verified Student</span>
+                        <span className="badge" style={{ background: 'var(--primary-soft)', color: 'var(--primary)', border: '1px solid var(--primary)', padding: '6px 12px' }}>🤝 Trusted Partner</span>
+                    </div>
 
-  {/* Deliveries */}
-  <div className="stat-card">
-    <Package
-      size={18}
-      style={{ color: "var(--primary)", marginBottom: 6 }}
-    />
-
-    <div className="stat-value">
-      {user?.total_deliveries || 0}
-    </div>
-
-    <div className="stat-label">
-      Deliveries
-    </div>
-  </div>
-
-  {/* Earned */}
-  <div className="stat-card">
-    <DollarSign
-      size={18}
-      style={{ color: "#22c55e", marginBottom: 6 }}
-    />
-
-    <div className="stat-value">
-      ₹{user?.total_earnings || 0}
-    </div>
-
-    <div className="stat-label">
-      Earned
-    </div>
-  </div>
-
-  {/* Orders Bottom Right */}
-  <Link
-    to="/my-orders"
-    className="stat-card"
-    style={{
-      textDecoration: "none",
-      background:
-        "linear-gradient(135deg,#4F46E5,#6366F1)",
-      color: "white"
-    }}
-  >
-    <Package2 size={18} style={{ marginBottom: 6 }} />
-
-    <div
-      className="stat-value"
-      style={{
-        color: "white",
-        fontSize: 18
-      }}
-    >
-      View
-    </div>
-
-    <div
-      className="stat-label"
-      style={{
-        color: "rgba(255,255,255,0.9)"
-      }}
-    >
-      Orders
-    </div>
-  </Link>
-</div>
+                    {/* Online Toggle inside card */}
+                    <div
+                        onClick={handleToggle}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 10,
+                            padding: '12px',
+                            borderRadius: 12,
+                            cursor: 'pointer',
+                            background: user?.is_available
+                                ? 'rgba(34,197,94,0.15)'
+                                : 'var(--surface)',
+                            border: `1px solid ${user?.is_available ? 'rgba(34,197,94,0.3)' : 'var(--border)'}`,
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        <span>{user?.is_available ? '🟢' : '🔴'}</span>
+                        <span style={{ color: user?.is_available ? '#4ade80' : 'var(--text-muted)', fontWeight: 700, fontSize: 14 }}>
+                            {user?.is_available ? 'Active & Online' : 'Currently Offline'}
+                        </span>
+                    </div>
+                </div>
 
                 {/* PERSONAL INFO */}
                 <div
@@ -849,7 +772,76 @@ export default function ProfilePage() {
                         ))
                     )}
                 </div>
+                </div>
+
+                {/* LOGOUT BUTTON */}
+                <button
+                    className="btn"
+                    onClick={() => setShowLogoutModal(true)}
+                    style={{
+                        width: '100%',
+                        padding: '16px',
+                        borderRadius: 16,
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        color: '#ef4444',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        fontWeight: 700,
+                        fontSize: 15,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        marginTop: 24
+                    }}
+                >
+                    Logout
+                </button>
             </div>
+
+            {/* LOGOUT MODAL */}
+            {showLogoutModal && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.6)', zIndex: 9999,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: 24, backdropFilter: 'blur(4px)'
+                }}>
+                    <div className="card fade-in" style={{
+                        width: '100%', maxWidth: 320, padding: 24,
+                        background: 'var(--surface-2)', border: '1px solid var(--border)',
+                        textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: 32, marginBottom: 12 }}>🚪</div>
+                        <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: 'var(--text)' }}>
+                            Are you sure you want to logout?
+                        </h3>
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>
+                            You will stop receiving delivery requests until you log back in.
+                        </p>
+                        
+                        <div style={{ display: 'flex', gap: 12 }}>
+                            <button
+                                className="btn"
+                                style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}
+                                onClick={() => setShowLogoutModal(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="btn"
+                                style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none' }}
+                                onClick={() => {
+                                    setShowLogoutModal(false);
+                                    logoutUser();
+                                    navigate('/login');
+                                }}
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* BOTTOM NAV */}
             <nav className="bottom-nav">

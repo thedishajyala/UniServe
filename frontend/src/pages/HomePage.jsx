@@ -105,7 +105,13 @@ export default function HomePage() {
                 getMyOrders(), getDemandAnalytics(), getMyDeliveries(), getOnlinePartners().catch(() => ({ data: [] })),
                 getEarnings().catch(() => ({ data: {} }))
             ]);
-            setOrders(ordersRes.data);
+            const allOrders = ordersRes.data || [];
+            const validOrders = allOrders.filter(o => {
+                const isDummy = ['hj', 'dfg', 'yghj'].includes(o.pickup_location?.toLowerCase()) || 
+                                ['hj', 'dfg', 'yghj'].includes(o.item_details?.toLowerCase());
+                return !isDummy;
+            });
+            setOrders(validOrders);
             setDemand(demandRes.data);
             setActiveDeliveries(deliveriesRes.data.filter(d => ['accepted', 'picked', 'on_the_way'].includes(d.status)));
             setOnlinePartners(partnersRes.data || []);
