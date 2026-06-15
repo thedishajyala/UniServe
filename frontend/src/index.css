@@ -2,23 +2,23 @@
 
 /* ===== CSS VARIABLES ===== */
 :root {
-  --primary: #7C3AED;
-  --primary-dark: #6D28D9;
-  --primary-light: #8B5CF6;
-  --primary-soft: rgba(124,58,237,0.15);
+  --primary: #8B5CF6;
+  --primary-dark: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-soft: rgba(139,92,246,0.15);
   --secondary: #A855F7;
   --secondary-light: #C084FC;
 
-  --bg: #0A0A0A;
+  --bg: #050505;
   --bg-dark: #000000;
   --surface: #111111;
-  --surface-2: #171717;
+  --surface-2: #1A1A1A;
   --card: #111111;
-  --card-dark: #111111;
+  --card-dark: #0A0A0A;
 
-  --text-primary: #F8FAFC;
+  --text-primary: #FFFFFF;
   --text-secondary: #A1A1AA;
-  --text-muted: #A1A1AA;
+  --text-muted: #71717A;
 
   --success: #10B981;
   --success-light: rgba(16, 185, 129, 0.1);
@@ -92,6 +92,29 @@ h1, h2, h3, h4, h5, h6 {
 .gap-4 { gap: 16px; }
 .w-full { width: 100%; }
 .text-center { text-align: center; }
+
+/* ===== GLOBAL MICRO ANIMATIONS ===== */
+.hover-lift {
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.glow {
+  box-shadow: 0 0 20px rgba(139,92,246,0.15);
+  transition: box-shadow var(--transition);
+}
+.glow:hover {
+  box-shadow: 0 0 30px rgba(139,92,246,0.3);
+}
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* ===== CARD ===== */
 .card {
@@ -454,17 +477,20 @@ select.input {
 /* ===== BOTTOM NAV ===== */
 .bottom-nav {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  max-width: 432px;
+  margin: 0 auto;
   background: rgba(17, 17, 17, 0.85);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
   display: flex;
-  padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  padding: 12px 16px;
   z-index: 200;
-  box-shadow: 0 -10px 25px rgba(0,0,0,0.03);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 .nav-item {
   flex: 1;
@@ -484,7 +510,7 @@ select.input {
 .nav-label { font-size: 11px; font-weight: 700; font-family: 'Outfit', sans-serif; letter-spacing: 0.01em; }
 
 .nav-icon-wrapper {
-  padding: 6px 16px;
+  padding: 8px 20px;
   border-radius: 999px;
   transition: all var(--transition-bounce);
   display: flex;
@@ -494,8 +520,8 @@ select.input {
 .nav-item.active .nav-icon-wrapper {
   background: var(--primary-soft);
   color: var(--primary);
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.2);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 0 20px rgba(139,92,246,0.3);
 }
 
 /* ===== PRICE TAG ===== */
