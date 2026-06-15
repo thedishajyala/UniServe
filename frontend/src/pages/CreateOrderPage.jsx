@@ -165,7 +165,7 @@ export default function CreateOrderPage() {
                                     <button key={opt.key}
                                         style={{
                                             flex: 1, padding: '12px 8px', borderRadius: 12, border: `2px solid ${form.pickup_type === opt.key ? 'var(--primary)' : 'var(--border)'}`,
-                                            background: form.pickup_type === opt.key ? 'rgba(79,70,229,0.08)' : 'white',
+                                            background: form.pickup_type === opt.key ? 'var(--primary-soft)' : 'var(--surface-2)',
                                             color: form.pickup_type === opt.key ? 'var(--primary)' : 'var(--text-secondary)',
                                             fontFamily: 'Outfit, sans-serif', fontWeight: 600, fontSize: 12, cursor: 'pointer',
                                             transition: 'all 0.2s ease'
@@ -195,7 +195,7 @@ export default function CreateOrderPage() {
                                         <button key={g.value}
                                             style={{
                                                 padding: '14px 18px', borderRadius: 12, border: `2px solid ${form.pickup_location === g.value ? 'var(--primary)' : 'var(--border)'}`,
-                                                background: form.pickup_location === g.value ? 'rgba(79,70,229,0.08)' : 'white',
+                                                background: form.pickup_location === g.value ? 'var(--primary-soft)' : 'var(--surface-2)',
                                                 textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s'
                                             }}
                                             onClick={() => setForm((f) => ({ ...f, pickup_location: g.value }))}>
@@ -226,7 +226,7 @@ export default function CreateOrderPage() {
                         )}
 
                         {pricing && (
-                            <div className="card" style={{ padding: 16, background: 'rgba(79,70,229,0.04)', border: '1px solid rgba(79,70,229,0.2)' }}>
+                            <div className="card" style={{ padding: 16, background: 'var(--primary-soft)', border: '1px solid var(--primary)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div>
                                         <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 16 }}>Delivery Fee</p>
@@ -281,8 +281,8 @@ export default function CreateOrderPage() {
                         <div className="input-group">
                             <label className="input-label">Have you already paid for the item?</label>
                             <div style={{ display: 'flex', gap: 10 }}>
-                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: form.is_prepaid ? 'rgba(79,70,229,0.08)' : 'white' }} onClick={() => setForm(f => ({ ...f, is_prepaid: true }))}>✅ Paid @ Shop</button>
-                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${!form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: !form.is_prepaid ? 'rgba(79,70,229,0.08)' : 'white' }} onClick={() => setForm(f => ({ ...f, is_prepaid: false }))}>💵 Cash @ Door</button>
+                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: form.is_prepaid ? 'var(--primary-soft)' : 'var(--surface-2)', color: 'var(--text)' }} onClick={() => setForm(f => ({ ...f, is_prepaid: true }))}>✅ Paid @ Shop</button>
+                                <button className="btn" style={{ flex: 1, padding: '12px', border: `2px solid ${!form.is_prepaid ? 'var(--primary)' : 'var(--border)'}`, background: !form.is_prepaid ? 'var(--primary-soft)' : 'var(--surface-2)', color: 'var(--text)' }} onClick={() => setForm(f => ({ ...f, is_prepaid: false }))}>💵 Cash @ Door</button>
                             </div>
                         </div>
 
@@ -326,14 +326,14 @@ export default function CreateOrderPage() {
                             <label className="input-label">Pay Delivery Fee via</label>
                             <div style={{ display: 'flex', gap: 10 }}>
                                 <button className="btn" 
-                                    style={{ flex: 1, padding: '16px', borderRadius: 16, border: `2px solid ${form.payment_method === 'online' ? 'var(--primary)' : 'var(--border)'}`, background: form.payment_method === 'online' ? 'rgba(79,70,229,0.08)' : 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+                                    style={{ flex: 1, padding: '16px', borderRadius: 16, border: `2px solid ${form.payment_method === 'online' ? 'var(--primary)' : 'var(--border)'}`, background: form.payment_method === 'online' ? 'var(--primary-soft)' : 'var(--surface-2)', color: 'var(--text)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
                                     onClick={() => setForm(f => ({ ...f, payment_method: 'online' }))}>
                                     <span style={{ fontSize: 20 }}>💳</span>
                                     <span style={{ fontWeight: 700, fontSize: 12 }}>Pay Online</span>
                                 </button>
                                 <button className="btn" 
                                     disabled={form.pickup_type === 'outlet'}
-                                    style={{ flex: 1, padding: '16px', borderRadius: 16, border: `2px solid ${form.payment_method === 'cash' ? 'var(--primary)' : 'var(--border)'}`, background: form.payment_method === 'cash' ? 'rgba(79,70,229,0.08)' : 'white', opacity: form.pickup_type === 'outlet' ? 0.5 : 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+                                    style={{ flex: 1, padding: '16px', borderRadius: 16, border: `2px solid ${form.payment_method === 'cash' ? 'var(--primary)' : 'var(--border)'}`, background: form.payment_method === 'cash' ? 'var(--primary-soft)' : 'var(--surface-2)', color: 'var(--text)', opacity: form.pickup_type === 'outlet' ? 0.5 : 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
                                     onClick={() => setForm(f => ({ ...f, payment_method: 'cash' }))}>
                                     <span style={{ fontSize: 20 }}>💵</span>
                                     <span style={{ fontWeight: 700, fontSize: 12 }}>Cash on Delivery</span>

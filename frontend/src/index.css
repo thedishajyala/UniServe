@@ -2,35 +2,38 @@
 
 /* ===== CSS VARIABLES ===== */
 :root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818CF8;
-  --secondary: #a855f7;
-  --secondary-light: #c084fc;
+  --primary: #7C3AED;
+  --primary-dark: #6D28D9;
+  --primary-light: #8B5CF6;
+  --primary-soft: rgba(124,58,237,0.15);
+  --secondary: #A855F7;
+  --secondary-light: #C084FC;
 
-  --bg: #FAFBFF;
-  --bg-dark: #09090B;
-  --card: #FFFFFF;
-  --card-dark: #18181B;
+  --bg: #0A0A0A;
+  --bg-dark: #000000;
+  --surface: #111111;
+  --surface-2: #171717;
+  --card: #111111;
+  --card-dark: #111111;
 
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
+  --text-primary: #F8FAFC;
+  --text-secondary: #A1A1AA;
+  --text-muted: #A1A1AA;
 
   --success: #10B981;
-  --success-light: #ECFDF5;
+  --success-light: rgba(16, 185, 129, 0.1);
   --error: #EF4444;
-  --error-light: #FEF2F2;
+  --error-light: rgba(239, 68, 68, 0.1);
   --warning: #F59E0B;
-  --warning-light: #FFFBEB;
+  --warning-light: rgba(245, 158, 11, 0.1);
 
-  --border: #F1F5F9;
-  --border-strong: #E2E8F0;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
   
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.02);
-  --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.04), 0 4px 6px -2px rgba(0,0,0,0.02);
-  --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -5px rgba(0,0,0,0.03);
-  --shadow-glow: 0 0 20px rgba(99,102,241,0.15);
+  --shadow-sm: 0 4px 10px rgba(0,0,0,0.2);
+  --shadow-md: 0 10px 30px rgba(0,0,0,0.3);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.35);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.15);
 
   --radius-sm: 12px;
   --radius-md: 18px;
@@ -95,8 +98,8 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--card);
   border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
   transition: all var(--transition);
 }
 
@@ -239,12 +242,12 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 500;
   color: var(--text-primary);
-  background: #fdfdfd;
-  border: 1px solid var(--border);
+  background: var(--bg);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius-md);
   outline: none;
   transition: all var(--transition);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
 }
 .input:focus {
   border-color: var(--primary);
@@ -453,7 +456,7 @@ select.input {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(10, 10, 10, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border);
@@ -488,10 +491,10 @@ select.input {
   justify-content: center;
 }
 .nav-item.active .nav-icon-wrapper {
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--primary-soft);
   color: var(--primary);
   transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.2);
 }
 
 /* ===== PRICE TAG ===== */

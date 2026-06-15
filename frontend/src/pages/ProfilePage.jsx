@@ -450,7 +450,7 @@ export default function ProfilePage() {
             <div
                 className="gradient-hero"
                 style={{
-                    padding: '48px 24px 80px',
+                    padding: '40px 24px 60px',
                     textAlign: 'center',
                     borderBottomLeftRadius: 30,
                     borderBottomRightRadius: 30
@@ -484,7 +484,7 @@ export default function ProfilePage() {
                         fontSize: 13
                     }}
                 >
-                    {user?.email}
+                    {user?.email ? user.email.replace(/(.{7})[^@]*(@.*)/, "$1****$2") : ''}
                 </p>
 
                 <div
@@ -546,7 +546,7 @@ export default function ProfilePage() {
     <div className="stat-label">
       {user?.total_reviews > 0
         ? `⭐ (${user.total_reviews})`
-        : "New 🆕"}
+        : "Partner Level: New"}
     </div>
   </div>
 
@@ -640,7 +640,7 @@ export default function ProfilePage() {
 
                     <input
                         className="input"
-                        value={user?.email || ''}
+                        value={user?.email ? user.email.replace(/(.{7})[^@]*(@.*)/, "$1****$2") : ''}
                         disabled
                         style={{ marginBottom: 12 }}
                     />
@@ -648,7 +648,7 @@ export default function ProfilePage() {
                     <input
                         className="input"
                         placeholder="Phone"
-                        value={form.phone}
+                        value={form.phone ? form.phone.replace(/.(?=.{4})/g, '*') : ''}
                         onChange={(e) =>
                             handleChange('phone', e.target.value)
                         }
@@ -859,6 +859,15 @@ export default function ProfilePage() {
                     </div>
                     <span className="nav-label">
                         Home
+                    </span>
+                </Link>
+
+                <Link to="/orders" className="nav-item">
+                    <div className="nav-icon-wrapper">
+                        <Package size={20} />
+                    </div>
+                    <span className="nav-label">
+                        Orders
                     </span>
                 </Link>
 

@@ -32,6 +32,10 @@ function BottomNav() {
                 <div className={`nav-icon-wrapper ${path === '/' ? 'active-pill' : ''}`}><Home size={20} /></div>
                 <span className="nav-label">Home</span>
             </Link>
+            <Link to="/orders" className={`nav-item ${path === '/orders' ? 'active' : ''}`}>
+                <div className={`nav-icon-wrapper ${path === '/orders' ? 'active-pill' : ''}`}><Package size={20} /></div>
+                <span className="nav-label">Orders</span>
+            </Link>
             <Link to="/earnings" className={`nav-item ${path === '/earnings' ? 'active' : ''}`}>
                 <div className={`nav-icon-wrapper ${path === '/earnings' ? 'active-pill' : ''}`}><TrendingUp size={20} /></div>
                 <span className="nav-label">Earnings</span>
@@ -89,7 +93,11 @@ export default function HomePage() {
 
     const topRestaurants = useMemo(() => getTopRestaurantsFromOrders(orders, 6), [orders]);
     const recentOrdersList = useMemo(() => orders.slice(0, 5), [orders]);
-    const reorderCandidates = useMemo(() => orders.slice(0, 3), [orders]);
+    const reorderCandidates = [
+        { _id: 'mock1', pickup_location: 'Gate 3', item_details: 'Delivery to D1 Hostel', pickup_type: 'custom', delivery_hostel: 'D1', delivery_room: '', payment_method: 'cash' },
+        { _id: 'mock2', pickup_location: 'Tuck Shop', item_details: 'Snacks for Room 207', pickup_type: 'outlet', delivery_hostel: 'Boys Hostel', delivery_room: '207', payment_method: 'cash' },
+        { _id: 'mock3', pickup_location: 'Library', item_details: 'Books to Girls Hostel B', pickup_type: 'custom', delivery_hostel: 'Girls Hostel B', delivery_room: '', payment_method: 'cash' }
+    ];
 
     const loadData = useCallback(async () => {
         try {
@@ -242,7 +250,7 @@ export default function HomePage() {
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Hero Header */}
-            <div className="gradient-hero" style={{ padding: '60px 24px 120px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 40, borderBottomRightRadius: 40 }}>
+            <div className="gradient-hero" style={{ padding: '40px 24px 80px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 40, borderBottomRightRadius: 40, background: 'var(--surface-2)' }}>
                 {/* Decorative mesh circles */}
                 <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)', filter: 'blur(40px)' }} />
                 <div style={{ position: 'absolute', bottom: -60, left: -20, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)', filter: 'blur(30px)' }} />
@@ -266,10 +274,13 @@ export default function HomePage() {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         <div>
-                            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, marginBottom: 4, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 4, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                                 {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}
                             </p>
-                            <h1 style={{ color: 'white', fontSize: 32, marginBottom: 0, letterSpacing: '-1.5px', fontWeight: 900 }}>Hey, {user?.name?.split(' ')[0]}!</h1>
+                            <h1 style={{ color: 'var(--text-primary)', fontSize: 32, marginBottom: 4, letterSpacing: '-1.5px', fontWeight: 900 }}>Hey, {user?.name?.split(' ')[0]}!</h1>
+                            {mode === 'order' && (
+                                <p style={{ color: 'var(--text-muted)', fontSize: 15, fontWeight: 500 }}>What do you need delivered today?</p>
+                            )}
                         </div>
 
                         {/* Delivery stats capsule — only visible in Deliver mode */}
@@ -298,18 +309,35 @@ export default function HomePage() {
                     <div className={`home-mode-panel ${mode === 'order' ? 'is-visible' : 'is-hidden'}`}>
                         {/* ── ORDER MODE CONTENT — shifted up from Place Order through list below ── */}
                         <div style={{ marginTop: -36 }}>
+                        
+                        {/* Quick Action Buttons */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
+                            <button className="card" onClick={() => navigate('/order/create')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer' }}>
+                                <div style={{ fontSize: 24, marginBottom: 8 }}>🍔</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Food</div>
+                            </button>
+                            <button className="card" onClick={() => navigate('/order/create')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer' }}>
+                                <div style={{ fontSize: 24, marginBottom: 8 }}>📦</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Parcel</div>
+                            </button>
+                            <button className="card" onClick={() => navigate('/order/create')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer' }}>
+                                <div style={{ fontSize: 24, marginBottom: 8 }}>📄</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Docs</div>
+                            </button>
+                        </div>
+
                         {/* Main Call to Action */}
-                        <button className="card action-card premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 24, background: 'linear-gradient(145deg, #6366f1, #4f46e5)', color: 'white', border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 12px 30px rgba(99,102,241,0.25)', width: '100%', marginBottom: 24 }}
+                        <button className="card action-card premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '32px 24px', background: 'linear-gradient(145deg, var(--primary), var(--primary-dark))', color: 'white', border: 'none', position: 'relative', overflow: 'hidden', boxShadow: 'var(--shadow-lg)', width: '100%', marginBottom: 32 }}
                             onClick={() => navigate('/order/create')}>
-                            <div style={{ position: 'absolute', right: -15, bottom: -1, opacity: 0.1, transform: 'rotate(-15deg)' }}>
-                                <Package size={80} />
+                            <div style={{ position: 'absolute', right: -20, bottom: -20, opacity: 0.1, transform: 'rotate(-15deg)' }}>
+                                <Package size={140} />
                             </div>
-                            <div style={{ background: 'rgba(255,255,255,0.25)', padding: 10, borderRadius: 14, marginBottom: 18, backdropFilter: 'blur(10px)' }}>
-                                <Package size={24} color="white" />
+                            <div style={{ background: 'rgba(255,255,255,0.2)', padding: 14, borderRadius: 20, marginBottom: 16, backdropFilter: 'blur(10px)' }}>
+                                <Package size={32} color="white" />
                             </div>
-                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 19, marginBottom: 4 }}>Place Order</div>
-                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
-                                Get it delivered directly to your room <ArrowRight size={14} />
+                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 24, marginBottom: 8 }}>Place Order</div>
+                            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+                                Get it delivered directly to your room <ArrowRight size={16} />
                             </div>
                         </button>
 

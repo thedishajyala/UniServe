@@ -204,6 +204,10 @@ export default function OrderHistoryPage() {
           <div className="nav-icon-wrapper"><Home size={20} /></div>
           <span className="nav-label">Home</span>
         </Link>
+        <Link to="/orders" className="nav-item active">
+          <div className="nav-icon-wrapper active-pill"><Package size={20} /></div>
+          <span className="nav-label">Orders</span>
+        </Link>
         <Link to="/earnings" className="nav-item">
           <div className="nav-icon-wrapper"><TrendingUp size={20} /></div>
           <span className="nav-label">Earnings</span>

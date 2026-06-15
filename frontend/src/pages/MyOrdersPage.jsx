@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getMyOrders } from '../services/api';
-import { Home, TrendingUp, User, X } from 'lucide-react';
+import { Home, TrendingUp, User, X, Package } from 'lucide-react';
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -441,24 +441,31 @@ export default function MyOrdersPage() {
       {/* NAV */}
       <nav className="bottom-nav">
         <Link to="/" className="nav-item">
-          <Home size={20} />
-          <span>Home</span>
+          <div className="nav-icon-wrapper">
+            <Home size={20} />
+          </div>
+          <span className="nav-label">Home</span>
         </Link>
 
-        <Link
-          to="/earnings"
-          className="nav-item"
-        >
-          <TrendingUp size={20} />
-          <span>Earnings</span>
+        <Link to="/orders" className="nav-item active">
+          <div className="nav-icon-wrapper active-pill">
+            <Package size={20} />
+          </div>
+          <span className="nav-label">Orders</span>
         </Link>
 
-        <Link
-          to="/profile"
-          className="nav-item"
-        >
-          <User size={20} />
-          <span>Profile</span>
+        <Link to="/earnings" className="nav-item">
+          <div className="nav-icon-wrapper">
+            <TrendingUp size={20} />
+          </div>
+          <span className="nav-label">Earnings</span>
+        </Link>
+
+        <Link to="/profile" className="nav-item">
+          <div className="nav-icon-wrapper">
+            <User size={20} />
+          </div>
+          <span className="nav-label">Profile</span>
         </Link>
       </nav>
     </div>
