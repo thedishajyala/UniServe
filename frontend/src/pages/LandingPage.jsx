@@ -51,6 +51,26 @@ export default function LandingPage() {
                 </div>
             </header>
 
+            {/* Social Proof Metrics */}
+            <section className="fade-in" style={{ padding: '0 24px 60px', display: 'flex', justifyContent: 'center', gap: '40px', flexWrap: 'wrap', textAlign: 'center' }}>
+                <div>
+                    <h3 style={{ fontSize: '32px', color: '#FFFFFF', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>500+</h3>
+                    <p style={{ fontSize: '13px', color: 'var(--lp-text-sec)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Students Served</p>
+                </div>
+                <div>
+                    <h3 style={{ fontSize: '32px', color: '#FFFFFF', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>2000+</h3>
+                    <p style={{ fontSize: '13px', color: 'var(--lp-text-sec)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Deliveries</p>
+                </div>
+                <div>
+                    <h3 style={{ fontSize: '32px', color: '#10B981', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>98%</h3>
+                    <p style={{ fontSize: '13px', color: 'var(--lp-text-sec)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Success Rate</p>
+                </div>
+                <div>
+                    <h3 style={{ fontSize: '32px', color: '#F59E0B', marginBottom: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontFamily: 'Outfit, sans-serif' }}>4.9 <span style={{fontSize: '20px'}}>⭐</span></h3>
+                    <p style={{ fontSize: '13px', color: 'var(--lp-text-sec)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Average Rating</p>
+                </div>
+            </section>
+
             {/* Massive Screenshot */}
             <section className="screenshot-section">
                 <div className="screenshot-container">
