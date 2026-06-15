@@ -344,6 +344,7 @@ import { HOSTELS } from '../config/campus';
 export default function ProfilePage() {
     const { user, updateUser, logoutUser } = useAuth();
     const navigate = useNavigate();
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const [saving, setSaving] = useState(false);
@@ -460,7 +461,7 @@ export default function ProfilePage() {
                     position: 'relative'
                 }}
             >
-                <div onClick={() => setShowLogoutModal(true)} className="hover-lift" style={{ position: 'absolute', top: 32, right: 24, width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', zIndex: 10 }}>
+                <div onClick={() => setShowSettingsModal(true)} className="hover-lift" style={{ position: 'absolute', top: 32, right: 24, width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', zIndex: 10 }}>
                     <span style={{ fontSize: 20 }}>⚙️</span>
                 </div>
                 <h1 style={{ color: 'white', fontSize: 24, fontWeight: 800 }}>My Profile</h1>
@@ -801,45 +802,25 @@ export default function ProfilePage() {
                 </button>
             </div>
 
-            {/* LOGOUT MODAL */}
-            {showLogoutModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.6)', zIndex: 9999,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    padding: 24, backdropFilter: 'blur(4px)'
-                }}>
-                    <div className="card fade-in" style={{
-                        width: '100%', maxWidth: 320, padding: 24,
-                        background: 'var(--surface-2)', border: '1px solid var(--border)',
-                        textAlign: 'center'
-                    }}>
-                        <div style={{ fontSize: 32, marginBottom: 12 }}>🚪</div>
-                        <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: 'var(--text)' }}>
-                            Are you sure you want to logout?
-                        </h3>
-                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>
-                            You will stop receiving delivery requests until you log back in.
-                        </p>
+            {/* Settings Modal */}
+            {showSettingsModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={() => setShowSettingsModal(false)}>
+                    <div className="card slide-up" style={{ width: '100%', maxWidth: 480, background: 'var(--bg)', borderTopLeftRadius: 32, borderTopRightRadius: 32, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, padding: '32px 24px 48px', position: 'relative' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ width: 40, height: 4, background: 'var(--border)', borderRadius: 2, margin: '0 auto 24px' }} />
+                        <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 24, color: 'var(--text-primary)' }}>Settings</h3>
                         
-                        <div style={{ display: 'flex', gap: 12 }}>
-                            <button
-                                className="btn"
-                                style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}
-                                onClick={() => setShowLogoutModal(false)}
-                            >
-                                Cancel
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            <button className="btn hover-lift" style={{ padding: '16px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 16, color: 'var(--text-primary)', fontWeight: 700, textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => { setShowSettingsModal(false); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }}>
+                                <span>✏️ Edit Profile</span>
+                                <span style={{ color: 'var(--text-muted)' }}>→</span>
                             </button>
-                            <button
-                                className="btn"
-                                style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none' }}
-                                onClick={() => {
-                                    setShowLogoutModal(false);
-                                    logoutUser();
-                                    navigate('/login');
-                                }}
-                            >
-                                Logout
+                            <button className="btn hover-lift" style={{ padding: '16px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 16, color: 'var(--text-primary)', fontWeight: 700, textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => { setShowSettingsModal(false); navigate('/'); }}>
+                                <span>👁️ View Public Profile</span>
+                                <span style={{ color: 'var(--text-muted)' }}>→</span>
+                            </button>
+                            <button className="btn hover-lift" style={{ padding: '16px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 16, color: '#ef4444', fontWeight: 700, textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => { setShowSettingsModal(false); setShowLogoutModal(true); }}>
+                                <span>🚪 Logout</span>
+                                <span style={{ color: '#ef4444' }}>→</span>
                             </button>
                         </div>
                     </div>
