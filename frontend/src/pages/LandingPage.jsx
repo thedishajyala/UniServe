@@ -40,10 +40,7 @@ export default function LandingPage() {
 
             {/* Hero Section */}
             <header className="hero-section">
-                <div className="hero-badge">
-                    <span>⚡ Real-Time Campus Logistics</span>
-                </div>
-                <h1 className="hero-title">Deliver Anything.<br/>Anywhere.<br/>Across Campus.</h1>
+                <h1 className="hero-title">Deliver Anything.<br/>Across Campus.</h1>
                 <p className="hero-subtitle">
                     Food. Parcels. Documents. Essentials.<br/>
                     Delivered across campus in real time.

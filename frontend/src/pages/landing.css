@@ -118,7 +118,7 @@
 
 .hero-badge {
   display: inline-block;
-  padding: 0.4rem 1rem;
+  padding: 0.4rem 0.85rem;
   background: rgba(124, 58, 237, 0.1);
   border: 1px solid rgba(124, 58, 237, 0.2);
   border-radius: 999px;
@@ -338,7 +338,23 @@
   flex-direction: column;
   justify-content: flex-start;
   overflow-y: auto;
-  border-right: 1px solid var(--lp-border);
+  position: relative;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.split-left::-webkit-scrollbar {
+  display: none;
+}
+
+.split-left::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .left-content {
@@ -351,7 +367,7 @@
 .auth-features {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .auth-feature-item {
@@ -394,6 +410,7 @@
 .auth-card {
   width: 100%;
   max-width: 400px;
+  margin-top: -24px;
 }
 
 .auth-header {

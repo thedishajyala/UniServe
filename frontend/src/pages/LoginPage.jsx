@@ -87,12 +87,12 @@ export default function LoginPage() {
                 {/* Left Side: Branding / Marketing */}
                 <div className="split-left">
                     <div className="left-content">
-                        <div className="hero-badge" style={{ marginBottom: '1.5rem', display: 'inline-block' }}>
-                            <span>⚡ Real-Time Campus Logistics</span>
-                        </div>
-                        <h1 className="hero-title" style={{ textAlign: 'left', fontSize: '3rem', marginBottom: '2rem' }}>
-                            Deliver Anything.<br/>Anywhere.<br/>Across Campus.
+                        <h1 className="hero-title" style={{ textAlign: 'left', fontSize: '3rem', marginBottom: '1.5rem' }}>
+                            Deliver Anything.<br/>Across Campus.
                         </h1>
+                        <p className="hero-subtitle" style={{ fontSize: '1rem', marginBottom: '2.5rem', textAlign: 'left', color: 'var(--lp-text-sec)', fontWeight: 500 }}>
+                            Food. Parcels. Documents. Essentials.
+                        </p>
                         <div className="auth-features">
                             <div className="auth-feature-item">
                                 <span className="feature-icon">⚡</span>
@@ -126,7 +126,7 @@ export default function LoginPage() {
 
                         {/* Visual Floating Element */}
                         <div className="floating-card visual-element" style={{ 
-                            marginTop: '3rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', 
+                            marginTop: '1.5rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', 
                             borderRadius: 16, padding: '1.5rem', width: 'fit-content', backdropFilter: 'blur(10px)',
                             boxShadow: '0 20px 40px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden'
                         }}>
