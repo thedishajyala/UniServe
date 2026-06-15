@@ -222,46 +222,63 @@ export default function TrackingPage() {
                 </MapContainer>
             </div>
 
-            {/* ── LUXE BOTTOM CONSOLE ── */}
             <div style={{ 
                 position: 'absolute', bottom: 20, left: 20, right: 20, zIndex: 1000,
-                background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(16px)', borderRadius: 32, padding: 32,
-                boxShadow: '0 20px 60px rgba(0,0,0,0.12)', border: '1px solid rgba(255,255,255,0.8)'
+                background: 'var(--card)', backdropFilter: 'blur(16px)', borderRadius: 32, padding: 32,
+                boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)'
             }} className="slide-up">
                 
-                {/* MISSION STATUS HUD */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{ width: 44, height: 44, background: '#F1F5F9', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            {ORDER_STATUSES.find(s => s.key === order.status)?.icon || <Package size={20} />}
-                        </div>
-                        <div>
-                            <p style={{ fontSize: 10, fontWeight: 900, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Order Status</p>
-                            <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B' }}>{order.status.replace('_', ' ').toUpperCase()}</h2>
-                        </div>
+                {/* MISSION STATUS TIMELINE */}
+                <div style={{ marginBottom: 28 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '0 8px' }}>
+                        {[
+                            { key: 'accepted', label: 'Partner Assigned' },
+                            { key: 'picked', label: 'Order Picked Up' },
+                            { key: 'on_the_way', label: 'On the Way' },
+                            { key: 'delivered', label: 'Delivered' }
+                        ].map((step, idx) => {
+                            const isCompleted = currentStatusIndex >= idx;
+                            const isCurrent = currentStatusIndex === idx;
+                            return (
+                                <div key={step.key} style={{ display: 'flex', gap: 16 }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: isCompleted ? 'linear-gradient(135deg, var(--primary), var(--secondary))' : 'var(--surface-2)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, boxShadow: isCurrent ? '0 0 0 4px rgba(139,92,246,0.2)' : 'none', border: '1px solid var(--border)' }}>
+                                            {isCompleted && '✓'}
+                                        </div>
+                                        {idx < 3 && (
+                                            <div style={{ width: 2, height: 32, background: currentStatusIndex > idx ? 'var(--primary)' : 'var(--border)', margin: '4px 0' }} />
+                                        )}
+                                    </div>
+                                    <div style={{ paddingTop: 2, paddingBottom: 16 }}>
+                                        <p style={{ fontSize: 16, fontWeight: 800, color: isCompleted ? 'var(--text-primary)' : 'var(--text-muted)' }}>{step.label}</p>
+                                        {isCurrent && <p style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 700, marginTop: 4 }}>In Progress...</p>}
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
 
                 {/* LOGISTICS DETAILS CAROUSEL-STYLE */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
-                    <div style={{ background: '#F8FAFC', borderRadius: 20, padding: 16 }}>
-                        <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', marginBottom: 4 }}>PICKUP LOCATION</p>
-                        <p style={{ fontSize: 14, fontWeight: 800, color: '#1E293B' }}>{order.pickup_location}</p>
+                    <div style={{ background: 'var(--surface-2)', borderRadius: 20, padding: 16, border: '1px solid var(--border)' }}>
+                        <p style={{ fontSize: 9, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 4 }}>PICKUP LOCATION</p>
+                        <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{order.pickup_location}</p>
                     </div>
-                    <div style={{ background: '#F8FAFC', borderRadius: 20, padding: 16 }}>
-                        <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', marginBottom: 4 }}>DELIVER TO</p>
-                        <p style={{ fontSize: 14, fontWeight: 800, color: '#1E293B' }}>{order.delivery_hostel} • {order.delivery_room}</p>
+                    <div style={{ background: 'var(--surface-2)', borderRadius: 20, padding: 16, border: '1px solid var(--border)' }}>
+                        <p style={{ fontSize: 9, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 4 }}>DELIVER TO</p>
+                        <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{order.delivery_hostel} • {order.delivery_room}</p>
                     </div>
                 </div>
 
                 {/* PARTNER SNAPSHOT */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'rgba(79, 70, 229, 0.04)', borderRadius: 24, marginBottom: 20 }}>
-                    <div style={{ width: 48, height: 48, background: '#4F46E5', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 900, fontSize: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 24, marginBottom: 20 }}>
+                    <div style={{ width: 48, height: 48, background: 'linear-gradient(135deg, var(--primary), var(--secondary))', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 900, fontSize: 16, boxShadow: '0 4px 10px rgba(139,92,246,0.3)' }}>
                         {getInitials((isOwner ? partner : requester)?.name)}
                     </div>
                     <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: 15, fontWeight: 800, color: '#1E293B' }}>{(isOwner ? partner : requester)?.name}</p>
-                        <p style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>BENNETT STUDENT • {isOwner ? 'Partner' : 'Customer'}</p>
+                        <p style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{(isOwner ? partner : requester)?.name}</p>
+                        <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>BENNETT STUDENT • {isOwner ? 'Partner' : 'Customer'}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F59E0B', fontWeight: 800, fontSize: 14 }}>
@@ -276,9 +293,10 @@ export default function TrackingPage() {
                         <button 
                             onClick={() => handleUpdateStatus(nextStatusMap[order.status])}
                             disabled={updating}
+                            className="btn hover-lift glow"
                             style={{ 
-                                flex: 1, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 18, 
-                                fontSize: 15, fontWeight: 900, cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.4)', transition: 'all 0.2s ease'
+                                flex: 1, height: 56, background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: 18, 
+                                fontSize: 15, fontWeight: 900, cursor: 'pointer'
                             }}
                         >
                             {updating ? 'SAVING...' : nextStatusLabels[nextStatusMap[order.status]]}
