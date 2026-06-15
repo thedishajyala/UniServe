@@ -73,33 +73,60 @@ export default function LandingPage() {
 
             {/* Massive Screenshot */}
             <section className="screenshot-section">
-                <div className="screenshot-container">
-                    <img src="/hero-mockup.png" alt="UniServe Dashboard" className="hero-screenshot" />
+                <div className="screenshot-container floating-card" style={{ animationDuration: '6s' }}>
+                    <img src="/dashboard.png" alt="UniServe Dashboard" className="hero-screenshot" />
                 </div>
             </section>
 
-            {/* Features (4 Cards) */}
-            <section id="features" className="features-section">
-                <div className="features-grid">
-                    <div className="feature-card">
-                        <div className="feature-icon">⚡</div>
-                        <h3>Real-Time</h3>
-                        <p>Live tracking and updates.</p>
+            {/* Bento Grid Showcase */}
+            <section id="features" className="bento-section">
+                <div className="bento-header">
+                    <h2>Everything you need.</h2>
+                    <p>Built exclusively for the Bennett University campus.</p>
+                </div>
+                <div className="bento-grid">
+                    {/* Large Feature 1 */}
+                    <div className="bento-card large">
+                        <div className="bento-content">
+                            <h3>Live Order Tracking</h3>
+                            <p>Know exactly where your delivery partner is in real-time on the campus map.</p>
+                        </div>
+                        <div className="bento-img-wrapper" style={{ height: '400px' }}>
+                            <img src="/tracking.png" alt="Tracking Map" className="bento-img" style={{ objectPosition: 'center top' }} />
+                        </div>
                     </div>
-                    <div className="feature-card">
-                        <div className="feature-icon">🧠</div>
-                        <h3>Smart Matching</h3>
-                        <p>Connect with the best delivery partner.</p>
+                    
+                    {/* Feature 2 */}
+                    <div className="bento-card">
+                        <div className="bento-content">
+                            <h3>Trusted Network</h3>
+                            <p>Every partner is a verified student with public ratings and trust badges.</p>
+                        </div>
+                        <div className="bento-img-wrapper" style={{ height: '400px' }}>
+                            <img src="/profile.png" alt="Partner Profile" className="bento-img" style={{ objectFit: 'contain' }} />
+                        </div>
                     </div>
-                    <div className="feature-card">
-                        <div className="feature-icon">💬</div>
-                        <h3>Instant Chat</h3>
-                        <p>Coordinate seamlessly.</p>
+                    
+                    {/* Feature 3 */}
+                    <div className="bento-card">
+                        <div className="bento-content">
+                            <h3>Smart Matching</h3>
+                            <p>Choose from available partners nearby or let our algorithm find the best match.</p>
+                        </div>
+                        <div className="bento-img-wrapper" style={{ height: '400px' }}>
+                            <img src="/pick-partner.png" alt="Pick Partner" className="bento-img" style={{ objectFit: 'cover', objectPosition: 'top' }} />
+                        </div>
                     </div>
-                    <div className="feature-card">
-                        <div className="feature-icon">💳</div>
-                        <h3>Payments</h3>
-                        <p>Secure and frictionless.</p>
+
+                    {/* Feature 4 */}
+                    <div className="bento-card large">
+                        <div className="bento-content">
+                            <h3>Accountability & Quality</h3>
+                            <p>Rate and review your delivery experience to maintain high campus standards.</p>
+                        </div>
+                        <div className="bento-img-wrapper" style={{ height: '350px' }}>
+                            <img src="/rate.png" alt="Rate Partner" className="bento-img" style={{ objectFit: 'contain' }} />
+                        </div>
                     </div>
                 </div>
             </section>
