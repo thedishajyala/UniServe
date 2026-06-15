@@ -66,7 +66,10 @@ export default function LoginPage() {
         <div className="login-split-page">
             {/* Top Navbar specifically for auth page */}
             <nav className="auth-nav">
-                <Link to="/" className="nav-brand">UniServe</Link>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Link to="/" className="nav-brand" style={{ lineHeight: 1 }}>UniServe</Link>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--lp-text-sec)', fontWeight: 600, letterSpacing: '0.05em', marginTop: 4 }}>CAMPUS DELIVERY NETWORK</span>
+                </div>
                 <div className="nav-cta">
                     <button onClick={() => setMode('login')} className="nav-login">Login</button>
                     <button onClick={() => setMode('signup')} className="btn-get-started">Get Started →</button>
@@ -77,8 +80,11 @@ export default function LoginPage() {
                 {/* Left Side: Branding / Marketing */}
                 <div className="split-left">
                     <div className="left-content">
+                        <div className="hero-badge" style={{ marginBottom: '1.5rem', display: 'inline-block' }}>
+                            <span>⚡ Real-Time Campus Logistics</span>
+                        </div>
                         <h1 className="hero-title" style={{ textAlign: 'left', fontSize: '3rem', marginBottom: '2rem' }}>
-                            Deliver Anything.<br/>Anywhere. Across Campus.
+                            Deliver Anything.<br/>Anywhere.<br/>Across Campus.
                         </h1>
                         <div className="auth-features">
                             <div className="auth-feature-item">
@@ -110,6 +116,33 @@ export default function LoginPage() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Visual Floating Element */}
+                        <div style={{ 
+                            marginTop: '3rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', 
+                            borderRadius: 16, padding: '1.5rem', width: 'fit-content', backdropFilter: 'blur(10px)',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>📦 Order #1298</span>
+                                <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '4px 8px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 700 }}>In Transit</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '2rem', fontSize: '0.85rem' }}>
+                                <div>
+                                    <div style={{ color: 'var(--lp-text-sec)', marginBottom: 4 }}>Pickup:</div>
+                                    <div style={{ fontWeight: 600 }}>Gate 3</div>
+                                </div>
+                                <div>
+                                    <div style={{ color: 'var(--lp-text-sec)', marginBottom: 4 }}>Drop:</div>
+                                    <div style={{ fontWeight: 600 }}>Girls Hostel B</div>
+                                </div>
+                                <div>
+                                    <div style={{ color: 'var(--lp-text-sec)', marginBottom: 4 }}>ETA:</div>
+                                    <div style={{ fontWeight: 600 }}>6 mins</div>
+                                </div>
+                            </div>
+                            <div style={{ position: 'absolute', top: 0, right: 0, width: 80, height: 80, background: 'var(--lp-primary)', filter: 'blur(40px)', opacity: 0.3, borderRadius: '50%' }}></div>
+                        </div>
                     </div>
                 </div>
 
@@ -136,7 +169,7 @@ export default function LoginPage() {
                             <div className="form-group">
                                 <label>UNIVERSITY EMAIL</label>
                                 <input 
-                                    type="email" name="email" placeholder={`id@${UNIVERSITY_DOMAIN}`} 
+                                    type="email" name="email" placeholder="Enter your university email" 
                                     value={form.email} onChange={handleChange} 
                                     className={errors.email ? 'error-input' : ''}
                                 />
@@ -175,6 +208,17 @@ export default function LoginPage() {
                             <button type="submit" className="btn-submit" disabled={loading}>
                                 {loading ? 'Processing...' : (mode === 'login' ? 'Sign In' : 'Get Started')}
                             </button>
+
+                            {mode === 'login' && (
+                                <div style={{ textAlign: 'center', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--lp-text-sec)' }}>
+                                    New to UniServe? <span onClick={() => { setMode('signup'); setErrors({}); }} style={{ color: 'var(--lp-text)', cursor: 'pointer', fontWeight: 600, borderBottom: '1px solid var(--lp-text)' }}>Create Account →</span>
+                                </div>
+                            )}
+                            {mode === 'signup' && (
+                                <div style={{ textAlign: 'center', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--lp-text-sec)' }}>
+                                    Already have an account? <span onClick={() => { setMode('login'); setErrors({}); }} style={{ color: 'var(--lp-text)', cursor: 'pointer', fontWeight: 600, borderBottom: '1px solid var(--lp-text)' }}>Sign In →</span>
+                                </div>
+                            )}
                         </form>
                     </div>
                 </div>

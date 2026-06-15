@@ -16,7 +16,10 @@ export default function LandingPage() {
         <div className="landing-page">
             {/* Navbar */}
             <nav className="landing-nav">
-                <div className="nav-brand">UniServe</div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Link to="/" className="nav-brand" style={{ lineHeight: 1 }}>UniServe</Link>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--lp-text-sec)', fontWeight: 600, letterSpacing: '0.05em', marginTop: 4 }}>CAMPUS DELIVERY NETWORK</span>
+                </div>
                 <div className="nav-links">
                     <a href="#features">Features</a>
                     <a href="#tech">Technology</a>
@@ -33,7 +36,7 @@ export default function LandingPage() {
                 <div className="hero-badge">
                     <span>⚡ Real-Time Campus Logistics</span>
                 </div>
-                <h1 className="hero-title">Deliver Anything.<br/>Anywhere. Across Campus.</h1>
+                <h1 className="hero-title">Deliver Anything.<br/>Anywhere.<br/>Across Campus.</h1>
                 <p className="hero-subtitle">
                     Food. Parcels. Documents. Essentials.<br/>
                     Delivered across campus in real time.
