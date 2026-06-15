@@ -78,7 +78,7 @@ export default function LoginPage() {
                 <div className="split-left">
                     <div className="left-content">
                         <h1 className="hero-title" style={{ textAlign: 'left', fontSize: '3rem', marginBottom: '2rem' }}>
-                            The Operating System<br/>for Campus Deliveries.
+                            Deliver Anything.<br/>Anywhere. Across Campus.
                         </h1>
                         <div className="auth-features">
                             <div className="auth-feature-item">

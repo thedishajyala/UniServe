@@ -33,7 +33,7 @@ export default function LandingPage() {
                 <div className="hero-badge">
                     <span>⚡ Real-Time Campus Logistics</span>
                 </div>
-                <h1 className="hero-title">The Operating System<br/>for Campus Deliveries.</h1>
+                <h1 className="hero-title">Deliver Anything.<br/>Anywhere. Across Campus.</h1>
                 <p className="hero-subtitle">
                     Food. Parcels. Documents. Essentials.<br/>
                     Delivered across campus in real time.
