@@ -153,7 +153,7 @@ export default function CreateOrderPage() {
             <div className="page-content" style={{ paddingTop: 0 }}>
                 {/* STEP 0: PICKUP */}
                 {step === 0 && (
-                    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    <div className="fade-in card" style={{ padding: 24, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 24, boxShadow: 'var(--shadow-md)' }}>
                         <div>
                             <p className="section-title" style={{ marginBottom: 12 }}>Where to pick up from?</p>
                             <div style={{ display: 'flex', gap: 10 }}>
@@ -226,13 +226,16 @@ export default function CreateOrderPage() {
                         )}
 
                         {pricing && (
-                            <div className="card" style={{ padding: 16, background: 'var(--primary-soft)', border: '1px solid var(--primary)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className="fade-in" style={{ padding: 20, background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(168,85,247,0.05))', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 16, position: 'relative', overflow: 'hidden' }}>
+                                <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, background: 'rgba(139,92,246,0.2)', filter: 'blur(30px)', borderRadius: '50%' }} />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
                                     <div>
-                                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 16 }}>Delivery Fee</p>
-                                        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>Partner earns ₹{pricing.partnerEarns}</p>
+                                        <p style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6, color: 'var(--primary-light)' }}>
+                                            ⚡ Live Estimate
+                                        </p>
+                                        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, fontWeight: 600 }}>Partner earns ₹{pricing.partnerEarns}</p>
                                     </div>
-                                    <span className="price-tag">₹{pricing.price}</span>
+                                    <span style={{ fontSize: 24, fontWeight: 900, color: 'white', textShadow: '0 2px 10px rgba(139,92,246,0.5)' }}>₹{pricing.price}</span>
                                 </div>
                             </div>
                         )}
@@ -247,7 +250,7 @@ export default function CreateOrderPage() {
 
                 {/* STEP 1: DELIVERY */}
                 {step === 1 && (
-                    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    <div className="fade-in card" style={{ padding: 24, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 24, boxShadow: 'var(--shadow-md)' }}>
                         <div className="input-group">
                             <label className="input-label">Delivery Hostel</label>
                             <select className="input" name="delivery_hostel" value={form.delivery_hostel} onChange={handleChange}>
@@ -296,8 +299,8 @@ export default function CreateOrderPage() {
 
                 {/* STEP 2: CONFIRM + PAY */}
                 {step === 2 && (
-                    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        <div className="card" style={{ padding: 24 }}>
+                    <div className="fade-in card" style={{ padding: 24, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 24, boxShadow: 'var(--shadow-md)' }}>
+                        <div style={{ background: 'var(--bg)', borderRadius: 16, padding: 20, border: '1px solid var(--border)' }}>
                             <h3 style={{ marginBottom: 18 }}>Order Summary</h3>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -313,10 +316,10 @@ export default function CreateOrderPage() {
                                     <span style={{ color: 'var(--text-secondary)', fontSize: 14 }}>🛍️ Items</span>
                                     <span style={{ fontWeight: 600, fontSize: 14, maxWidth: '55%', textAlign: 'right' }}>{form.item_details}</span>
                                 </div>
-                                <hr style={{ border: 'none', borderTop: '1px solid var(--border)' }} />
+                                <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '4px 0' }} />
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Delivery Fee</span>
-                                    <span className="price-tag">₹{pricing?.price}</span>
+                                    <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--primary)' }}>₹{pricing?.price}</span>
                                 </div>
                             </div>
                         </div>
