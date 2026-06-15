@@ -772,7 +772,6 @@ export default function ProfilePage() {
                         ))
                     )}
                 </div>
-                </div>
 
                 {/* LOGOUT BUTTON */}
                 <button
