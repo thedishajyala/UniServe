@@ -67,8 +67,14 @@ export default function LoginPage() {
             {/* Top Navbar specifically for auth page */}
             <nav className="auth-nav">
                 <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', boxShadow: '0 0 40px rgba(124,58,237,0.3)', borderRadius: '50%', zIndex: -1, pointerEvents: 'none' }}></div>
-                    <Link to="/" className="nav-brand" style={{ lineHeight: 1 }}>UniServe</Link>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', boxShadow: '0 0 40px rgba(124,58,237,0.15)', borderRadius: '50%', zIndex: -1, pointerEvents: 'none' }}></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Link to="/" className="nav-brand" style={{ lineHeight: 1 }}>UniServe</Link>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 8px', borderRadius: '999px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                            <div style={{ width: 6, height: 6, background: '#10b981', borderRadius: '50%', boxShadow: '0 0 8px #10b981' }}></div>
+                            <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: 700, letterSpacing: '0.05em' }}>LIVE</span>
+                        </div>
+                    </div>
                     <span style={{ fontSize: '0.65rem', color: 'var(--lp-text-sec)', fontWeight: 600, letterSpacing: '0.05em', marginTop: 4 }}>CAMPUS DELIVERY NETWORK</span>
                 </div>
                 <div className="nav-cta">
@@ -125,10 +131,14 @@ export default function LoginPage() {
                             boxShadow: '0 20px 40px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>📦 Order #1298</span>
+                                <span style={{ fontWeight: 800, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    📦 Order #1298
+                                    <div style={{ width: 6, height: 6, background: '#10b981', borderRadius: '50%', boxShadow: '0 0 8px #10b981' }}></div>
+                                    <span style={{ color: '#10b981', fontSize: '0.75rem' }}>Live</span>
+                                </span>
                                 <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '4px 8px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 700 }}>In Transit</span>
                             </div>
-                            <div style={{ display: 'flex', gap: '2rem', fontSize: '0.85rem' }}>
+                            <div style={{ display: 'flex', gap: '2rem', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
                                 <div>
                                     <div style={{ color: 'var(--lp-text-sec)', marginBottom: 4 }}>Pickup:</div>
                                     <div style={{ fontWeight: 600 }}>Gate 3</div>
@@ -141,6 +151,10 @@ export default function LoginPage() {
                                     <div style={{ color: 'var(--lp-text-sec)', marginBottom: 4 }}>ETA:</div>
                                     <div style={{ fontWeight: 600 }}>6 mins</div>
                                 </div>
+                            </div>
+                            {/* Progress Bar */}
+                            <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
+                                <div style={{ width: '60%', height: '100%', background: 'var(--lp-primary)', borderRadius: 2, boxShadow: '0 0 10px var(--lp-primary)' }}></div>
                             </div>
                             <div style={{ position: 'absolute', top: 0, right: 0, width: 80, height: 80, background: 'var(--lp-primary)', filter: 'blur(40px)', opacity: 0.3, borderRadius: '50%' }}></div>
                         </div>

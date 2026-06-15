@@ -336,12 +336,16 @@
   padding: 4rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  overflow-y: auto;
   border-right: 1px solid var(--lp-border);
 }
 
 .left-content {
   max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 2rem;
 }
 
 .auth-features {
@@ -358,6 +362,12 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 1rem 1.5rem;
   border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.auth-feature-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .auth-feature-item h3 {
@@ -414,6 +424,7 @@
   color: var(--lp-text-sec);
   margin-bottom: 0.5rem;
   letter-spacing: 0.05em;
+  opacity: 0.7;
 }
 
 .form-group input {
@@ -431,7 +442,7 @@
 .form-group input:focus {
   outline: none;
   border-color: var(--lp-primary);
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
 .form-row {

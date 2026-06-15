@@ -17,8 +17,14 @@ export default function LandingPage() {
             {/* Navbar */}
             <nav className="landing-nav">
                 <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', boxShadow: '0 0 40px rgba(124,58,237,0.3)', borderRadius: '50%', zIndex: -1, pointerEvents: 'none' }}></div>
-                    <Link to="/" className="nav-brand" style={{ lineHeight: 1 }}>UniServe</Link>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', boxShadow: '0 0 40px rgba(124,58,237,0.15)', borderRadius: '50%', zIndex: -1, pointerEvents: 'none' }}></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Link to="/" className="nav-brand" style={{ lineHeight: 1 }}>UniServe</Link>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 8px', borderRadius: '999px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                            <div style={{ width: 6, height: 6, background: '#10b981', borderRadius: '50%', boxShadow: '0 0 8px #10b981' }}></div>
+                            <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: 700, letterSpacing: '0.05em' }}>LIVE</span>
+                        </div>
+                    </div>
                     <span style={{ fontSize: '0.65rem', color: 'var(--lp-text-sec)', fontWeight: 600, letterSpacing: '0.05em', marginTop: 4 }}>CAMPUS DELIVERY NETWORK</span>
                 </div>
                 <div className="nav-links">
