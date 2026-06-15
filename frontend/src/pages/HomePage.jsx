@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { toggleAvailability, getMyOrders, getDemandAnalytics, getIncomingRequests, respondToOrder, getMyDeliveries, getOnlinePartners, getEarnings } from '../services/api';
 import toast from 'react-hot-toast';
-import { Home, Package, TrendingUp, User, Bell, ArrowRight, Star, RotateCcw } from 'lucide-react';
+import { Home, Package, TrendingUp, User, Bell, ArrowRight, Star, RotateCcw, Truck, Users, FileText } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import { OUTLETS } from '../config/campus';
 
@@ -69,7 +69,9 @@ function renderRating(rating, totalReviews, totalDeliveries = 0) {
     if (totalDeliveries === 0) return <span className="badge badge-info" style={{ fontSize: 10 }}>New 🆕</span>;
     return (
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: '#F59E0B' }}>
-            ⭐ {Number(rating || 0).toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 10 }}>({totalDeliveries} orders)</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Star size={12} fill="currentColor" /> {Number(rating || 0).toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 10 }}>({totalDeliveries} orders)</span>
+            </div>
         </span>
     );
 }
@@ -302,7 +304,9 @@ export default function HomePage() {
                                         <div style={{ width: 1, height: 16, background: 'var(--border)' }} />
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                                             <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Rating</span>
-                                            <span style={{ fontSize: 14, color: '#F59E0B', fontWeight: 800 }}>⭐ 98%</span>
+                                            <span style={{ fontSize: 14, color: '#F59E0B', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                            <Star size={14} fill="#F59E0B" color="#F59E0B" /> 98%
+                                        </span>
                                         </div>
                                     </div>
                                 </div>
@@ -358,7 +362,9 @@ export default function HomePage() {
                         {/* FEATURED: Place Order */}
                         <div style={{ marginBottom: 24 }}>
                             <button className="card hover-lift glow" onClick={() => navigate('/order/create')} style={{ width: '100%', padding: '32px 24px', textAlign: 'center', background: 'var(--card)', border: '1px solid rgba(139,92,246,0.4)', backgroundImage: 'linear-gradient(var(--card), var(--card)), linear-gradient(135deg, rgba(139,92,246,0.2), rgba(255,255,255,0.02))', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', borderRadius: 24, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, boxShadow: '0 10px 40px rgba(139,92,246,0.15)' }}>
-                                <div style={{ width: 72, height: 72, borderRadius: 20, background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, boxShadow: '0 12px 30px rgba(139,92,246,0.5)' }}>🚀</div>
+                                <div style={{ width: 72, height: 72, borderRadius: 20, background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 30px rgba(139,92,246,0.5)' }}>
+                                    <Package size={36} color="white" />
+                                </div>
                                 <div>
                                     <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>Place Order</div>
                                     <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600 }}>Get anything delivered across campus</div>
@@ -370,22 +376,30 @@ export default function HomePage() {
                         {/* Quick Actions Grid */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 32 }}>
                             <button className="card hover-lift" onClick={() => navigate('/orders')} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🚚</div>
+                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Truck size={20} color="var(--primary)" />
+                                </div>
                                 <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Track Order</div>
                             </button>
                             <button className="card hover-lift" onClick={() => {
                                 const el = document.getElementById('partner-hub');
                                 if (el) el.scrollIntoView({ behavior: 'smooth' });
                             }} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🤝</div>
+                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Users size={20} color="var(--primary)" />
+                                </div>
                                 <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Partner Hub</div>
                             </button>
                             <button className="card hover-lift" onClick={() => navigate('/earnings')} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>💰</div>
+                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <TrendingUp size={20} color="var(--primary)" />
+                                </div>
                                 <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Earnings</div>
                             </button>
                             <button className="card hover-lift" onClick={() => navigate('/orders')} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📋</div>
+                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <FileText size={20} color="var(--primary)" />
+                                </div>
                                 <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>My Orders</div>
                             </button>
                         </div>
@@ -393,7 +407,7 @@ export default function HomePage() {
                         {topRestaurants.length > 0 && (
                             <div style={{ marginBottom: 20 }}>
                                 <div className="section-header">
-                                    <h3 className="section-title">🔥 Your top restaurants</h3>
+                                    <h3 className="section-title">Your top restaurants</h3>
                                 </div>
                                 <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px', WebkitOverflowScrolling: 'touch' }}>
                                     {topRestaurants.map(({ name, count }) => (
@@ -426,7 +440,7 @@ export default function HomePage() {
                         {onlinePartners.length > 0 && (
                             <div id="partner-hub" style={{ marginBottom: 32 }}>
                                 <div className="section-header">
-                                    <h3 className="section-title">📍 Available Nearby</h3>
+                                    <h3 className="section-title">Available Nearby</h3>
                                 </div>
                                 <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px', WebkitOverflowScrolling: 'touch' }}>
                                     {onlinePartners.map((partner) => (
@@ -438,7 +452,10 @@ export default function HomePage() {
                                                 <div style={{ flex: 1 }}>
                                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                                         <h4 style={{ fontSize: 16, fontWeight: 800 }}>{partner.name}</h4>
-                                                        <span style={{ fontSize: 10, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '2px 8px', borderRadius: 8, fontWeight: 700 }}>🟢 Online</span>
+                                                        <span style={{ fontSize: 10, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '2px 8px', borderRadius: 8, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                            <span style={{width: 6, height: 6, borderRadius: '50%', background: '#4ade80'}} />
+                                                            Online
+                                                        </span>
                                                     </div>
                                                     <p style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{partner.hostel} • Room {partner.room_no || 'TBA'}</p>
                                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 6, fontSize: 10, color: '#10B981', background: 'rgba(16,185,129,0.1)', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>
@@ -449,7 +466,7 @@ export default function HomePage() {
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20, background: 'var(--surface-2)', padding: 12, borderRadius: 12 }}>
                                                 <div>
                                                     <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Rating</p>
-                                                    <p style={{ fontSize: 14, fontWeight: 800, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 4 }}>⭐ {Number(partner.rating || 5.0).toFixed(1)}</p>
+                                                    <p style={{ fontSize: 14, fontWeight: 800, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 4 }}><Star size={14} fill="currentColor" /> {Number(partner.rating || 5.0).toFixed(1)}</p>
                                                 </div>
                                                 <div>
                                                     <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Accept Rate</p>
@@ -595,7 +612,9 @@ export default function HomePage() {
                                                 <div>
                                                     <p style={{ fontWeight: 700, fontSize: 14 }}>{requester?.name || 'Student'}</p>
                                                     <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', gap: 4 }}>
-                                                        {requester?.hostel} · Room {requester?.room_no} · {requester?.total_deliveries > 0 ? `⭐ ${Number(requester.rating || 0).toFixed(1)} (${requester.total_deliveries} deli.)` : 'New'}
+                                                        {requester?.hostel} · Room {requester?.room_no} · {requester?.total_deliveries > 0 ? (
+                                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}><Star size={10} fill="currentColor" /> {Number(requester.rating || 0).toFixed(1)} ({requester.total_deliveries} deli.)</span>
+                                                        ) : 'New'}
                                                     </div>
                                                 </div>
                                                 <span style={{
@@ -746,7 +765,7 @@ export default function HomePage() {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 32 }}>
                             <div style={{ background: 'var(--surface-2)', padding: '16px 8px', borderRadius: 16, textAlign: 'center' }}>
                                 <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Rating</p>
-                                <p style={{ fontSize: 16, fontWeight: 800, color: '#F59E0B' }}>⭐ {Number(selectedPartner.rating || 5.0).toFixed(1)}</p>
+                                <p style={{ fontSize: 16, fontWeight: 800, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center' }}><Star size={16} fill="currentColor" /> {Number(selectedPartner.rating || 5.0).toFixed(1)}</p>
                             </div>
                             <div style={{ background: 'var(--surface-2)', padding: '16px 8px', borderRadius: 16, textAlign: 'center' }}>
                                 <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Deliveries</p>
@@ -792,7 +811,7 @@ export default function HomePage() {
                             <div style={{ background: 'var(--surface-2)', padding: 16, borderRadius: 16, border: '1px solid var(--border)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                                     <p style={{ fontWeight: 700, fontSize: 13 }}>"Super fast and friendly! Highly recommend."</p>
-                                    <p style={{ fontSize: 12, color: '#F59E0B', fontWeight: 800 }}>⭐ 5.0</p>
+                                    <p style={{ fontSize: 12, color: '#F59E0B', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}><Star size={12} fill="currentColor" /> 5.0</p>
                                 </div>
                                 <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>- Aarav M. • 2 days ago</p>
                             </div>
