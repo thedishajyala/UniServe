@@ -54,11 +54,11 @@ export default function LandingPage() {
             {/* Social Proof Metrics */}
             <section className="fade-in" style={{ padding: '0 24px 60px', display: 'flex', justifyContent: 'center', gap: '40px', flexWrap: 'wrap', textAlign: 'center' }}>
                 <div>
-                    <h3 style={{ fontSize: '32px', color: '#FFFFFF', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>500+</h3>
+                    <h3 style={{ fontSize: '32px', color: '#FFFFFF', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>200+</h3>
                     <p style={{ fontSize: '13px', color: 'var(--lp-text-sec)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Students Served</p>
                 </div>
                 <div>
-                    <h3 style={{ fontSize: '32px', color: '#FFFFFF', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>2000+</h3>
+                    <h3 style={{ fontSize: '32px', color: '#FFFFFF', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>800+</h3>
                     <p style={{ fontSize: '13px', color: 'var(--lp-text-sec)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Deliveries</p>
                 </div>
                 <div>
