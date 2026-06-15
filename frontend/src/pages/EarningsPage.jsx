@@ -383,6 +383,36 @@ export default function EarningsPage() {
           </div>
         </div>
 
+        {/* WEEKLY CHART */}
+        <div className="card fade-in" style={{ padding: 24, marginBottom: 20, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <div>
+                    <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 2 }}>Weekly Overview</h3>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Average ₹240 / day</p>
+                </div>
+                <span style={{ fontSize: 12, color: 'var(--success)', fontWeight: 700, background: 'rgba(16,185,129,0.1)', padding: '4px 10px', borderRadius: 999 }}>+12% vs last week</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: 140, paddingTop: 20, borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+                {[
+                    { day: 'Mon', val: 40 },
+                    { day: 'Tue', val: 70 },
+                    { day: 'Wed', val: 45 },
+                    { day: 'Thu', val: 90 },
+                    { day: 'Fri', val: 120 },
+                    { day: 'Sat', val: 180 },
+                    { day: 'Sun', val: Math.min(200, Math.max(50, today)) }
+                ].map((d, i) => (
+                    <div key={d.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative' }}>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, position: 'absolute', top: -20, opacity: i === 6 ? 1 : 0 }}>₹{d.val}</div>
+                        <div style={{ width: 28, height: 100, background: 'var(--bg)', borderRadius: 8, overflow: 'hidden', position: 'relative' }}>
+                            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${(d.val / 200) * 100}%`, background: i === 6 ? 'linear-gradient(180deg, var(--primary), var(--secondary))' : 'var(--primary-soft)', borderRadius: 8, transition: 'height 1s ease-out' }} />
+                        </div>
+                        <span style={{ fontSize: 11, color: i === 6 ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: i === 6 ? 800 : 600 }}>{d.day}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+
         {/* Stats */}
         <div className="stat-grid" style={{ marginBottom: 16 }}>
           <div className="stat-card">
@@ -422,49 +452,48 @@ export default function EarningsPage() {
           </div>
         </div>
 
-        {/* Peak Hours */}
+        {/* Peak Hours Chart */}
         {demand?.peakHours?.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
-            <p className="section-title" style={{ marginBottom: 12 }}>
-              📊 Peak Hours (Go Online to Earn More!)
+          <div className="card fade-in" style={{ padding: 24, marginBottom: 24, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 24 }}>
+            <p className="section-title" style={{ marginBottom: 4 }}>
+              🔥 Peak Hours Tracker
             </p>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 20 }}>Go online during these hours to earn more!</p>
 
             <div
               style={{
                 display: 'flex',
-                gap: 8,
-                overflowX: 'auto',
-                paddingBottom: 4,
+                alignItems: 'flex-end',
+                justifyContent: 'space-between',
+                height: 120,
+                paddingBottom: 12,
+                borderBottom: '1px solid var(--border)'
               }}
             >
-              {demand.peakHours.map((ph) => (
-                <div
-                  key={ph.hour}
-                  style={{
-                    background: 'white',
-                    borderRadius: 12,
-                    padding: '12px 14px',
-                    textAlign: 'center',
-                    minWidth: 60,
-                    border: '1px solid var(--border)',
-                  }}
-                >
-                  <p
-                    style={{
-                      fontWeight: 800,
-                      fontSize: 16,
-                      color: 'var(--primary)',
-                      margin: 0,
-                    }}
-                  >
-                    {ph.count}
-                  </p>
-
-                  <p style={{ fontSize: 10, marginTop: 2 }}>
-                    {formatTime(ph.hour)}
-                  </p>
-                </div>
-              ))}
+              {demand.peakHours.map((ph, i) => {
+                const maxCount = Math.max(...demand.peakHours.map(p => p.count));
+                const heightPct = Math.max(15, (ph.count / maxCount) * 100);
+                const isPeak = heightPct > 70;
+                
+                return (
+                    <div
+                      key={ph.hour}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 8,
+                        flex: 1
+                      }}
+                    >
+                      <div style={{ fontSize: 10, fontWeight: 700, color: isPeak ? '#F59E0B' : 'var(--text-muted)', marginBottom: -4 }}>{ph.count}</div>
+                      <div style={{ width: 32, height: 80, background: 'var(--bg)', borderRadius: 8, overflow: 'hidden', position: 'relative' }}>
+                          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${heightPct}%`, background: isPeak ? 'linear-gradient(180deg, #F59E0B, #D97706)' : 'var(--primary-soft)', borderRadius: 8, transition: 'height 1s ease-out' }} />
+                      </div>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>{formatTime(ph.hour).replace(' ', '')}</span>
+                    </div>
+                );
+              })}
             </div>
           </div>
         )}
