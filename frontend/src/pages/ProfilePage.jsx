@@ -456,9 +456,13 @@ export default function ProfilePage() {
                     textAlign: 'center',
                     borderBottomLeftRadius: 30,
                     borderBottomRightRadius: 30,
-                    marginBottom: -80
+                    marginBottom: -80,
+                    position: 'relative'
                 }}
             >
+                <div onClick={() => setShowLogoutModal(true)} className="hover-lift" style={{ position: 'absolute', top: 32, right: 24, width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', zIndex: 10 }}>
+                    <span style={{ fontSize: 20 }}>⚙️</span>
+                </div>
                 <h1 style={{ color: 'white', fontSize: 24, fontWeight: 800 }}>My Profile</h1>
             </div>
 
@@ -886,6 +890,21 @@ export default function ProfilePage() {
                     </span>
                 </Link>
             </nav>
+
+            {/* Logout Modal */}
+            {showLogoutModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={() => setShowLogoutModal(false)}>
+                    <div className="card fade-in" style={{ width: '100%', maxWidth: 320, padding: 24, background: 'var(--surface-2)', border: '1px solid var(--border)', textAlign: 'center', borderRadius: 24 }} onClick={e => e.stopPropagation()}>
+                        <div style={{ fontSize: 40, marginBottom: 12 }}>👋</div>
+                        <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)' }}>Logging Out?</h3>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 24 }}>Are you sure you want to logout?</p>
+                        <div style={{ display: 'flex', gap: 12 }}>
+                            <button className="btn hover-lift" style={{ flex: 1, padding: '12px', background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: 12, fontWeight: 700, cursor: 'pointer' }} onClick={() => setShowLogoutModal(false)}>Cancel</button>
+                            <button className="btn hover-lift" style={{ flex: 1, padding: '12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: 12, fontWeight: 700, cursor: 'pointer' }} onClick={() => { logoutUser(); navigate('/login'); }}>Logout</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
