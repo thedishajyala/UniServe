@@ -258,7 +258,7 @@ export default function HomePage() {
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Hero Header */}
-            <div className="gradient-hero" style={{ padding: '24px 24px 40px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 32, borderBottomRightRadius: 32, background: 'var(--bg)' }}>
+            <div className="gradient-hero" style={{ padding: '24px 24px 32px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 32, borderBottomRightRadius: 32, background: 'var(--bg)' }}>
                 {/* Decorative mesh circles */}
                 <div style={{ position: 'absolute', top: -20, right: -40, width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)', filter: 'blur(50px)' }} />
                 <div style={{ position: 'absolute', bottom: -60, left: -20, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)', filter: 'blur(40px)' }} />
@@ -273,122 +273,120 @@ export default function HomePage() {
                                 <button className={`mode-toggle-btn ${mode === 'order' ? 'active' : ''}`} onClick={() => setMode('order')}>Order</button>
                                 <button className={`mode-toggle-btn ${mode === 'deliver' ? 'active' : ''}`} onClick={() => setMode('deliver')}>Deliver</button>
                             </div>
-                            <div className="glass" style={{ padding: '6px 12px', borderRadius: 999, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => navigate('/profile')}>
-                                <Star size={14} color="#FBBF24" fill="#FBBF24" />
-                                <span style={{ color: 'white', fontSize: 13, fontWeight: 700 }}>{Number(user?.rating || 5.0).toFixed(1)}</span>
-                            </div>
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                        <div>
-                            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 4, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                                {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}
-                            </p>
-                            <h1 style={{ color: 'var(--text-primary)', fontSize: 32, marginBottom: 4, letterSpacing: '-1.5px', fontWeight: 900 }}>Hey, {user?.name?.split(' ')[0]}!</h1>
-                            {mode === 'order' && (
-                                <>
-                                    <p style={{ color: 'var(--text-muted)', fontSize: 15, fontWeight: 500 }}>What do you need delivered today?</p>
-                                    <p style={{ color: '#4ade80', fontSize: 12, fontWeight: 700, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#4ade80' }} />
-                                        {onlinePartners.length} delivery partners online near you
-                                    </p>
-                                </>
-                            )}
-                        </div>
+                    <div>
+                        <h1 style={{ color: 'var(--text-primary)', fontSize: 32, marginBottom: 8, letterSpacing: '-1.5px', fontWeight: 900 }}>Hey, {user?.name?.split(' ')[0]}!</h1>
+                        {mode === 'order' && (
+                            <>
+                                <p style={{ color: 'var(--text-muted)', fontSize: 15, fontWeight: 600, marginBottom: 16 }}>{onlinePartners.length} partners online near you</p>
+                                
+                                {/* Compact Stats Strip */}
+                                <div className="hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 4 }}>
+                                    <div className="glass" style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 12, padding: '8px 16px', gap: 12, flexShrink: 0 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Orders</span>
+                                            <span style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 800 }}>12</span>
+                                        </div>
+                                        <div style={{ width: 1, height: 16, background: 'var(--border)' }} />
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Earned</span>
+                                            <span style={{ fontSize: 14, color: '#10B981', fontWeight: 800 }}>₹425</span>
+                                        </div>
+                                        <div style={{ width: 1, height: 16, background: 'var(--border)' }} />
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Online</span>
+                                            <span style={{ fontSize: 14, color: '#4ade80', fontWeight: 800 }}>{onlinePartners.length || 3}</span>
+                                        </div>
+                                        <div style={{ width: 1, height: 16, background: 'var(--border)' }} />
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Rating</span>
+                                            <span style={{ fontSize: 14, color: '#F59E0B', fontWeight: 800 }}>⭐ 98%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
 
-                        {/* Delivery stats capsule — only visible in Deliver mode */}
-                        <div className="hero-stats-slot" style={{ marginBottom: -4 }}>
-                        <div
-                            className={`glass-card home-mode-panel ${mode === 'deliver' ? 'is-visible' : 'is-hidden'}`}
-                            style={{ padding: '12px 20px', borderRadius: 24, display: 'flex', gap: 20 }}
-                        >
-                            <div style={{ textAlign: 'center' }}>
-                                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Deliveries</p>
-                                <p style={{ fontSize: 18, color: 'white', fontWeight: 900 }}>{activeDeliveries.length}</p>
-                            </div>
-                            <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.2)', alignSelf: 'center' }} />
-                            <div style={{ textAlign: 'center' }}>
-                                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Earned Today</p>
-                                <p style={{ fontSize: 18, color: 'white', fontWeight: 900 }}>₹{earnings?.today_earnings || 0}</p>
-                            </div>
-                        </div>
-                        </div>
+                        {mode === 'deliver' && (
+                            <>
+                                <p style={{ color: 'var(--text-muted)', fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Ready to earn? Go online now</p>
+                                {/* Compact Stats Strip */}
+                                <div className="glass" style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 12, padding: '8px 16px', gap: 12 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Deliveries</span>
+                                        <span style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 800 }}>{activeDeliveries.length}</span>
+                                    </div>
+                                    <div style={{ width: 1, height: 16, background: 'var(--border)' }} />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Earned</span>
+                                        <span style={{ fontSize: 14, color: '#10B981', fontWeight: 800 }}>₹{earnings?.today_earnings || 0}</span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
 
-            <div className="page-content" style={{ marginTop: -24, position: 'relative', zIndex: 2 }}>
+            <div className="page-content" style={{ marginTop: 24, position: 'relative', zIndex: 2 }}>
                 <div className="home-mode-stack">
                     <div className={`home-mode-panel ${mode === 'order' ? 'is-visible' : 'is-hidden'}`}>
                         {/* ── ORDER MODE CONTENT ── */}
                         <div style={{ marginTop: 0 }}>
                         
-                        {/* Today's Overview */}
-                        <div className="glass-card fade-in" style={{ padding: '20px', borderRadius: 20, marginBottom: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 12px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                            <div style={{ gridColumn: '1 / -1', borderBottom: '1px solid var(--border)', paddingBottom: 12, marginBottom: -4 }}>
-                                <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Today's Overview</h3>
-                            </div>
-                            <div>
-                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Orders</p>
-                                <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>12</p>
-                            </div>
-                            <div>
-                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Earned</p>
-                                <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--success)' }}>₹425</p>
-                            </div>
-                            <div>
-                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Online</p>
-                                <p style={{ fontSize: 20, fontWeight: 800, color: '#4ade80' }}>{onlinePartners.length || 3}</p>
-                            </div>
-                            <div>
-                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Rating</p>
-                                <p style={{ fontSize: 20, fontWeight: 800, color: '#F59E0B' }}>98%</p>
-                            </div>
-                        </div>
-
                         {/* Live Activity Feed */}
-                        <div className="card fade-in" style={{ padding: 16, borderRadius: 20, marginBottom: 24, background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
-                            <h3 style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Recent Activity</h3>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                    <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(16,185,129,0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✓</div>
-                                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Order #1298 Delivered</p>
+                        <div className="card fade-in" style={{ padding: 12, borderRadius: 16, marginBottom: 24, background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                            <h3 style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Recent Activity</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <div style={{ width: 24, height: 24, borderRadius: 8, background: 'rgba(16,185,129,0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>✓</div>
+                                    <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>Order #1298 Delivered</p>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                    <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(139,92,246,0.1)', color: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✓</div>
-                                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Partner Accepted Request</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <div style={{ width: 24, height: 24, borderRadius: 8, background: 'rgba(16,185,129,0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>✓</div>
+                                    <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>Partner Accepted Request</p>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                    <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(245,158,11,0.1)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✓</div>
-                                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>New Review Received</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <div style={{ width: 24, height: 24, borderRadius: 8, background: 'rgba(16,185,129,0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>✓</div>
+                                    <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>New Review Received</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Quick Action Buttons */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
-                            <button className="card hover-lift glow" onClick={() => navigate('/order/create')} style={{ gridColumn: '1 / -1', padding: '24px 20px', textAlign: 'left', background: 'var(--card)', border: '1px solid rgba(139,92,246,0.3)', backgroundImage: 'linear-gradient(var(--card), var(--card)), linear-gradient(135deg, rgba(139,92,246,0.15), rgba(255,255,255,0.02))', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', borderRadius: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                                    <div style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 8px 20px rgba(139,92,246,0.4)' }}>📦</div>
-                                    <div>
-                                        <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)' }}>Place Order</div>
-                                        <div style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600, marginTop: 4 }}>Get anything delivered on campus</div>
-                                    </div>
+                        {/* FEATURED: Place Order */}
+                        <div style={{ marginBottom: 24 }}>
+                            <button className="card hover-lift glow" onClick={() => navigate('/order/create')} style={{ width: '100%', padding: '32px 24px', textAlign: 'center', background: 'var(--card)', border: '1px solid rgba(139,92,246,0.4)', backgroundImage: 'linear-gradient(var(--card), var(--card)), linear-gradient(135deg, rgba(139,92,246,0.2), rgba(255,255,255,0.02))', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', borderRadius: 24, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, boxShadow: '0 10px 40px rgba(139,92,246,0.15)' }}>
+                                <div style={{ width: 72, height: 72, borderRadius: 20, background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, boxShadow: '0 12px 30px rgba(139,92,246,0.5)' }}>🚀</div>
+                                <div>
+                                    <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>Place Order</div>
+                                    <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600 }}>Get anything delivered across campus</div>
                                 </div>
-                                <ArrowRight color="var(--primary-light)" size={20} />
+                                <div style={{ marginTop: 8, background: 'var(--primary)', color: 'white', padding: '10px 24px', borderRadius: 999, fontWeight: 800, fontSize: 14 }}>Create Order</div>
                             </button>
-                            <button className="card hover-lift" onClick={() => navigate('/orders')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                        </div>
+
+                        {/* Quick Actions Grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 32 }}>
+                            <button className="card hover-lift" onClick={() => navigate('/orders')} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🚚</div>
-                                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)' }}>Track</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Track Order</div>
                             </button>
-                            <button className="card hover-lift" onClick={() => navigate('/earnings')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                            <button className="card hover-lift" onClick={() => {
+                                const el = document.getElementById('partner-hub');
+                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                            }} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🤝</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Partner Hub</div>
+                            </button>
+                            <button className="card hover-lift" onClick={() => navigate('/earnings')} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>💰</div>
-                                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)' }}>Earnings</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Earnings</div>
                             </button>
-                            <button className="card hover-lift" onClick={() => navigate('/orders')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                            <button className="card hover-lift" onClick={() => navigate('/orders')} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📋</div>
-                                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)' }}>History</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>My Orders</div>
                             </button>
                         </div>
 
@@ -426,7 +424,7 @@ export default function HomePage() {
 
                         {/* Available Nearby Snippet */}
                         {onlinePartners.length > 0 && (
-                            <div style={{ marginBottom: 32 }}>
+                            <div id="partner-hub" style={{ marginBottom: 32 }}>
                                 <div className="section-header">
                                     <h3 className="section-title">📍 Available Nearby</h3>
                                 </div>
