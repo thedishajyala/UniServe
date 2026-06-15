@@ -1,0 +1,121 @@
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import './landing.css';
+
+export default function LandingPage() {
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLaunch = () => {
+        if (user) navigate('/app');
+        else navigate('/login');
+    };
+
+    return (
+        <div className="landing-page">
+            {/* Navbar */}
+            <nav className="landing-nav">
+                <div className="nav-brand">UniServe</div>
+                <div className="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#tech">Technology</a>
+                    <a href="https://github.com/thedishajyala/UniServe" target="_blank" rel="noreferrer">GitHub</a>
+                </div>
+                <div className="nav-cta">
+                    <Link to="/login" className="nav-login">Login</Link>
+                    <Link to="/login" className="btn-get-started">Get Started →</Link>
+                </div>
+            </nav>
+
+            {/* Hero Section */}
+            <header className="hero-section">
+                <div className="hero-badge">
+                    <span>⚡ Real-Time Campus Logistics</span>
+                </div>
+                <h1 className="hero-title">The Operating System<br/>for Campus Deliveries.</h1>
+                <p className="hero-subtitle">
+                    Food. Parcels. Documents. Essentials.<br/>
+                    Delivered across campus in real time.
+                </p>
+                <div className="hero-buttons">
+                    <button onClick={handleLaunch} className="btn-launch">Launch App</button>
+                    <a href="https://github.com/thedishajyala/UniServe" target="_blank" rel="noreferrer" className="btn-github">GitHub →</a>
+                </div>
+            </header>
+
+            {/* Massive Screenshot */}
+            <section className="screenshot-section">
+                <div className="screenshot-container">
+                    <img src="/hero-mockup.png" alt="UniServe Dashboard" className="hero-screenshot" />
+                </div>
+            </section>
+
+            {/* Features (4 Cards) */}
+            <section id="features" className="features-section">
+                <div className="features-grid">
+                    <div className="feature-card">
+                        <div className="feature-icon">⚡</div>
+                        <h3>Real-Time</h3>
+                        <p>Live tracking and updates.</p>
+                    </div>
+                    <div className="feature-card">
+                        <div className="feature-icon">🧠</div>
+                        <h3>Smart Matching</h3>
+                        <p>Connect with the best delivery partner.</p>
+                    </div>
+                    <div className="feature-card">
+                        <div className="feature-icon">💬</div>
+                        <h3>Instant Chat</h3>
+                        <p>Coordinate seamlessly.</p>
+                    </div>
+                    <div className="feature-card">
+                        <div className="feature-icon">💳</div>
+                        <h3>Payments</h3>
+                        <p>Secure and frictionless.</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Built For Students */}
+            <section className="built-for-section">
+                <h2>
+                    Built for Students.<br/>
+                    Verified campus users.<br/>
+                    Student-powered deliveries.<br/>
+                    Real-world logistics.
+                </h2>
+            </section>
+
+            {/* Tech Stack */}
+            <section id="tech" className="tech-section">
+                <p className="tech-subtitle">POWERED BY</p>
+                <div className="tech-chips">
+                    <span className="tech-chip react">React</span>
+                    <span className="tech-chip node">Node.js</span>
+                    <span className="tech-chip mongo">MongoDB</span>
+                    <span className="tech-chip socket">Socket.io</span>
+                    <span className="tech-chip razorpay">Razorpay</span>
+                    <span className="tech-chip leaflet">Leaflet</span>
+                </div>
+            </section>
+
+            {/* The Secret Sauce */}
+            <section className="secret-sauce-section">
+                <h2>
+                    Built by a student.<br/>
+                    Designed for thousands.<br/>
+                    Engineered in real time.
+                </h2>
+            </section>
+
+            {/* Footer */}
+            <footer className="landing-footer">
+                <div className="footer-content">
+                    <div className="footer-brand">UniServe</div>
+                    <div className="footer-copyright">© {new Date().getFullYear()} UniServe. All rights reserved.</div>
+                </div>
+            </footer>
+        </div>
+    );
+}

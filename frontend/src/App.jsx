@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import LoginPage from './pages/LoginPage';
 import ProfileSetupPage from './pages/ProfileSetupPage';
 import HomePage from './pages/HomePage';
+import LandingPage from './pages/LandingPage';
 import CreateOrderPage from './pages/CreateOrderPage';
 import PartnersPage from './pages/PartnersPage';
 import ChatPage from './pages/ChatPage';
@@ -43,7 +44,7 @@ function ProtectedRoute({ children }) {
 function AuthRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (user && user.profile_complete) return <Navigate to="/" replace />;
+  if (user && user.profile_complete) return <Navigate to="/app" replace />;
   return children;
 }
 
@@ -92,7 +93,8 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<AuthRoute><LoginPage /></AuthRoute>} />
       <Route path="/setup" element={<ProfileSetupPage />} />
-      <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/app" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/order/create" element={<ProtectedRoute><CreateOrderPage /></ProtectedRoute>} />
       <Route path="/order/:orderId/partners" element={<ProtectedRoute><PartnersPage /></ProtectedRoute>} />

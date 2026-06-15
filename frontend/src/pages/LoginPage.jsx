@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login, signup } from '../services/api';
 import { UNIVERSITY_DOMAIN } from '../config/campus';
 import toast from 'react-hot-toast';
-import { Box } from 'lucide-react';
+import './landing.css'; // Shared premium dark styles
 
 export default function LoginPage() {
     const { loginUser } = useAuth();
@@ -12,13 +12,7 @@ export default function LoginPage() {
     const [mode, setMode] = useState('login'); // 'login' | 'signup'
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
-        name: '',
-        email: '',
-        password: '',
-        enrollment_no: '',
-        phone: '',
-        hostel: '',
-        room_no: '',
+        name: '', email: '', password: '', enrollment_no: '', phone: '', hostel: '', room_no: '',
     });
     const [errors, setErrors] = useState({});
 
@@ -60,7 +54,7 @@ export default function LoginPage() {
             const { token, ...userData } = res.data;
             loginUser(userData, token);
             toast.success(mode === 'login' ? `Welcome back, ${userData.name}! 👋` : `Welcome to UniServe! 🎉`);
-            navigate(userData.profile_complete ? '/' : '/setup');
+            navigate(userData.profile_complete ? '/app' : '/setup');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Something went wrong');
         } finally {
@@ -69,145 +63,122 @@ export default function LoginPage() {
     };
 
     return (
-        <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', fontFamily: 'Plus Jakarta Sans' }}>
-            {/* ── LUXE MESH BACKGROUND ── */}
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45vh', background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)', zIndex: 0 }}>
-                {/* Animated Gradient Orbs */}
-                <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '60%', height: '100%', background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%)', borderRadius: '50%', animation: 'float-bg 20s infinite alternate' }} />
-                <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '50%', height: '80%', background: 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 50%)', borderRadius: '50%', animation: 'float-bg 15s infinite alternate-reverse' }} />
-            </div>
-
-            {/* ── LOGO HUD ── */}
-            <div style={{ position: 'relative', zIndex: 1, padding: '60px 24px 80px', textAlign: 'center' }}>
-                <div style={{ 
-                    width: 72, height: 72, background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)', borderRadius: 24, 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', 
-                    border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
-                }}>
-                    <div style={{ 
-                        width: 36, height: 36, background: '#fff', borderRadius: 10, 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#4F46E5', fontSize: 20
-                    }}>U</div>
+        <div className="login-split-page">
+            {/* Top Navbar specifically for auth page */}
+            <nav className="auth-nav">
+                <Link to="/" className="nav-brand">UniServe</Link>
+                <div className="nav-cta">
+                    <button onClick={() => setMode('login')} className="nav-login">Login</button>
+                    <button onClick={() => setMode('signup')} className="btn-get-started">Get Started →</button>
                 </div>
-                <h1 style={{ color: '#fff', fontSize: 42, fontWeight: 900, letterSpacing: '-2px', marginBottom: 8 }}>UniServe</h1>
-                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, fontWeight: 500, letterSpacing: '0.02em' }}>Your Campus Delivery Partner</p>
-            </div>
+            </nav>
 
-            {/* ── SECURITY CARD ── */}
-            <div style={{ maxWidth: 460, width: '100%', margin: '-40px auto 0', padding: '0 20px 60px', position: 'relative', zIndex: 10 }}>
-                <div style={{ 
-                    background: '#fff', borderRadius: 32, padding: 40, 
-                    boxShadow: '0 40px 100px -20px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1)',
-                    border: '1px solid rgba(255,255,255,0.8)'
-                }}>
-                    {/* MODE TERMINAL */}
-                    <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: 18, padding: 6, marginBottom: 32 }}>
-                        {['login', 'signup'].map((m) => (
-                             <button key={m}
-                                type="button"
-                                style={{
-                                    flex: 1, borderRadius: 14, padding: '12px 0', fontSize: 14, fontWeight: 800,
-                                    background: mode === m ? '#fff' : 'transparent',
-                                    color: mode === m ? '#4F46E5' : '#64748B',
-                                    boxShadow: mode === m ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                                    border: 'none', cursor: 'pointer', transition: 'all 0.3s ease'
-                                }}
-                                onClick={() => { setMode(m); setErrors({}); }}
-                            >
-                                {m === 'login' ? 'Sign In' : 'Sign Up'}
-                            </button>
-                        ))}
+            <div className="split-container">
+                {/* Left Side: Branding / Marketing */}
+                <div className="split-left">
+                    <div className="left-content">
+                        <h1 className="hero-title" style={{ textAlign: 'left', fontSize: '3rem', marginBottom: '2rem' }}>
+                            The Operating System<br/>for Campus Deliveries.
+                        </h1>
+                        <div className="auth-features">
+                            <div className="auth-feature-item">
+                                <span className="feature-icon">⚡</span>
+                                <div>
+                                    <h3>Real-Time Tracking</h3>
+                                    <p>Live updates on your delivery status.</p>
+                                </div>
+                            </div>
+                            <div className="auth-feature-item">
+                                <span className="feature-icon">🧠</span>
+                                <div>
+                                    <h3>Smart Matching</h3>
+                                    <p>Connect with the best delivery partner.</p>
+                                </div>
+                            </div>
+                            <div className="auth-feature-item">
+                                <span className="feature-icon">💬</span>
+                                <div>
+                                    <h3>Instant Communication</h3>
+                                    <p>Coordinate seamlessly in real-time.</p>
+                                </div>
+                            </div>
+                            <div className="auth-feature-item">
+                                <span className="feature-icon">💳</span>
+                                <div>
+                                    <h3>Secure Payments</h3>
+                                    <p>Safe and frictionless transactions.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
 
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                        {mode === 'signup' && (
-                            <div>
-                                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>FULL NAME</label>
+                {/* Right Side: Auth Form */}
+                <div className="split-right">
+                    <div className="auth-card">
+                        <div className="auth-header">
+                            <h2>{mode === 'login' ? 'Sign in to UniServe' : 'Create an account'}</h2>
+                            <p>{mode === 'login' ? 'Welcome back. Let\'s get started.' : 'Join the campus delivery network.'}</p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="auth-form">
+                            {mode === 'signup' && (
+                                <div className="form-group">
+                                    <label>FULL NAME</label>
+                                    <input 
+                                        type="text" name="name" placeholder="E.g. Disha Jyala" 
+                                        value={form.name} onChange={handleChange} 
+                                        className={errors.name ? 'error-input' : ''}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="form-group">
+                                <label>UNIVERSITY EMAIL</label>
                                 <input 
-                                    style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.name ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
-                                    name="name" placeholder="E.g. Disha Jyala" value={form.name} onChange={handleChange} 
+                                    type="email" name="email" placeholder={`id@${UNIVERSITY_DOMAIN}`} 
+                                    value={form.email} onChange={handleChange} 
+                                    className={errors.email ? 'error-input' : ''}
                                 />
                             </div>
-                        )}
 
-                        <div>
-                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>UNIVERSITY EMAIL</label>
-                            <input 
-                                style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.email ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
-                                type="email" name="email" placeholder={`id@${UNIVERSITY_DOMAIN}`} value={form.email} onChange={handleChange} 
-                            />
-                        </div>
+                            <div className="form-group">
+                                <label>PASSWORD</label>
+                                <input 
+                                    type="password" name="password" placeholder="••••••••" 
+                                    value={form.password} onChange={handleChange} 
+                                    className={errors.password ? 'error-input' : ''}
+                                />
+                            </div>
 
-                        <div style={{ position: 'relative' }}>
-                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>PASSWORD</label>
-                            <input 
-                                style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.password ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
-                                type="password" name="password" placeholder="••••••••" value={form.password} onChange={handleChange} 
-                            />
-                        </div>
-
-                        {mode === 'signup' && (
-                            <>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>PHONE NUMBER</label>
+                            {mode === 'signup' && (
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>PHONE NUMBER</label>
                                         <input 
-                                            style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.phone ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
-                                            type="tel" name="phone" placeholder="98XXXXXXXX" value={form.phone} onChange={handleChange} maxLength={10} 
+                                            type="tel" name="phone" placeholder="98XXXXXXXX" 
+                                            value={form.phone} onChange={handleChange} maxLength={10} 
+                                            className={errors.phone ? 'error-input' : ''}
                                         />
                                     </div>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748B', marginBottom: 8, letterSpacing: '0.05em' }}>ENROLLMENT NO</label>
+                                    <div className="form-group">
+                                        <label>ENROLLMENT NO</label>
                                         <input 
-                                            style={{ width: '100%', background: '#F8FAFC', border: `1px solid ${errors.enrollment_no ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '14px 16px', fontSize: 14, fontWeight: 600, outline: 'none' }} 
-                                            name="enrollment_no" placeholder="E23CSEU..." value={form.enrollment_no} onChange={handleChange} 
+                                            type="text" name="enrollment_no" placeholder="E23CSEU..." 
+                                            value={form.enrollment_no} onChange={handleChange} 
+                                            className={errors.enrollment_no ? 'error-input' : ''}
                                         />
                                     </div>
                                 </div>
-                                <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)', borderRadius: 12, padding: '10px 14px' }}>
-                                    <p style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, lineHeight: 1.4 }}>
-                                        ⚠️ WARNING: Registered Email and Phone Number <strong>cannot be changed</strong> later for security reasons.
-                                    </p>
-                                </div>
-                            </>
-                        )}
+                            )}
 
-                        <button 
-                            type="submit" 
-                            style={{ 
-                                marginTop: 8, height: 56, background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 16, 
-                                fontSize: 16, fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.4)', transition: 'all 0.2s ease'
-                            }} 
-                            className="btn-luxe"
-                            disabled={loading}
-                        >
-                            {loading ? 'Initializing...' : (mode === 'login' ? 'Sign In' : 'Sign Up')}
-                        </button>
-                    </form>
-
-                    <div style={{ textAlign: 'center', marginTop: 32 }}>
-                        <p style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600, lineHeight: 1.6 }}>
-                            BENNETT UNIVERSITY STUDENTS ONLY<br />
-                            <span style={{ color: '#4F46E5', fontWeight: 800 }}>SECURE STUDENT LOGIN</span>
-                        </p>
+                            <button type="submit" className="btn-submit" disabled={loading}>
+                                {loading ? 'Processing...' : (mode === 'login' ? 'Sign In' : 'Get Started')}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
-
-            <style>{`
-                @keyframes float-bg {
-                    from { transform: translate(0, 0) scale(1); }
-                    to { transform: translate(10%, 10%) scale(1.1); }
-                }
-                .btn-luxe:hover {
-                    filter: brightness(1.1);
-                    transform: translateY(-2px);
-                    box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
-                }
-                .btn-luxe:active {
-                    transform: translateY(0);
-                }
-            `}</style>
         </div>
     );
 }
