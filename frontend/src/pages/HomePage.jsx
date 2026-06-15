@@ -256,7 +256,7 @@ export default function HomePage() {
     return (
         <div className="page" style={{ paddingBottom: 80 }}>
             {/* Hero Header */}
-            <div className="gradient-hero" style={{ padding: '40px 24px 80px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 40, borderBottomRightRadius: 40, background: 'var(--surface-2)' }}>
+            <div className="gradient-hero" style={{ padding: '40px 24px 60px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 40, borderBottomRightRadius: 40, background: 'var(--surface-2)' }}>
                 {/* Decorative mesh circles */}
                 <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)', filter: 'blur(40px)' }} />
                 <div style={{ position: 'absolute', bottom: -60, left: -20, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)', filter: 'blur(30px)' }} />
@@ -285,7 +285,13 @@ export default function HomePage() {
                             </p>
                             <h1 style={{ color: 'var(--text-primary)', fontSize: 32, marginBottom: 4, letterSpacing: '-1.5px', fontWeight: 900 }}>Hey, {user?.name?.split(' ')[0]}!</h1>
                             {mode === 'order' && (
-                                <p style={{ color: 'var(--text-muted)', fontSize: 15, fontWeight: 500 }}>What do you need delivered today?</p>
+                                <>
+                                    <p style={{ color: 'var(--text-muted)', fontSize: 15, fontWeight: 500 }}>What do you need delivered today?</p>
+                                    <p style={{ color: '#4ade80', fontSize: 12, fontWeight: 700, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                        <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#4ade80' }} />
+                                        {onlinePartners.length} delivery partners online near you
+                                    </p>
+                                </>
                             )}
                         </div>
 
@@ -317,35 +323,24 @@ export default function HomePage() {
                         <div style={{ marginTop: -36 }}>
                         
                         {/* Quick Action Buttons */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
-                            <button className="card" onClick={() => navigate('/order/create')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer' }}>
-                                <div style={{ fontSize: 24, marginBottom: 8 }}>🍔</div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Food</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 32 }}>
+                            <button className="card" onClick={() => navigate('/order/create')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                                <div style={{ fontSize: 28 }}>📦</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Place Order</div>
                             </button>
-                            <button className="card" onClick={() => navigate('/order/create')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer' }}>
-                                <div style={{ fontSize: 24, marginBottom: 8 }}>📦</div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Parcel</div>
+                            <button className="card" onClick={() => navigate('/orders')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                                <div style={{ fontSize: 28 }}>🚚</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Track Order</div>
                             </button>
-                            <button className="card" onClick={() => navigate('/order/create')} style={{ padding: '16px 8px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer' }}>
-                                <div style={{ fontSize: 24, marginBottom: 8 }}>📄</div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Docs</div>
+                            <button className="card" onClick={() => navigate('/earnings')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                                <div style={{ fontSize: 28 }}>💰</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Earnings</div>
+                            </button>
+                            <button className="card" onClick={() => navigate('/orders')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                                <div style={{ fontSize: 28 }}>📋</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>My Orders</div>
                             </button>
                         </div>
-
-                        {/* Main Call to Action */}
-                        <button className="card action-card premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '32px 24px', background: 'linear-gradient(145deg, var(--primary), var(--primary-dark))', color: 'white', border: 'none', position: 'relative', overflow: 'hidden', boxShadow: 'var(--shadow-lg)', width: '100%', marginBottom: 32 }}
-                            onClick={() => navigate('/order/create')}>
-                            <div style={{ position: 'absolute', right: -20, bottom: -20, opacity: 0.1, transform: 'rotate(-15deg)' }}>
-                                <Package size={140} />
-                            </div>
-                            <div style={{ background: 'rgba(255,255,255,0.2)', padding: 14, borderRadius: 20, marginBottom: 16, backdropFilter: 'blur(10px)' }}>
-                                <Package size={32} color="white" />
-                            </div>
-                            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 24, marginBottom: 8 }}>Place Order</div>
-                            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
-                                Get it delivered directly to your room <ArrowRight size={16} />
-                            </div>
-                        </button>
 
                         {topRestaurants.length > 0 && (
                             <div style={{ marginBottom: 20 }}>
@@ -379,64 +374,30 @@ export default function HomePage() {
                             </div>
                         )}
 
-                        {reorderCandidates.length > 0 && (
-                            <div style={{ marginBottom: 24 }}>
-                                <div className="section-header">
-                                    <h3 className="section-title">↩️ Order again</h3>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                    {reorderCandidates.map((order) => (
-                                        <div
-                                            key={order._id}
-                                            className="card"
-                                            style={{
-                                                padding: '14px 16px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 12,
-                                                border: '1px solid var(--border)',
-                                            }}
-                                        >
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <p style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>{order.pickup_location}</p>
-                                                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.35 }}>
-                                                    {order.item_details?.slice(0, 72)}
-                                                    {(order.item_details?.length || 0) > 72 ? '…' : ''}
-                                                </p>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                className="btn btn-primary btn-sm"
-                                                style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12 }}
-                                                onClick={() => goReorderFromOrder(order)}
-                                            >
-                                                <RotateCcw size={14} />
-                                                Reorder
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
                         {/* Available Nearby Snippet */}
                         {onlinePartners.length > 0 && (
-                            <div style={{ marginBottom: 24 }}>
+                            <div style={{ marginBottom: 32 }}>
                                 <div className="section-header">
-                                    <h3 className="section-title">👥 Available Nearby</h3>
+                                    <h3 className="section-title">📍 Available Nearby</h3>
                                 </div>
-                                <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px' }}>
-                                    {onlinePartners.map((p) => (
-                                        <div key={p._id} className="card partner-pill" style={{ minWidth: 160, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 12 }}>
-                                                {p.name.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <div style={{ fontSize: 13, fontWeight: 700 }}>{p.name.split(' ')[0]}</div>
-                                                <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                    {renderRating(p.rating, p.total_reviews, p.total_deliveries)} · {p.hostel}
+                                <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px', WebkitOverflowScrolling: 'touch' }}>
+                                    {onlinePartners.map((partner) => (
+                                        <div key={partner._id} className="card" style={{ flexShrink: 0, width: 220, padding: 16, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                                                <div>
+                                                    <h4 style={{ fontSize: 15, fontWeight: 800 }}>{partner.name}</h4>
+                                                    <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{partner.hostel}</p>
                                                 </div>
+                                                <span style={{ fontSize: 10, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '2px 6px', borderRadius: 8 }}>🟢 Online</span>
                                             </div>
+                                            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                                                <span style={{ fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, color: '#F59E0B' }}>⭐ {Number(partner.rating || 5.0).toFixed(1)}</span>
+                                                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
+                                                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>🎯 98% Accept</span>
+                                            </div>
+                                            <button className="btn" style={{ width: '100%', padding: '8px', fontSize: 13, background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }} onClick={() => navigate('/order/create')}>
+                                                Choose Partner
+                                            </button>
                                         </div>
                                     ))}
                                 </div>
@@ -445,19 +406,19 @@ export default function HomePage() {
 
                         {/* Recent Orders */}
                         <div>
-                            {/* <div className="section-header">
+                            <div className="section-header">
                                 <h3 className="section-title">📋 Recent Orders</h3>
-                                <Link to="/order/create" style={{ color: 'var(--primary)', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>+ New</Link>
+                                <Link to="/orders" style={{ color: 'var(--primary)', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>See All</Link>
                             </div>
                             {recentOrdersList.length === 0 ? (
-                                <div className="empty-state">
+                                <div className="empty-state" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
                                     <div className="empty-state-icon">🛍️</div>
-                                    <p className="empty-state-title">No orders yet</p>
-                                    <p className="empty-state-sub">Create your first delivery request!</p>
+                                    <p className="empty-state-title" style={{ color: 'var(--text-primary)' }}>No recent orders yet.</p>
+                                    <p className="empty-state-sub" style={{ color: 'var(--text-muted)' }}>Place your first order and we'll remember it here.</p>
                                 </div>
                             ) : (
                                 recentOrdersList.map((order) => (
-                                    <div key={order._id} className="order-card recent-order-card" style={{ cursor: 'pointer', padding: 16 }}
+                                    <div key={order._id} className="card recent-order-card" style={{ cursor: 'pointer', padding: 16, background: 'var(--card)', border: '1px solid var(--border)', marginBottom: 10 }}
                                         onClick={() => {
                                             setUnreadOrders(prev => ({ ...prev, [order._id]: false }));
                                             navigate(
@@ -468,7 +429,7 @@ export default function HomePage() {
                                         }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                                             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                                                <div style={{ background: 'var(--bg)', padding: 8, borderRadius: 10, position: 'relative' }}>
+                                                <div style={{ background: 'var(--surface-2)', padding: 8, borderRadius: 10, position: 'relative' }}>
                                                     {order.pickup_location.includes('Gate') ? <Package size={18} color="var(--primary)" /> : <span style={{ fontSize: 18 }}>🍔</span>}
                                                     {unreadOrders[order._id] && <div style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: '50%', background: '#EF4444', border: '2px solid white' }} />}
                                                 </div>
@@ -481,11 +442,11 @@ export default function HomePage() {
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 10 }}>
                                             <p style={{ fontSize: 12, color: 'var(--text-muted)', flex: 1 }}>{order.item_details.slice(0, 35)}{order.item_details.length > 35 ? '...' : ''}</p>
-                                            <span style={{ fontFamily: 'Outfit', fontWeight: 800, color: 'var(--primary-dark)', fontSize: 16 }}>₹{order.price}</span>
+                                            <span style={{ fontFamily: 'Outfit', fontWeight: 800, color: 'var(--primary-light)', fontSize: 16 }}>₹{order.price}</span>
                                         </div>
                                     </div>
                                 ))
-                            )} */}
+                            )}
                         </div>
                         </div>
                     </div>
