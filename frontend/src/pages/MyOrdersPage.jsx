@@ -69,7 +69,7 @@ export default function MyOrdersPage() {
                         style={{ flex: 1, padding: '10px 0', borderRadius: 8, background: activeTab === 'past' ? 'white' : 'transparent', color: activeTab === 'past' ? 'var(--bg)' : 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', transition: 'all 0.2s' }}
                         onClick={() => setActiveTab('past')}
                     >
-                        Past ({pastOrders.length})
+                        Completed ({pastOrders.length})
                     </button>
                 </div>
             </div>
@@ -80,11 +80,11 @@ export default function MyOrdersPage() {
                         <div className="spinner"></div>
                     </div>
                 ) : displayedOrders.length === 0 ? (
-                    <div className="empty-state fade-in" style={{ background: 'var(--surface-2)', borderRadius: 24, padding: '60px 24px', border: '1px solid var(--border)', textAlign: 'center' }}>
-                        <div className="empty-state-icon" style={{ fontSize: '4rem', marginBottom: 20 }}>📦</div>
-                        <h3 className="empty-state-title" style={{ fontSize: 20, marginBottom: 8 }}>No {activeTab} orders</h3>
-                        <p className="empty-state-sub" style={{ color: 'var(--text-muted)' }}>
-                            {activeTab === 'active' ? 'You don\'t have any ongoing deliveries right now.' : 'You haven\'t made any past orders yet.'}
+                    <div className="empty-state fade-in" style={{ background: 'var(--surface-2)', borderRadius: 24, padding: '60px 24px', border: '1px solid var(--border)', textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+                        <div className="empty-state-icon" style={{ fontSize: '5rem', marginBottom: 24, filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.4))' }}>{activeTab === 'active' ? '🛵' : '📭'}</div>
+                        <h3 className="empty-state-title" style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)' }}>No {activeTab === 'active' ? 'active' : 'completed'} orders</h3>
+                        <p className="empty-state-sub" style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.5, maxWidth: 260, margin: '0 auto' }}>
+                            {activeTab === 'active' ? 'You don\'t have any ongoing deliveries right now. Time to place one!' : 'You haven\'t completed any orders yet.'}
                         </p>
                     </div>
                 ) : (
