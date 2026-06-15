@@ -90,6 +90,8 @@ export default function HomePage() {
 
     const [onlinePartners, setOnlinePartners] = useState([]);
     const [unreadOrders, setUnreadOrders] = useState({}); // { orderId: true }
+    const [showMenuModal, setShowMenuModal] = useState(false);
+    const [selectedPartner, setSelectedPartner] = useState(null);
 
     const topRestaurants = useMemo(() => getTopRestaurantsFromOrders(orders, 6), [orders]);
     const recentOrdersList = useMemo(() => orders.slice(0, 5), [orders]);
@@ -263,7 +265,7 @@ export default function HomePage() {
                 
                 <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
-                        <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
+                        <div onClick={() => setShowMenuModal(true)} className="hover-lift" style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer' }}>
                             <span style={{ fontSize: 20 }}>🚀</span>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
@@ -322,23 +324,46 @@ export default function HomePage() {
                         {/* ── ORDER MODE CONTENT — shifted up from Place Order through list below ── */}
                         <div style={{ marginTop: -36 }}>
                         
+                        {/* Today's Overview */}
+                        <div className="glass-card fade-in" style={{ padding: '20px', borderRadius: 20, marginBottom: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div style={{ gridColumn: '1 / -1', borderBottom: '1px solid var(--border)', paddingBottom: 12, marginBottom: -4 }}>
+                                <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Today's Overview</h3>
+                            </div>
+                            <div>
+                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Orders</p>
+                                <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>12</p>
+                            </div>
+                            <div>
+                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Earned</p>
+                                <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--success)' }}>₹425</p>
+                            </div>
+                            <div>
+                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Online</p>
+                                <p style={{ fontSize: 20, fontWeight: 800, color: '#4ade80' }}>{onlinePartners.length || 3}</p>
+                            </div>
+                            <div>
+                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Rating</p>
+                                <p style={{ fontSize: 20, fontWeight: 800, color: '#F59E0B' }}>98%</p>
+                            </div>
+                        </div>
+
                         {/* Quick Action Buttons */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 32 }}>
-                            <button className="card" onClick={() => navigate('/order/create')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                                <div style={{ fontSize: 28 }}>📦</div>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Place Order</div>
+                            <button className="card hover-lift glow" onClick={() => navigate('/order/create')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid transparent', backgroundImage: 'linear-gradient(var(--card), var(--card)), linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02))', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, boxShadow: '0 8px 16px rgba(139,92,246,0.3)' }}>📦</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Place Order</div>
                             </button>
-                            <button className="card" onClick={() => navigate('/orders')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                                <div style={{ fontSize: 28 }}>🚚</div>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Track Order</div>
+                            <button className="card hover-lift glow" onClick={() => navigate('/orders')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid transparent', backgroundImage: 'linear-gradient(var(--card), var(--card)), linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02))', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🚚</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Track Order</div>
                             </button>
-                            <button className="card" onClick={() => navigate('/earnings')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                                <div style={{ fontSize: 28 }}>💰</div>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Earnings</div>
+                            <button className="card hover-lift glow" onClick={() => navigate('/earnings')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid transparent', backgroundImage: 'linear-gradient(var(--card), var(--card)), linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02))', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>💰</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Earnings</div>
                             </button>
-                            <button className="card" onClick={() => navigate('/orders')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                                <div style={{ fontSize: 28 }}>📋</div>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>My Orders</div>
+                            <button className="card hover-lift glow" onClick={() => navigate('/orders')} style={{ padding: '20px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid transparent', backgroundImage: 'linear-gradient(var(--card), var(--card)), linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02))', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', borderRadius: 16, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>📋</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>My Orders</div>
                             </button>
                         </div>
 
@@ -382,20 +407,38 @@ export default function HomePage() {
                                 </div>
                                 <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px', WebkitOverflowScrolling: 'touch' }}>
                                     {onlinePartners.map((partner) => (
-                                        <div key={partner._id} className="card" style={{ flexShrink: 0, width: 220, padding: 16, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16 }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                                                <div>
-                                                    <h4 style={{ fontSize: 15, fontWeight: 800 }}>{partner.name}</h4>
-                                                    <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{partner.hostel}</p>
+                                        <div key={partner._id} className="card hover-lift" style={{ flexShrink: 0, width: 280, padding: 20, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20 }}>
+                                            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
+                                                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 16, flexShrink: 0 }}>
+                                                    {partner.name.charAt(0)}
                                                 </div>
-                                                <span style={{ fontSize: 10, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '2px 6px', borderRadius: 8 }}>🟢 Online</span>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                        <h4 style={{ fontSize: 16, fontWeight: 800 }}>{partner.name}</h4>
+                                                        <span style={{ fontSize: 10, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '2px 8px', borderRadius: 8, fontWeight: 700 }}>🟢 Online</span>
+                                                    </div>
+                                                    <p style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{partner.hostel} • Room {partner.room_no || 'TBA'}</p>
+                                                </div>
                                             </div>
-                                            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-                                                <span style={{ fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, color: '#F59E0B' }}>⭐ {Number(partner.rating || 5.0).toFixed(1)}</span>
-                                                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
-                                                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>🎯 98% Accept</span>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20, background: 'var(--surface-2)', padding: 12, borderRadius: 12 }}>
+                                                <div>
+                                                    <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Rating</p>
+                                                    <p style={{ fontSize: 14, fontWeight: 800, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 4 }}>⭐ {Number(partner.rating || 5.0).toFixed(1)}</p>
+                                                </div>
+                                                <div>
+                                                    <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Accept Rate</p>
+                                                    <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>98%</p>
+                                                </div>
+                                                <div>
+                                                    <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Deliveries</p>
+                                                    <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{partner.total_deliveries || 142}</p>
+                                                </div>
+                                                <div>
+                                                    <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Response</p>
+                                                    <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{'< 2 mins'}</p>
+                                                </div>
                                             </div>
-                                            <button className="btn" style={{ width: '100%', padding: '8px', fontSize: 13, background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }} onClick={() => navigate('/order/create')}>
+                                            <button className="btn hover-lift" style={{ width: '100%', padding: '12px', fontSize: 14, background: 'var(--primary)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 800 }} onClick={() => setSelectedPartner(partner)}>
                                                 Choose Partner
                                             </button>
                                         </div>
@@ -641,6 +684,72 @@ export default function HomePage() {
             </div>
 
             <BottomNav />
+
+            {/* Menu Modal */}
+            {showMenuModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, backdropFilter: 'blur(4px)' }} onClick={() => setShowMenuModal(false)}>
+                    <div className="card fade-in" style={{ width: '100%', maxWidth: 320, padding: 24, background: 'var(--surface-2)', border: '1px solid var(--border)', textAlign: 'center', borderRadius: 24 }} onClick={e => e.stopPropagation()}>
+                        <div style={{ fontSize: 40, marginBottom: 12 }}>🚀</div>
+                        <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 24, color: 'var(--text-primary)' }}>UniServe</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            <button onClick={() => navigate('/')} style={{ padding: '14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 700, cursor: 'pointer' }}>View Website</button>
+                            <a href="https://github.com/thedishajyala/UniServe" target="_blank" rel="noreferrer" style={{ padding: '14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 700, display: 'block' }}>About / GitHub</a>
+                            <button onClick={() => { logoutUser(); navigate('/login'); }} style={{ padding: '14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 12, color: '#ef4444', fontWeight: 700, cursor: 'pointer' }}>Logout</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Public Partner Profile Modal */}
+            {selectedPartner && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={() => setSelectedPartner(null)}>
+                    <div className="card fade-in" style={{ width: '100%', maxWidth: 480, background: 'var(--bg)', borderTopLeftRadius: 32, borderTopRightRadius: 32, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, padding: '32px 24px 48px', position: 'relative' }} onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setSelectedPartner(null)} style={{ position: 'absolute', top: 20, right: 20, background: 'var(--surface-2)', border: 'none', borderRadius: '50%', width: 36, height: 36, color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+                        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 32, margin: '0 auto 16px', boxShadow: '0 10px 25px rgba(139,92,246,0.4)' }}>
+                                {selectedPartner.name.charAt(0)}
+                            </div>
+                            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{selectedPartner.name}</h2>
+                            <p style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: 14 }}>{selectedPartner.hostel} • Room {selectedPartner.room_no || 'TBA'}</p>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '4px 12px', borderRadius: 999, fontWeight: 700, fontSize: 12, marginTop: 12 }}>
+                                🟢 Online & Ready
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 32 }}>
+                            <div style={{ background: 'var(--surface-2)', padding: 16, borderRadius: 16, textAlign: 'center' }}>
+                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Rating</p>
+                                <p style={{ fontSize: 20, fontWeight: 800, color: '#F59E0B' }}>⭐ {Number(selectedPartner.rating || 5.0).toFixed(1)}</p>
+                            </div>
+                            <div style={{ background: 'var(--surface-2)', padding: 16, borderRadius: 16, textAlign: 'center' }}>
+                                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Deliveries</p>
+                                <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>{selectedPartner.total_deliveries || 142}</p>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'rgba(139,92,246,0.1)', borderRadius: 16 }}>
+                                <div style={{ fontSize: 24 }}>🏅</div>
+                                <div>
+                                    <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Top Rated Partner</h4>
+                                    <p style={{ fontSize: 12, color: 'var(--primary)' }}>Consistently delivers 5-star service</p>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'rgba(16,185,129,0.1)', borderRadius: 16 }}>
+                                <div style={{ fontSize: 24 }}>⚡</div>
+                                <div>
+                                    <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Fast Responder</h4>
+                                    <p style={{ fontSize: 12, color: 'var(--success)' }}>Usually accepts within 2 minutes</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button className="btn btn-primary hover-lift glow" style={{ width: '100%', marginTop: 32, height: 56, fontSize: 16, borderRadius: 16 }} onClick={() => { setSelectedPartner(null); navigate('/order/create'); }}>
+                            Request Delivery
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
         </div>
     );
