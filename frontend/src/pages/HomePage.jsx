@@ -259,8 +259,9 @@ export default function HomePage() {
 
     return (
         <div className="page" style={{ paddingBottom: 120 }}>
+            <div className="page-content" style={{ padding: '24px', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
             {/* Hero Header */}
-            <div className="gradient-hero" style={{ padding: '24px 24px 32px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 32, borderBottomRightRadius: 32, background: 'var(--bg)' }}>
+            <div className="gradient-hero" style={{ padding: '24px 24px 32px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderRadius: 32, background: 'var(--bg)' }}>
                 {/* Decorative mesh circles */}
                 <div style={{ position: 'absolute', top: -20, right: -40, width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)', filter: 'blur(50px)' }} />
                 <div style={{ position: 'absolute', bottom: -60, left: -20, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)', filter: 'blur(40px)' }} />
@@ -334,7 +335,7 @@ export default function HomePage() {
                 </div>
             </div>
 
-            <div className="page-content" style={{ marginTop: 24, position: 'relative', zIndex: 2 }}>
+            <div style={{ marginTop: 24, position: 'relative', zIndex: 2 }}>
                 <div className="home-mode-stack">
                     <div className={`home-mode-panel ${mode === 'order' ? 'is-visible' : 'is-hidden'}`}>
                         {/* ── ORDER MODE CONTENT ── */}
@@ -725,7 +726,8 @@ export default function HomePage() {
                             </div>
                         )}
                     </div>
-                </div>
+            </div>
+            </div>
             </div>
 
             <BottomNav />
