@@ -258,7 +258,7 @@ export default function HomePage() {
     };
 
     return (
-        <div className="page" style={{ paddingBottom: 80 }}>
+        <div className="page" style={{ paddingBottom: 120 }}>
             {/* Hero Header */}
             <div className="gradient-hero" style={{ padding: '24px 24px 32px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderBottomLeftRadius: 32, borderBottomRightRadius: 32, background: 'var(--bg)' }}>
                 {/* Decorative mesh circles */}
