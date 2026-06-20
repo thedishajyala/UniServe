@@ -258,8 +258,8 @@ export default function HomePage() {
     };
 
     return (
-        <div className="page" style={{ paddingBottom: 120 }}>
-            <div className="page-content" style={{ padding: '24px', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+        <div className="page">
+            <div className="page-content">
             {/* Hero Header */}
             <div className="gradient-hero" style={{ padding: '24px 24px 32px', textAlign: 'left', position: 'relative', overflow: 'hidden', borderRadius: 32, background: 'var(--bg)' }}>
                 {/* Decorative mesh circles */}
@@ -339,7 +339,7 @@ export default function HomePage() {
                 <div className="home-mode-stack">
                     <div className={`home-mode-panel ${mode === 'order' ? 'is-visible' : 'is-hidden'}`}>
                         {/* ── ORDER MODE CONTENT ── */}
-                        <div style={{ marginTop: 0 }}>
+                        <div style={{ marginTop: 0, marginBottom: 260 }}>
                         
                         {/* Live Activity Feed */}
                         <div className="card fade-in" style={{ padding: 12, borderRadius: 16, marginBottom: 24, background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
@@ -375,7 +375,7 @@ export default function HomePage() {
                         </div>
 
                         {/* Quick Actions Grid */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 32 }}>
+                        <div className="quick-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 32, marginTop: 36 }}>
                             <button className="card hover-lift" onClick={() => navigate('/orders')} style={{ padding: '16px 12px', textAlign: 'center', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Truck size={20} color="var(--primary)" />
@@ -538,7 +538,7 @@ export default function HomePage() {
                         </div>
                     </div>
                     <div className={`home-mode-panel ${mode === 'deliver' ? 'is-visible' : 'is-hidden'}`}>
-                    <div style={{ marginTop: -36 }}>
+                    <div style={{ marginBottom: 260 }}>
 
                         {/* ── DELIVER MODE CONTENT ── */}
                         
